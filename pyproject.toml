@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "house-hunt"
+version = "0.1.0"
+description = ""
+authors = ["Thang Phan <phancaothng@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Scrapy = "^2.11.2"
+scrapy-playwright = "^0.0.40"
+playwright = "^1.45.0"
+
+[tool.poetry.group.dev.dependencies]
+Scrapy = "^2.11.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
