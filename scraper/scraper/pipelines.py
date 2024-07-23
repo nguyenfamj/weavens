@@ -5,6 +5,41 @@
 import boto3
 from itemadapter import ItemAdapter
 
+from .utils import TextUtils
+
+
+class ExtractPricePipeline:
+    def process_item(self, item, spider):
+        adapter = ItemAdapter(item)
+        fields = ["price_no_tax", "sales_price", "condominium_payment"]
+        for field in fields:
+            if adapter.get(field):
+                adapter[field] = TextUtils.extract_price(adapter[field])
+
+        return item
+
+
+class ExtractAreaPipeline:
+    def process_item(self, item, spider):
+        adapter = ItemAdapter(item)
+        fields = ["life_sq"]
+        for field in fields:
+            if adapter.get(field):
+                adapter[field] = TextUtils.extract_area(adapter[field])
+
+        return item
+
+
+class ExtractCastToIntPipeline:
+    def process_item(self, item, spider):
+        adapter = ItemAdapter(item)
+        fields = ["oikotie_id", "build_year"]
+        for field in fields:
+            if adapter.get(field):
+                adapter[field] = TextUtils.cast_to_int(adapter[field])
+
+        return item
+
 
 class DynamoDBPipeline:
     def __init__(self, table_name, endpoint_url):
