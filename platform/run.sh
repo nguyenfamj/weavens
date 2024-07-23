@@ -5,6 +5,7 @@ cmd=$2      # Command as the second argument
 
 # Service names
 ALL="all"
+DYNAMODB="dynamodb"
 REDIS="redis"
 RESTART_SLEEP_SEC=2
 
@@ -13,6 +14,7 @@ usage() {
     echo "  run.sh <service> <command> [options]"
     echo "Available services:"
     echo "  $ALL"
+    echo "  $DYNAMODB"
     echo "  $REDIS"
     echo "Available commands:"
     echo "  up           run container"
@@ -47,6 +49,26 @@ down() {
     docker compose -f "$docker_compose_file" down "$@"
 }
 
+# ALL
+up_all() {
+    up_dynamodb "$@"
+    up_redis "$@"
+}
+
+down_all() {
+    down_dynamodb "$@"
+    down_redis "$@"
+}
+
+# DYNAMODB
+up_dynamodb() {
+    up "$DYNAMODB" "$@"
+}
+
+down_dynamodb() {
+    down "$DYNAMODB" "$@"
+}
+
 #REDIS
 up_redis() {
     up "$REDIS" "$@"
@@ -79,6 +101,9 @@ case $cmd in
             "$ALL")
                 up_all "$@"
                 ;;
+            "$DYNAMODB")
+                up_dynamodb "$@"
+                ;;
             "$REDIS")
                 up_redis "$@"
                 ;;
@@ -93,6 +118,9 @@ case $cmd in
         case $service in
             "$ALL")
                 down_all "$@"
+                ;;
+            "$DYNAMODB")
+                down_dynamodb "$@"
                 ;;
             "$REDIS")
                 down_redis "$@"
@@ -110,6 +138,11 @@ case $cmd in
                 down_all "$@"
                 sleep $RESTART_SLEEP_SEC
                 up_all "$@"
+                ;;
+            "$DYNAMODB")
+                down_dynamodb "$@"
+                sleep $RESTART_SLEEP_SEC
+                up_dynamodb "$@"
                 ;;
             "$REDIS")
                 down_redis "$@"
