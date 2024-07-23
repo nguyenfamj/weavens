@@ -1,0 +1,16 @@
+version: "3.5"
+
+services:
+  redis:
+    container_name: redis-stack
+    image: redis/redis-stack:edge
+    environment:
+      - REDIS_ARGS=--appendonly yes
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    volumes:
+      - ./redis-data:/data
+
+volumes:
+  redis-data:
