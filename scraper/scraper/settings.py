@@ -99,7 +99,10 @@ DOWNLOAD_HANDLERS = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     # "scrapy_redis.pipelines.RedisPipeline": 400
-    "scraper.pipelines.DynamoDBPipeline": 500
+    "scraper.pipelines.ExtractCastToIntPipeline": 100,
+    "scraper.pipelines.ExtractPricePipeline": 200,
+    "scraper.pipelines.ExtractAreaPipeline": 300,
+    "scraper.pipelines.DynamoDBPipeline": 500,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
