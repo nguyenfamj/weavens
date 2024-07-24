@@ -9,5 +9,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = ""
     API_V1_STR: str = "/api/v1"
 
+    DYNAMODB_ENDPOINT_URL: str
+
 
 settings = Settings()
