@@ -4,4 +4,4 @@ default:
     just --list
 
 dev:
-    bash scripts/start_dev.sh
+    poetry run bash scripts/start_dev.sh
