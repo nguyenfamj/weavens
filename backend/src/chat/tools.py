@@ -1,6 +1,10 @@
 import requests
 from langchain.tools import tool
 
+from ..config import settings
+
+BACKEND_URL = f"http://{settings.HOST}:{settings.PORT}"
+
 
 @tool
 def find_properties(
@@ -9,7 +13,7 @@ def find_properties(
     """Finds the properties are on sale in a city."""
 
     response = requests.get(
-        "http://0.0.0.0:8686/api/v1/properties",
+        f"{BACKEND_URL}/{settings.API_V1_STR}/properties",
         params={
             "city": city,
         },

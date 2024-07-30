@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     DYNAMODB_ENDPOINT_URL: str
+    HOST: str
+    PORT: str
 
 
 settings = Settings()
