@@ -32,7 +32,11 @@ class PropertyService:
         if filter_expression is None:
             response = db.table.scan()
         else:
-            response = db.table.scan(FilterExpression=filter_expression)
+            response = db.table.scan(
+                FilterExpression=filter_expression,
+                ProjectionExpression="oikotie_id,city,#location,district,sales_price,build_year,life_sq,floor,building_type,property_ownership,condominium_payment,housing_type,completed_renovations",
+                ExpressionAttributeNames={"#location": "location"},
+            )
 
         return response.get("Items", [])
 
