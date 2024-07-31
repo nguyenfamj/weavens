@@ -1,6 +1,6 @@
 from boto3.dynamodb.conditions import Attr
 
-from .dependencies import PropertyQueryParams
+from .schemas import PropertyQueryParams
 
 
 class PropertyService:
@@ -10,20 +10,16 @@ class PropertyService:
 
         if params.city:
             filter_expression = Attr("city").eq(params.city)
-        if params.property_ownership:
-            filter_expression = filter_expression & Attr("property_ownership").eq(
-                params.property_ownership
+        if params.min_price:
+            filter_expression = filter_expression & Attr("sales_price").gte(
+                params.min_price
+            )
+        if params.max_price:
+            filter_expression = filter_expression & Attr("sales_price").lte(
+                params.max_price
             )
         if params.district:
             filter_expression = filter_expression & Attr("district").eq(params.district)
-        if params.location:
-            filter_expression = filter_expression & Attr("location").contains(
-                params.location
-            )
-        if params.housing_type:
-            filter_expression = filter_expression & Attr("housing_type").eq(
-                params.housing_type
-            )
         if params.building_type:
             filter_expression = filter_expression & Attr("building_type").eq(
                 params.building_type
@@ -34,7 +30,7 @@ class PropertyService:
         else:
             response = db.table.scan(
                 FilterExpression=filter_expression,
-                ProjectionExpression="oikotie_id,city,#location,district,sales_price,build_year,life_sq,floor,building_type,property_ownership,condominium_payment,housing_type,completed_renovations",
+                ProjectionExpression="city,#location,district,sales_price,build_year,life_sq,floor,building_type,property_ownership,condominium_payment,completed_renovations",
                 ExpressionAttributeNames={"#location": "location"},
             )
 
