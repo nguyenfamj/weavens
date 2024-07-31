@@ -3,11 +3,12 @@ from typing import Annotated
 from fastapi import APIRouter, Response, status
 from fastapi.params import Depends
 
+from ..config import settings
 from ..db import DynamoDB
 from .dependencies import PropertyQueryParams
 from .service import PropertyService
 
-router = APIRouter(prefix="/properties", tags=["properties"])
+router = APIRouter(prefix=f"{settings.API_V1_STR}/properties", tags=["properties"])
 
 
 @router.get("")
