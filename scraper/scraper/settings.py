@@ -10,18 +10,25 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(dotenv_path="../platform/redis/.env")
+load_dotenv(dotenv_path="../platform/dynamodb/.env")
 
 BOT_NAME = "scraper"
 
 SPIDER_MODULES = ["scraper.spiders"]
 NEWSPIDER_MODULE = "scraper.spiders"
 
+# DYNAMODB variables
+DYNAMODB_HOST = os.getenv("DYNAMODB_HOST")
+DYNAMODB_PORT = os.getenv("DYNAMODB_PORT")
+DYNAMODB_ENDPOINT_URL = f"http://{DYNAMODB_HOST}:{DYNAMODB_PORT}"
+DYNAMODB_TABLE_NAME = "oikotie_properties"
 
-# Redis settings
+# Redis variables
 REDIS_HOST = os.getenv("REDIS_HOST")
 REDIS_PORT = os.getenv("REDIS_PORT")
 REDIS_DB = os.getenv("REDIS_DB")
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = "scraper (+http://www.yourdomain.com)"
@@ -90,10 +97,13 @@ DOWNLOAD_HANDLERS = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#     "scraper.pipelines.ScraperPipeline": 300,
-#     "scrapy_redis.pipelines.RedisPipeline": 400
-# }
+ITEM_PIPELINES = {
+    # "scrapy_redis.pipelines.RedisPipeline": 400
+    "scraper.pipelines.ExtractCastToIntPipeline": 100,
+    "scraper.pipelines.ExtractPricePipeline": 200,
+    "scraper.pipelines.ExtractAreaPipeline": 300,
+    "scraper.pipelines.DynamoDBPipeline": 500,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
@@ -126,6 +136,3 @@ SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 
 # Ensure all spiders share same duplicates filter through redis.
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
-
-# Redis Connection URL
-REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"

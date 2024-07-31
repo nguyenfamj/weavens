@@ -1,0 +1,13 @@
+{
+  "cSpell.words": [
+    "boto",
+    "botocore",
+    "dotenv",
+    "healthcheck",
+    "langchain",
+    "langserve",
+    "oikotie",
+    "openai",
+    "pydantic"
+  ]
+}

@@ -1,4 +1,4 @@
-version: "3.5"
+version: "3.9"
 
 services:
   redis:
@@ -7,10 +7,10 @@ services:
     environment:
       - REDIS_ARGS=--appendonly yes
     ports:
-      - "6379:6379"
-      - "8001:8001"
+      - "${REDIS_PORT}:6379"
+      - "${REDIS_ADMIN_PORT}:8001"
     volumes:
-      - ./redis-data:/data
+      - ./data:/data
 
 volumes:
-  redis-data:
+  data:

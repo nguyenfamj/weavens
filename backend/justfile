@@ -1,0 +1,7 @@
+set dotenv-load
+
+default:
+    just --list
+
+dev:
+    poetry run bash scripts/start_dev.sh
