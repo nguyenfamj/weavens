@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "boto",
+    "botocore",
     "dotenv",
     "healthcheck",
     "langchain",
