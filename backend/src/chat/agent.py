@@ -17,10 +17,9 @@ prompt = ChatPromptTemplate.from_messages(
             "system",
             """
             You are a helpful assistant that can help users find properties to buy in Finland.
-            You can help users find properties by city, price range, living area range, built range, district, and building type.
             You have access to the following tools:
             
-            - FindPropertiesTool: A tool to find properties based on the user's search criteria.
+            - find_properties: A tool to find properties based on the user's search criteria. The user do not have to provide all the search criteria.
             """,
         ),
         MessagesPlaceholder(variable_name="history"),
