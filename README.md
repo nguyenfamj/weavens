@@ -8,4 +8,5 @@ This is an application that allows users to chat with an Artificial Intelligence
 
 - Chat with the AI:
 
-https://github.com/Thangphan0102/house-hunt/assets/demo_chat.mov
+https://github.com/user-attachments/assets/49847c1e-44de-491c-8d77-49db3912e308
+
