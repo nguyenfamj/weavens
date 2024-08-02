@@ -76,11 +76,11 @@ https://github.com/user-attachments/assets/49847c1e-44de-491c-8d77-49db3912e308
 
 5. Copy the `.env.example` files in the following directories and rename them to `.env`:
 
-- `backend/.env.example`
-- `platform/dynamodb/.env.example`
-- `platform/redis/.env.example`
+   - `backend/.env.example`
+   - `platform/dynamodb/.env.example`
+   - `platform/redis/.env.example`
 
-  Then add the OpenAI API key to the `OPENAI_API_KEY` variable in the `backend/.env` file.
+Then add the OpenAI API key to the `OPENAI_API_KEY` variable in the `backend/.env` file.
 
 ### Running the application:
 
@@ -88,16 +88,14 @@ https://github.com/user-attachments/assets/49847c1e-44de-491c-8d77-49db3912e308
 >
 > - To run both the backend and the frontend in development, you need to have two terminal windows/tabs and run them each in a separate terminal.
 
-- Run the backend in development:
+**Run the backend in development:**
 
-  > **Note**: You need to have the OpenAI API key in the `.env` file.
+```bash
+just dev-backend
+```
 
-  ```bash
-  just dev-backend
-  ```
+**Run the frontend in development:**
 
-- Run the frontend in development:
-
-  ```bash
-  just dev-frontend
-  ```
+```bash
+just dev-frontend
+```
