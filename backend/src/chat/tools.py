@@ -1,11 +1,8 @@
-from typing import Type
-
 import requests
 from langchain.callbacks.manager import (
     CallbackManagerForToolRun,
 )
 from langchain.tools import BaseTool
-from langchain_core.pydantic_v1 import BaseModel
 
 from ..config import settings
 from ..properties.schemas import PropertyQueryParams
@@ -16,7 +13,7 @@ BACKEND_URL = f"http://{settings.HOST}:{settings.PORT}"
 class FindPropertiesTool(BaseTool):
     name = "find_properties"
     description = "A tool to find properties in a city."
-    args_schema: Type[BaseModel] = PropertyQueryParams
+    args_schema = PropertyQueryParams
 
     def _run(
         self,
