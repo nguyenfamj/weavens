@@ -8,7 +8,7 @@ from langchain_core.chat_history import BaseChatMessageHistory
 
 from ..db import DynamoDB
 
-PRIMARY_KEY_NAME = "session_id"
+PRIMARY_KEY_NAME = "SessionId"
 
 
 def _is_valid_identifier(value: str) -> bool:
@@ -74,6 +74,7 @@ def get_session_history(table_name: str) -> Callable[[str], BaseChatMessageHisto
             session_id=session_id,
             endpoint_url=db.endpoint_url,
             primary_key_name=PRIMARY_KEY_NAME,
+            boto3_session=db.session,
         )
 
     return get_chat_history
