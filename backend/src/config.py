@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     DYNAMODB_ENDPOINT_URL: str
+    REGION_NAME: str
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
+
     HOST: str
     PORT: str
 
