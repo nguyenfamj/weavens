@@ -19,7 +19,8 @@ https://github.com/user-attachments/assets/49847c1e-44de-491c-8d77-49db3912e308
   - [ ] Caching search results.
   - [ ] User authentication.
   - [ ] Load chat sessions.
-  - [ ] Monitoring AI performance and usage.
+  - [ ] Monitored AI performance and usage.
+  - [ ] Optimized data retrieval.
 - **Data**
   - [x] Crawling of property data from online sources.
   - [ ] Automatic updating property data.
@@ -30,7 +31,7 @@ https://github.com/user-attachments/assets/49847c1e-44de-491c-8d77-49db3912e308
 - Client: Python, Streamlit
 - Server: Python, FastAPI, OpenAI, Langchain
 - Database: DynamoDB
-- Crawling: Scrapy, Redis
+- Crawling: Python, Scrapy, Redis
 
 ## Getting Started
 
@@ -66,12 +67,10 @@ https://github.com/user-attachments/assets/49847c1e-44de-491c-8d77-49db3912e308
    brew install pipx
    ```
 
-4. Install `poetry` and project dependencies:
+4. Install `poetry`:
 
    ```bash
    pipx install poetry
-   poetry env use 3.10.14
-   poetry install --no-root
    ```
 
 5. Copy the `.env.example` files in the following directories and rename them to `.env`:
