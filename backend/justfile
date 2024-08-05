@@ -4,4 +4,6 @@ default:
     just --list
 
 dev:
+    poetry env use 3.10.14
+    poetry install --no-root
     poetry run bash scripts/start_dev.sh
