@@ -25,6 +25,14 @@ redis-down:
 redis-restart:
     bash run.sh redis restart
 
+# Run Airflow in Docker
+airflow-up:
+    bash run.sh airflow up
+
+# Stop Airflow
+airflow-down:
+    bash run.sh airflow down
+
 # Run all services
 all-up:
     just dynamodb-up
