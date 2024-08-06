@@ -2,12 +2,13 @@ from functools import reduce
 
 from boto3.dynamodb.conditions import Attr, Key
 
+from ..schemas import CommonParams
 from .schemas import PropertyQueryParams
 
 
 class PropertyService:
     @staticmethod
-    def get_properties(params: PropertyQueryParams, db):
+    def get_properties(params: PropertyQueryParams, q: CommonParams, db):
         filter_expressions = []
 
         if params.district:
@@ -39,6 +40,14 @@ class PropertyService:
             query["FilterExpression"] = combined_filter_expression
 
         response = db.table.query(**query)
+
+        response["Items"] = response["Items"][q.offset : q.offset + q.limit]
+        response["Pagination"] = {
+            "Page": q.offset // q.limit + 1,
+            "TotalPages": response["Count"] // q.limit + 1,
+            "PageSize": len(response["Items"]),
+            "TotalItems": response["Count"],
+        }
 
         return response
 
