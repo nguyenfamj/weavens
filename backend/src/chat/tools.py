@@ -44,7 +44,7 @@ class FindPropertiesTool(BaseTool):
             f"{BACKEND_URL}/{settings.API_V1_STR}/properties", params=params
         )
 
-        return {"data": response.json()}
+        return {"data": response.json()["Items"]}
 
 
 tools = [FindPropertiesTool()]
