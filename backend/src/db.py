@@ -15,4 +15,4 @@ class DynamoDB:
             "dynamodb",
             endpoint_url=self.endpoint_url,
         )
-        self.table = self.resource.Table("oikotie_properties")
+        self.table = self.resource.Table("OikotieProperties")
