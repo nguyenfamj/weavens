@@ -5,6 +5,7 @@
 import boto3
 from itemadapter import ItemAdapter
 
+from .db import DynamoDB
 from .utils import TextUtils
 
 
@@ -45,7 +46,7 @@ class DynamoDBPipeline:
     def __init__(self, table_name, endpoint_url):
         self.table_name = table_name
         self.endpoint_url = endpoint_url
-        self.table = None
+        self.db = DynamoDB(table_name=self.table_name, endpoint_url=self.endpoint_url)
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -54,14 +55,19 @@ class DynamoDBPipeline:
         return cls(table_name=table_name, endpoint_url=endpoint_url)
 
     def open_spider(self, spider):
-        db = boto3.resource("dynamodb", endpoint_url=self.endpoint_url)
-        self.table = db.Table(self.table_name)
+        pass
 
     def close_spider(self, spider):
-        self.table = None
+        pass
 
     def process_item(self, item, spider):
-        self.table.put_item(
-            Item={k: v for k, v in ItemAdapter(item).asdict().items() if v}
-        )
+        processed_item = {
+            k: v
+            for k, v in ItemAdapter(item).asdict().items()
+            if k not in ["oikotie_id", "city"]
+        }
+        processed_item.update({"PK": item.get("city"), "SK": item.get("oikotie_id")})
+
+        self.db.table.put_item(Item=processed_item)
+
         return item

@@ -22,7 +22,7 @@ NEWSPIDER_MODULE = "scraper.spiders"
 DYNAMODB_HOST = os.getenv("DYNAMODB_HOST")
 DYNAMODB_PORT = os.getenv("DYNAMODB_PORT")
 DYNAMODB_ENDPOINT_URL = f"http://{DYNAMODB_HOST}:{DYNAMODB_PORT}"
-DYNAMODB_TABLE_NAME = "oikotie_properties"
+DYNAMODB_TABLE_NAME = "OikotieProperties"
 
 # Redis variables
 REDIS_HOST = os.getenv("REDIS_HOST")
