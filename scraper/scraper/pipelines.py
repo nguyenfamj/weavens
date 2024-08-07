@@ -61,12 +61,8 @@ class DynamoDBPipeline:
         pass
 
     def process_item(self, item, spider):
-        processed_item = {
-            k: v
-            for k, v in ItemAdapter(item).asdict().items()
-            if k not in ["oikotie_id", "city"]
-        }
-        processed_item.update({"PK": item.get("city"), "SK": item.get("oikotie_id")})
+        processed_item = {k: v for k, v in ItemAdapter(item).asdict().items() if v}
+        processed_item.update({"translated": 0})
 
         self.db.table.put_item(Item=processed_item)
 
