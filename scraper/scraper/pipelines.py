@@ -4,42 +4,46 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 import boto3
 from itemadapter import ItemAdapter
+from scrapy import Spider
 
 from .db import DynamoDB
 from .utils import TextUtils
 
 
 class ExtractPricePipeline:
-    def process_item(self, item, spider):
-        adapter = ItemAdapter(item)
-        fields = ["price_no_tax", "sales_price", "condominium_payment"]
-        for field in fields:
-            if adapter.get(field):
-                adapter[field] = TextUtils.extract_price(adapter[field])
+    def process_item(self, item, spider: Spider):
+        if spider.name == "oikotie":
+            adapter = ItemAdapter(item)
+            fields = ["price_no_tax", "sales_price", "condominium_payment"]
+            for field in fields:
+                if adapter.get(field):
+                    adapter[field] = TextUtils.extract_price(adapter[field])
 
-        return item
+            return item
 
 
 class ExtractAreaPipeline:
-    def process_item(self, item, spider):
-        adapter = ItemAdapter(item)
-        fields = ["life_sq"]
-        for field in fields:
-            if adapter.get(field):
-                adapter[field] = TextUtils.extract_area(adapter[field])
+    def process_item(self, item, spider: Spider):
+        if spider.name == "oikotie":
+            adapter = ItemAdapter(item)
+            fields = ["life_sq"]
+            for field in fields:
+                if adapter.get(field):
+                    adapter[field] = TextUtils.extract_area(adapter[field])
 
-        return item
+            return item
 
 
 class ExtractCastToIntPipeline:
-    def process_item(self, item, spider):
-        adapter = ItemAdapter(item)
-        fields = ["oikotie_id", "build_year"]
-        for field in fields:
-            if adapter.get(field):
-                adapter[field] = TextUtils.cast_to_int(adapter[field])
+    def process_item(self, item, spider: Spider):
+        if spider.name == "oikotie":
+            adapter = ItemAdapter(item)
+            fields = ["oikotie_id", "build_year"]
+            for field in fields:
+                if adapter.get(field):
+                    adapter[field] = TextUtils.cast_to_int(adapter[field])
 
-        return item
+            return item
 
 
 class DynamoDBPipeline:
@@ -54,16 +58,17 @@ class DynamoDBPipeline:
         endpoint_url = crawler.settings.get("DYNAMODB_ENDPOINT_URL")
         return cls(table_name=table_name, endpoint_url=endpoint_url)
 
-    def open_spider(self, spider):
+    def open_spider(self, spider: Spider):
         pass
 
-    def close_spider(self, spider):
+    def close_spider(self, spider: Spider):
         pass
 
-    def process_item(self, item, spider):
-        processed_item = {k: v for k, v in ItemAdapter(item).asdict().items() if v}
-        processed_item.update({"translated": 0})
+    def process_item(self, item, spider: Spider):
+        if spider.name == "oikotie":
+            processed_item = {k: v for k, v in ItemAdapter(item).asdict().items() if v}
+            processed_item.update({"translated": 0})
 
-        self.db.table.put_item(Item=processed_item)
+            self.db.table.put_item(Item=processed_item)
 
-        return item
+            return item
