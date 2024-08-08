@@ -82,20 +82,21 @@ def write_to_dynamodb(ti: TaskInstance):
                     content_dict = json.loads(
                         response["response"]["body"]["choices"][0]["message"]["content"]
                     )
-                    item["completed_renovations_en"] = content_dict[
-                        "completed_renovations"
-                    ]
-                    item["future_renovations_en"] = content_dict["future_renovations"]
+                    for key in ["completed_renovations", "future_renovations"]:
+                        item[f"{key}_EN"] = content_dict[key]
+                        if isinstance(item[f"{key}_EN"], list):
+                            item[f"{key}_EN"] = "\n".join(item[f"{key}_EN"])
+
                 except Exception as e:
                     print(f"Error parsing response of {item["oikotie_id"]}", e)
 
                 try:
                     response = table.update_item(
                         Key={"oikotie_id": item["oikotie_id"]},
-                        UpdateExpression="SET completed_renovations_en = :cr, future_renovations_en = :fr, translated = :t",
+                        UpdateExpression="SET completed_renovations_EN = :cr, future_renovations_EN = :fr, translated = :t",
                         ExpressionAttributeValues={
-                            ":cr": item["completed_renovations_en"],
-                            ":fr": item["future_renovations_en"],
+                            ":cr": item["completed_renovations_EN"],
+                            ":fr": item["future_renovations_EN"],
                             ":t": 1,
                         },
                     )
