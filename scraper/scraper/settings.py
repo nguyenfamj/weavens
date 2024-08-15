@@ -42,7 +42,7 @@ ROBOTSTXT_OBEY = True
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 10
+# DOWNLOAD_DELAY = 10
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
@@ -65,23 +65,6 @@ DOWNLOAD_DELAY = 10
 #    "scraper.middlewares.ScraperSpiderMiddleware": 543,
 # }
 
-# ================
-# Playwright settings
-# ================
-# Enable or disable playwright downloader
-# Scrapy will now perform HTTP or HTTPS requests through Playwright
-DOWNLOAD_HANDLERS = {
-    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-}
-# Enable or disable Playwright headless mode
-# By default, Playwright operates in headless mode.
-# PLAYWRIGHT_LAUNCH_OPTIONS = {
-#     "headless": False,
-# }
-# ================
-# End of Playwright settings
-# ================
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
@@ -100,9 +83,10 @@ DOWNLOAD_HANDLERS = {
 ITEM_PIPELINES = {
     # "scrapy_redis.pipelines.RedisPipeline": 400
     "scraper.pipelines.ExtractCastToIntPipeline": 100,
+    "scraper.pipelines.DuplicateFilterPipeline": 150,
     "scraper.pipelines.ExtractPricePipeline": 200,
     "scraper.pipelines.ExtractAreaPipeline": 300,
-    "scraper.pipelines.DynamoDBPipeline": 500,
+    "scraper.pipelines.PutToDynamoDBPipeline": 500,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
