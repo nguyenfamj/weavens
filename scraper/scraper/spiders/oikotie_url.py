@@ -30,8 +30,7 @@ class OikotieUrlSpider(Spider):
         await page.close()
 
         for link in response.css("a.ot-card-v2"):
-            item = OikotieItem()
-            item["url"] = link.attrib["href"]
-            item["oikotie_id"] = link.attrib["analytics-click-card-id"]
-
-            yield item
+            il = ItemLoader(item=OikotieItem(), selector=link)
+            il.add_css("url", "::attr(href)")
+            il.add_css("id", "::attr(analytics-click-card-id)")
+            yield il.load_item()

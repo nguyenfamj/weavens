@@ -46,7 +46,7 @@ class ExtractAreaPipeline:
 class ExtractCastToIntPipeline:
     def process_item(self, item, spider: Spider):
         adapter = ItemAdapter(item)
-        fields = ["oikotie_id", "build_year"]
+        fields = ["id", "build_year", "item_number"]
         for field in fields:
             if adapter.get(field):
                 adapter[field] = TextUtils.cast_to_int(adapter[field])
@@ -69,8 +69,8 @@ class DuplicateFilterPipeline:
     def process_item(self, item, spider: Spider):
         adapter = ItemAdapter(item)
         if spider.name == "oikotie_url":
-            item_id = adapter.get("oikotie_id")
-            if self.db.table.get_item(Key={"oikotie_id": item_id}).get("Item"):
+            id = adapter.get("id")
+            if self.db.table.get_item(Key={"id": id}).get("Item"):
                 raise DropItem()
 
         return item

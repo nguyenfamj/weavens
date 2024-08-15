@@ -30,13 +30,14 @@ class DynamoDB:
         table = self.resource.create_table(
             TableName=table_name,
             AttributeDefinitions=[
-                {"AttributeName": "oikotie_id", "AttributeType": "N"},
+                {"AttributeName": "id", "AttributeType": "N"},
                 {"AttributeName": "sales_price", "AttributeType": "N"},
                 {"AttributeName": "city", "AttributeType": "S"},
                 {"AttributeName": "translated", "AttributeType": "N"},
+                {"AttributeName": "crawled", "AttributeType": "N"},
             ],
             KeySchema=[
-                {"AttributeName": "oikotie_id", "KeyType": "HASH"},
+                {"AttributeName": "id", "KeyType": "HASH"},
             ],
             GlobalSecondaryIndexes=[
                 {
