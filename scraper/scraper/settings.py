@@ -103,7 +103,7 @@ ITEM_PIPELINES = {
     "scraper.pipelines.DuplicateFilterPipeline": 150,
     "scraper.pipelines.ExtractPricePipeline": 200,
     "scraper.pipelines.ExtractAreaPipeline": 300,
-    "scraper.pipelines.DynamoDBPipeline": 500,
+    "scraper.pipelines.PutToDynamoDBPipeline": 500,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
