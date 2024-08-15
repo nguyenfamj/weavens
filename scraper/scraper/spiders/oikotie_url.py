@@ -1,8 +1,8 @@
-import json
-
 from scrapy import Request, Spider
 from scrapy.http import Response
 from scrapy_playwright.page import PageMethod
+
+from ..items import OikotieItem
 
 
 class OikotieUrlSpider(Spider):
@@ -10,7 +10,7 @@ class OikotieUrlSpider(Spider):
 
     def start_requests(self):
         # TODO: Change the range to the desired number of pages
-        for i in range(320, 340):
+        for i in range(1, 10):
             url = f"https://asunnot.oikotie.fi/myytavat-asunnot?pagination={i}"
 
             yield Request(
@@ -29,7 +29,9 @@ class OikotieUrlSpider(Spider):
 
         await page.close()
 
-        with open("oikotie.jsonl", "a") as f:
-            for link in response.css("a.ot-card-v2"):
-                f.write(json.dumps({"url": link.attrib["href"]}))
-                f.write("\n")
+        for link in response.css("a.ot-card-v2"):
+            item = OikotieItem()
+            item["url"] = link.attrib["href"]
+            item["oikotie_id"] = link.attrib["analytics-click-card-id"]
+
+            yield item

@@ -100,6 +100,7 @@ DOWNLOAD_HANDLERS = {
 ITEM_PIPELINES = {
     # "scrapy_redis.pipelines.RedisPipeline": 400
     "scraper.pipelines.ExtractCastToIntPipeline": 100,
+    "scraper.pipelines.DuplicateFilterPipeline": 150,
     "scraper.pipelines.ExtractPricePipeline": 200,
     "scraper.pipelines.ExtractAreaPipeline": 300,
     "scraper.pipelines.DynamoDBPipeline": 500,
