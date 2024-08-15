@@ -76,7 +76,7 @@ class DuplicateFilterPipeline:
         return item
 
 
-class DynamoDBPipeline:
+class PutToDynamoDBPipeline:
     def __init__(self, table_name, endpoint_url):
         self.table_name = table_name
         self.endpoint_url = endpoint_url
