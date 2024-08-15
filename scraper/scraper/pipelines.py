@@ -2,17 +2,12 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-
-import logging
-
 from itemadapter import ItemAdapter
 from scrapy import Spider
 from scrapy.exceptions import DropItem
 
 from .db import DynamoDB
 from .utils import TextUtils
-
-logger = logging.getLogger(__name__)
 
 
 class ExtractPricePipeline:
@@ -98,9 +93,9 @@ class PutToDynamoDBPipeline:
         processed_item = {k: v for k, v in ItemAdapter(item).asdict().items() if v}
         if spider.name == "oikotie_url":
             processed_item.update({"translated": 0, "crawled": 0})
+            self.db.table.put_item(Item=processed_item)
         if spider.name == "oikotie":
-            processed_item.update({"crawled": 1})
-
-        self.db.table.put_item(Item=processed_item)
+            processed_item.update({"translated": 0, "crawled": 1})
+            self.db.table.put_item(Item=processed_item)
 
         return item
