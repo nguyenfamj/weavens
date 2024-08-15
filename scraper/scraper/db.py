@@ -67,6 +67,20 @@ class DynamoDB:
                         ],
                     },
                 },
+                {
+                    "IndexName": "GSI3",
+                    "KeySchema": [{"AttributeName": "crawled", "KeyType": "HASH"}],
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 3,
+                        "WriteCapacityUnits": 3,
+                    },
+                    "Projection": {
+                        "ProjectionType": "INCLUDE",
+                        "NonKeyAttributes": [
+                            "url",
+                        ],
+                    },
+                },
             ],
             ProvisionedThroughput={"ReadCapacityUnits": 3, "WriteCapacityUnits": 3},
         )
