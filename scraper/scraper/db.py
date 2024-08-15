@@ -30,13 +30,14 @@ class DynamoDB:
         table = self.resource.create_table(
             TableName=table_name,
             AttributeDefinitions=[
-                {"AttributeName": "oikotie_id", "AttributeType": "N"},
+                {"AttributeName": "id", "AttributeType": "N"},
                 {"AttributeName": "sales_price", "AttributeType": "N"},
                 {"AttributeName": "city", "AttributeType": "S"},
                 {"AttributeName": "translated", "AttributeType": "N"},
+                {"AttributeName": "crawled", "AttributeType": "N"},
             ],
             KeySchema=[
-                {"AttributeName": "oikotie_id", "KeyType": "HASH"},
+                {"AttributeName": "id", "KeyType": "HASH"},
             ],
             GlobalSecondaryIndexes=[
                 {
@@ -63,6 +64,20 @@ class DynamoDB:
                         "NonKeyAttributes": [
                             "completed_renovations",
                             "future_renovations",
+                        ],
+                    },
+                },
+                {
+                    "IndexName": "GSI3",
+                    "KeySchema": [{"AttributeName": "crawled", "KeyType": "HASH"}],
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 3,
+                        "WriteCapacityUnits": 3,
+                    },
+                    "Projection": {
+                        "ProjectionType": "INCLUDE",
+                        "NonKeyAttributes": [
+                            "url",
                         ],
                     },
                 },
