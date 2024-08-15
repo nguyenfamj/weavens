@@ -2,7 +2,6 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-import boto3
 from itemadapter import ItemAdapter
 from scrapy import Spider
 
@@ -20,6 +19,8 @@ class ExtractPricePipeline:
                     adapter[field] = TextUtils.extract_price(adapter[field])
 
             return item
+        else:
+            return item
 
 
 class ExtractAreaPipeline:
@@ -32,6 +33,8 @@ class ExtractAreaPipeline:
                     adapter[field] = TextUtils.extract_area(adapter[field])
 
             return item
+        else:
+            return item
 
 
 class ExtractCastToIntPipeline:
@@ -43,6 +46,8 @@ class ExtractCastToIntPipeline:
                 if adapter.get(field):
                     adapter[field] = TextUtils.cast_to_int(adapter[field])
 
+            return item
+        else:
             return item
 
 
@@ -71,4 +76,6 @@ class DynamoDBPipeline:
 
             self.db.table.put_item(Item=processed_item)
 
+            return item
+        else:
             return item
