@@ -1,5 +1,6 @@
 from scrapy import Request, Spider
 from scrapy.http import Response
+from scrapy.loader import ItemLoader
 from scrapy_playwright.page import PageMethod
 
 from ..items import OikotieItem
@@ -7,6 +8,13 @@ from ..items import OikotieItem
 
 class OikotieUrlSpider(Spider):
     name = "oikotie_url"
+    custom_settings = dict(
+        DOWNLOAD_HANDLERS={
+            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        },
+        DOWNLOAD_DELAY=10,
+    )
 
     def start_requests(self):
         # TODO: Change the range to the desired number of pages
