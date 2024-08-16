@@ -29,8 +29,16 @@ redis-restart:
 all-up:
     just dynamodb-up
     just redis-up
+    just airflow-up
 
 # Stop all services
 all-down:
     just dynamodb-down
     just redis-down
+    just airflow-down
+
+# Restart all services
+all-restart:
+    just dynamodb-restart
+    just redis-restart
+    just airflow-restart
