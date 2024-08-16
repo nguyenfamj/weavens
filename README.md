@@ -81,6 +81,10 @@ https://github.com/user-attachments/assets/49847c1e-44de-491c-8d77-49db3912e308
 
 Then add the OpenAI API key to the `OPENAI_API_KEY` variable in the `backend/.env` file.
 
+### Running the crawlers:
+
+Details on how to run the crawlers can be found in this [`README.md`](scraper/README.md) file.
+
 ### Running the application:
 
 > **Note:**
