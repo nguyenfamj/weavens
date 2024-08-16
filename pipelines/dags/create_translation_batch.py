@@ -27,7 +27,7 @@ def prepare_batch_file():
         FilterExpression=(
             Attr("completed_renovations").exists() | Attr("future_renovations").exists()
         ),
-        ProjectionExpression="oikotie_id,completed_renovations,future_renovations",
+        ProjectionExpression="id,completed_renovations,future_renovations",
     )["Items"]
 
     input_file_id = str(uuid4())[:8]
@@ -35,9 +35,9 @@ def prepare_batch_file():
 
     with open(input_file, "w") as f:
         for item in items:
-            item["oikotie_id"] = int(item["oikotie_id"])
+            item["id"] = int(item["id"])
             request = {
-                "custom_id": str(item["oikotie_id"]),
+                "custom_id": str(item["id"]),
                 "method": "POST",
                 "url": "/v1/chat/completions",
                 "body": {
