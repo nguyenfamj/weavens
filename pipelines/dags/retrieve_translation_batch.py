@@ -77,7 +77,7 @@ def write_to_dynamodb(ti: TaskInstance):
             response = json.loads(line)
             item = {}
             if response["response"]["status_code"] == 200:
-                item["oikotie_id"] = int(response["custom_id"])
+                item["id"] = int(response["custom_id"])
                 try:
                     content_dict = json.loads(
                         response["response"]["body"]["choices"][0]["message"]["content"]
@@ -88,11 +88,11 @@ def write_to_dynamodb(ti: TaskInstance):
                             item[f"{key}_EN"] = "\n".join(item[f"{key}_EN"])
 
                 except Exception as e:
-                    print(f"Error parsing response of {item["oikotie_id"]}", e)
+                    print(f"Error parsing response of {item["id"]}", e)
 
                 try:
                     response = table.update_item(
-                        Key={"oikotie_id": item["oikotie_id"]},
+                        Key={"id": item["id"]},
                         UpdateExpression="SET completed_renovations_EN = :cr, future_renovations_EN = :fr, translated = :t",
                         ExpressionAttributeValues={
                             ":cr": item["completed_renovations_EN"],
@@ -102,8 +102,8 @@ def write_to_dynamodb(ti: TaskInstance):
                     )
                 except ClientError as err:
                     logger.error(
-                        "Could not update item with oikotie_id %s in table %s. Error code: %s. Error message: %s",
-                        item["oikotie_id"],
+                        "Could not update item with id %s in table %s. Error code: %s. Error message: %s",
+                        item["id"],
                         table.name,
                         err.response["Error"]["Code"],
                         err.response["Error"]["Message"],
