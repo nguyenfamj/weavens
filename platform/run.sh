@@ -7,6 +7,7 @@ cmd=$2      # Command as the second argument
 ALL="all"
 DYNAMODB="dynamodb"
 REDIS="redis"
+AIRFLOW="airflow"
 RESTART_SLEEP_SEC=2
 
 usage() {
@@ -16,6 +17,7 @@ usage() {
     echo "  $ALL"
     echo "  $DYNAMODB"
     echo "  $REDIS"
+    echo "  $AIRFLOW"
     echo "Available commands:"
     echo "  up           run container"
     echo "  down         stop and remove container"
@@ -78,6 +80,15 @@ down_redis() {
     down "$REDIS" "$@"
 }
 
+# AIRFLOW
+up_airflow() {
+    up "$AIRFLOW" "$@"
+}
+
+down_airflow() {
+    down "$AIRFLOW" "$@"
+}
+
 if [[ "$1" == "-h" ]]; then
     usage
     exit 0
@@ -107,6 +118,9 @@ case $cmd in
             "$REDIS")
                 up_redis "$@"
                 ;;
+            "$AIRFLOW")
+                up_airflow "$@"
+                ;;
             *)
                 echo "Unknown service"
                 usage
@@ -124,6 +138,9 @@ case $cmd in
                 ;;
             "$REDIS")
                 down_redis "$@"
+                ;;
+            "$AIRFLOW")
+                down_airflow "$@"
                 ;;
             *)
                 echo "Unknown service"
@@ -148,6 +165,11 @@ case $cmd in
                 down_redis "$@"
                 sleep $RESTART_SLEEP_SEC
                 up_redis "$@"
+                ;;
+            "$AIRFLOW")
+                down_airflow "$@"
+                sleep $RESTART_SLEEP_SEC
+                up_airflow "$@"
                 ;;
             *)
                 echo "Unknown service"
