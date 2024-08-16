@@ -11,9 +11,10 @@ There are two available spiders to scrape data from the web.
 | oikotie_url  | To crawl the ID and URLs of properties.                                               |
 | oikotie      | To crawl the detail information using the crawled URLs from the "oikotie_url" spider. |
 
-To run the scraper, you need to run the `oikotie_url` spider first to get the URLs of the properties. Then you can run the `oikotie` spider to get the detail information, such as price, location, etc., of the properties.
-
-In addition, since the spiders use the `redis` and `dynamodb` platforms, you need to run them before running the spiders.
+> **Notes:**
+>
+> - To run the scraper, you need to run the `oikotie_url` spider first to get the URLs of the properties. Then you can run the `oikotie` spider to get the detail information, such as price, location, etc., of the properties.
+> - In addition, since the spiders use the `redis` and `dynamodb` platforms, you need to run them before running the spiders.
 
 #### Thus, run the following command in order:
 
