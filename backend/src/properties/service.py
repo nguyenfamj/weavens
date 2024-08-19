@@ -2,57 +2,96 @@ from functools import reduce
 
 from boto3.dynamodb.conditions import Attr, Key
 
+from ..db import OIKOTIE_TABLE_NAME
 from ..schemas import CommonParams
 from .schemas import PropertyQueryParams
 
 
 class PropertyService:
-    @staticmethod
-    def get_properties(params: PropertyQueryParams, q: CommonParams, db):
-        filter_expressions = []
+    def __init__(self, db):
+        self.db = db
+        self.resource = self.db.resource
+        self.table = self.resource.Table(OIKOTIE_TABLE_NAME)
 
-        if params.district:
-            filter_expressions.append(Attr("district").eq(params.district))
-        if params.min_price:
-            filter_expressions.append(Attr("sales_price").gte(params.min_price))
-        if params.max_price:
-            filter_expressions.append(Attr("sales_price").lte(params.max_price))
-        if params.min_life_sq:
-            filter_expressions.append(Attr("life_sq").gte(params.min_life_sq))
-        if params.max_life_sq:
-            filter_expressions.append(Attr("life_sq").lte(params.max_life_sq))
-        if params.min_build_year:
-            filter_expressions.append(Attr("build_year").gte(params.min_build_year))
-        if params.max_build_year:
-            filter_expressions.append(Attr("build_year").lte(params.max_build_year))
-        if params.building_type:
-            filter_expressions.append(Attr("building_type").eq(params.building_type))
-
-        query = dict(
-            KeyConditionExpression=Key("PK").eq(params.city),
-            ProjectionExpression="PK,#location,district,sales_price,build_year,life_sq,floor,building_type,property_ownership,condominium_payment,completed_renovations",
-            ExpressionAttributeNames={"#location": "location"},
-            ReturnConsumedCapacity="TOTAL",
-        )
-
-        if filter_expressions:
-            combined_filter_expression = reduce(lambda x, y: x & y, filter_expressions)
-            query["FilterExpression"] = combined_filter_expression
-
-        response = db.table.query(**query)
+    def get_properties(self, params: PropertyQueryParams, q: CommonParams):
+        query = self._build_query(params)
+        response = self.table.query(**query)
 
         response["Items"] = response["Items"][q.offset : q.offset + q.limit]
+        count = response["Count"]
+        page_size = len(response["Items"])
+
+        ids = [{"id": item["id"]} for item in response["Items"]]
+
+        result = self.resource.batch_get_item(
+            RequestItems={OIKOTIE_TABLE_NAME: {"Keys": ids}},
+        )
+        response["Items"] = result["Responses"][OIKOTIE_TABLE_NAME]
         response["Pagination"] = {
             "Page": q.offset // q.limit + 1,
-            "TotalPages": response["Count"] // q.limit + 1,
-            "PageSize": len(response["Items"]),
-            "TotalItems": response["Count"],
+            "TotalPages": count // q.limit + 1,
+            "PageSize": page_size,
+            "TotalItems": count,
         }
 
         return response
 
-    @staticmethod
-    def get_property(property_id: int, db):
-        response = db.table.get_item(Key={"oikotie_id": property_id})
+    def get_property(self, property_id: int):
+        response = self.table.get_item(Key={"id": property_id})
 
-        return response.get("Item", None)
+        return response
+
+    def _build_query(self, params: PropertyQueryParams):
+        expressions = {
+            "KeyConditionExpression": [],
+            "FilterExpression": [],
+        }
+
+        if params.city:
+            expressions["KeyConditionExpression"].append(Key("city").eq(params.city))
+        if params.min_price and params.max_price:
+            expressions["KeyConditionExpression"].append(
+                Key("sales_price").between(params.min_price, params.max_price)
+            )
+        elif params.min_price:
+            expressions["KeyConditionExpression"].append(
+                Key("sales_price").gte(params.min_price)
+            )
+        elif params.max_price:
+            expressions["KeyConditionExpression"].append(
+                Key("sales_price").lte(params.max_price)
+            )
+
+        if params.district:
+            expressions["FilterExpression"].append(Attr("district").eq(params.district))
+        if params.min_life_sq:
+            expressions["FilterExpression"].append(
+                Attr("life_sq").gte(params.min_life_sq)
+            )
+        if params.max_life_sq:
+            expressions["FilterExpression"].append(
+                Attr("life_sq").lte(params.max_life_sq)
+            )
+        if params.min_build_year:
+            expressions["FilterExpression"].append(
+                Attr("build_year").gte(params.min_build_year)
+            )
+        if params.max_build_year:
+            expressions["FilterExpression"].append(
+                Attr("build_year").lte(params.max_build_year)
+            )
+        if params.building_type:
+            expressions["FilterExpression"].append(
+                Attr("building_type").eq(params.building_type)
+            )
+
+        query = dict(
+            IndexName="GSI1",
+            TableName=OIKOTIE_TABLE_NAME,
+        )
+
+        for k, v in expressions.items():
+            if v:
+                query[k] = reduce(lambda x, y: x & y, v)
+
+        return query
