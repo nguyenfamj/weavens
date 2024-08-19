@@ -5,7 +5,7 @@ TITLE_TO_FIELD = {
     "Sijainti": "location",
     "Kaupunki": "city",
     "Kaupunginosa": "district",
-    "Kohdenumero": "item_number",
+    # "Kohdenumero": "item_number",
     "Kerros": "floor",
     "Asuinpinta-ala": "life_sq",
     # "Tontin pinta-ala": "property_sq",
