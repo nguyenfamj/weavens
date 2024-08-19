@@ -2,6 +2,9 @@ import boto3
 
 from .config import settings
 
+OIKOTIE_TABLE_NAME = "OikotieProperties"
+CHAT_HISTORY_TABLE_NAME = "ChatHistories"
+
 
 class DynamoDB:
     def __init__(self):
@@ -15,4 +18,3 @@ class DynamoDB:
             "dynamodb",
             endpoint_url=self.endpoint_url,
         )
-        self.table = self.resource.Table("OikotieProperties")
