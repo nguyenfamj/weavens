@@ -6,6 +6,11 @@ from itemadapter import ItemAdapter
 from scrapy import Spider
 from scrapy.exceptions import DropItem
 
+from .constants import (
+    BUILDING_TYPE_TRANSLATIONS,
+    HOUSING_TYPE_TRANSLATIONS,
+    PROPERTY_OWNERSHIP_TRANSLATIONS,
+)
 from .db import DynamoDB
 from .utils import TextUtils
 
@@ -19,9 +24,7 @@ class ExtractPricePipeline:
                 if adapter.get(field):
                     adapter[field] = TextUtils.extract_price(adapter[field])
 
-            return item
-        else:
-            return item
+        return item
 
 
 class ExtractAreaPipeline:
@@ -33,18 +36,34 @@ class ExtractAreaPipeline:
                 if adapter.get(field):
                     adapter[field] = TextUtils.extract_area(adapter[field])
 
-            return item
-        else:
-            return item
+        return item
 
 
 class ExtractCastToIntPipeline:
     def process_item(self, item, spider: Spider):
         adapter = ItemAdapter(item)
-        fields = ["id", "build_year", "item_number"]
+        fields = ["id", "build_year"]
         for field in fields:
             if adapter.get(field):
                 adapter[field] = TextUtils.cast_to_int(adapter[field])
+
+        return item
+
+
+class TranslationPipeline:
+    def process_item(self, item, spider: Spider):
+        if spider.name == "oikotie":
+            adapter = ItemAdapter(item)
+            field_translation_dict = {
+                "property_ownership": PROPERTY_OWNERSHIP_TRANSLATIONS,
+                "housing_type": HOUSING_TYPE_TRANSLATIONS,
+                "building_type": BUILDING_TYPE_TRANSLATIONS,
+            }
+            for field in field_translation_dict.keys():
+                value = adapter.get(field)
+                if value:
+                    value = str(value).lower()
+                    adapter[field] = field_translation_dict[field][value]
 
         return item
 

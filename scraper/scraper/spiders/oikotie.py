@@ -16,7 +16,6 @@ from ..settings import DYNAMODB_ENDPOINT_URL, DYNAMODB_TABLE_NAME, REDIS_URL
 class OikotieSpider(RedisSpider):
     name = "oikotie"
     allowed_domains = ["asunnot.oikotie.fi"]
-    limit = 24
 
     # Redis config
     redis_key = "scraper:start_urls"
@@ -60,5 +59,5 @@ class OikotieSpider(RedisSpider):
         if not items:
             raise ValueError("No items need to be crawled")
 
-        for item in items[: self.limit]:
+        for item in items:
             redis_client.lpush(self.redis_key, json.dumps({"url": item["url"]}))
