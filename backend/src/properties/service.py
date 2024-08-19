@@ -24,7 +24,13 @@ class PropertyService:
         ids = [{"id": item["id"]} for item in response["Items"]]
 
         result = self.resource.batch_get_item(
-            RequestItems={OIKOTIE_TABLE_NAME: {"Keys": ids}},
+            RequestItems={
+                OIKOTIE_TABLE_NAME: {
+                    "Keys": ids,
+                    "ProjectionExpression": "city,sales_price,build_year,district,#location,life_sq,floor,condominium_payment,property_ownership,housing_type,building_type",
+                    "ExpressionAttributeNames": {"#location": "location"},
+                },
+            },
         )
         response["Items"] = result["Responses"][OIKOTIE_TABLE_NAME]
         response["Pagination"] = {
