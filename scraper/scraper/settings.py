@@ -81,11 +81,11 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    # "scrapy_redis.pipelines.RedisPipeline": 400
     "scraper.pipelines.ExtractCastToIntPipeline": 100,
     "scraper.pipelines.DuplicateFilterPipeline": 150,
     "scraper.pipelines.ExtractPricePipeline": 200,
     "scraper.pipelines.ExtractAreaPipeline": 300,
+    "scraper.pipelines.TranslationPipeline": 400,
     "scraper.pipelines.PutToDynamoDBPipeline": 500,
 }
 
@@ -120,3 +120,5 @@ SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 
 # Ensure all spiders share same duplicates filter through redis.
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+
+LOG_LEVEL = "INFO"
