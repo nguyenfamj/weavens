@@ -80,3 +80,25 @@ TITLE_TO_FIELD = {
     # "Yhteiset tilat": "common_spaces",
     # "Pintamateriaalit": "wallcovering",
 }
+
+PROPERTY_OWNERSHIP_TRANSLATIONS = {
+    "oma": "own",
+    "valinnainen vuokratontti": "optional rent",
+    "vuokralla": "rent",
+}
+
+HOUSING_TYPE_TRANSLATIONS = {
+    "omistus": "ownership",
+    "asumisoikeus": "right of residence",
+}
+
+BUILDING_TYPE_TRANSLATIONS = {
+    "kerrostalo": "apartment building",
+    "luhtitalo": "apartment building",
+    "erillistalo": "detached house",
+    "omakotitalo": "detached house",
+    "paritalo": "semi-detached house",
+    "puutalo-osake": "wooden house",
+    "rivitalo": "terraced house",
+    "muu": "other",
+}
