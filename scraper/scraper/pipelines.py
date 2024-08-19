@@ -41,7 +41,7 @@ class ExtractAreaPipeline:
 class ExtractCastToIntPipeline:
     def process_item(self, item, spider: Spider):
         adapter = ItemAdapter(item)
-        fields = ["id", "build_year", "item_number"]
+        fields = ["id", "build_year"]
         for field in fields:
             if adapter.get(field):
                 adapter[field] = TextUtils.cast_to_int(adapter[field])
