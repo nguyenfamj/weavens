@@ -5,7 +5,7 @@ TITLE_TO_FIELD = {
     "Sijainti": "location",
     "Kaupunki": "city",
     "Kaupunginosa": "district",
-    "Kohdenumero": "item_number",
+    # "Kohdenumero": "item_number",
     "Kerros": "floor",
     "Asuinpinta-ala": "life_sq",
     # "Tontin pinta-ala": "property_sq",
@@ -79,4 +79,26 @@ TITLE_TO_FIELD = {
     # "Pysäköintitilan kuvaus": "parking_space_description",
     # "Yhteiset tilat": "common_spaces",
     # "Pintamateriaalit": "wallcovering",
+}
+
+PROPERTY_OWNERSHIP_TRANSLATIONS = {
+    "oma": "own",
+    "valinnainen vuokratontti": "optional rent",
+    "vuokralla": "rent",
+}
+
+HOUSING_TYPE_TRANSLATIONS = {
+    "omistus": "ownership",
+    "asumisoikeus": "right of residence",
+}
+
+BUILDING_TYPE_TRANSLATIONS = {
+    "kerrostalo": "apartment building",
+    "luhtitalo": "apartment building",
+    "erillistalo": "detached house",
+    "omakotitalo": "detached house",
+    "paritalo": "semi-detached house",
+    "puutalo-osake": "wooden house",
+    "rivitalo": "terraced house",
+    "muu": "other",
 }
