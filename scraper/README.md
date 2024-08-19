@@ -48,13 +48,3 @@ There are two available spiders to scrape data from the web.
    cd scraper
    just crawl
    ```
-
-### Configuration
-
-Here are some of the default configurations:
-
-- The `oikotie_url` spider crawls the first 10 pages which contain 24 properties per page.
-- The `oikotie_url` spider has a delay of 10 second between each page.
-
-- The `oikotie` spider gets 24 URLs to crawl.
-- The `oikotie` spider has a batch size of 12 URLs.
