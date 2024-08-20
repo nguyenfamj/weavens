@@ -22,7 +22,7 @@ NEWSPIDER_MODULE = "scraper.spiders"
 DYNAMODB_HOST = os.getenv("DYNAMODB_HOST")
 DYNAMODB_PORT = os.getenv("DYNAMODB_PORT")
 DYNAMODB_ENDPOINT_URL = f"http://{DYNAMODB_HOST}:{DYNAMODB_PORT}"
-DYNAMODB_TABLE_NAME = "oikotie_properties"
+DYNAMODB_TABLE_NAME = "OikotieProperties"
 
 # Redis variables
 REDIS_HOST = os.getenv("REDIS_HOST")
@@ -42,7 +42,7 @@ ROBOTSTXT_OBEY = True
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY = 3
+# DOWNLOAD_DELAY = 10
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
 # CONCURRENT_REQUESTS_PER_IP = 16
@@ -65,23 +65,6 @@ ROBOTSTXT_OBEY = True
 #    "scraper.middlewares.ScraperSpiderMiddleware": 543,
 # }
 
-# ================
-# Playwright settings
-# ================
-# Enable or disable playwright downloader
-# Scrapy will now perform HTTP or HTTPS requests through Playwright
-DOWNLOAD_HANDLERS = {
-    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-}
-# Enable or disable Playwright headless mode
-# By default, Playwright operates in headless mode.
-# PLAYWRIGHT_LAUNCH_OPTIONS = {
-#     "headless": False,
-# }
-# ================
-# End of Playwright settings
-# ================
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
@@ -98,11 +81,12 @@ DOWNLOAD_HANDLERS = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    # "scrapy_redis.pipelines.RedisPipeline": 400
     "scraper.pipelines.ExtractCastToIntPipeline": 100,
+    "scraper.pipelines.DuplicateFilterPipeline": 150,
     "scraper.pipelines.ExtractPricePipeline": 200,
     "scraper.pipelines.ExtractAreaPipeline": 300,
-    "scraper.pipelines.DynamoDBPipeline": 500,
+    "scraper.pipelines.TranslationPipeline": 400,
+    "scraper.pipelines.PutToDynamoDBPipeline": 500,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -136,3 +120,5 @@ SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 
 # Ensure all spiders share same duplicates filter through redis.
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+
+LOG_LEVEL = "INFO"

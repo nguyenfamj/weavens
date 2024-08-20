@@ -47,12 +47,16 @@ if human_input := st.chat_input():
         },
         "config": {"configurable": {"session_id": st.session_state.session_id}},
     }
-    with st.spinner("Processing..."):
-        response = requests.post(f"{BACKEND_URL}/api/v1/chat/invoke", json=payload)
-    message = (
-        response.json()
-        .get("output", {})
-        .get("output", "Sorry, there was an error processing your request.")
-    )
-    st.session_state.messages.append({"role": "assistant", "content": message})
-    st.chat_message("assistant").write(message)
+    try:
+        with st.spinner("Processing..."):
+            response = requests.post(f"{BACKEND_URL}/api/v1/chat/invoke", json=payload)
+            response.raise_for_status()
+    except requests.exceptions.RequestException:
+        st.chat_message("assistant").write(
+            "Sorry, there was an unexpected error! Please try again later."
+        )
+        st.stop()
+    else:
+        message = response.json().get("output", {}).get("output", "")
+        st.session_state.messages.append({"role": "assistant", "content": message})
+        st.chat_message("assistant").write(message)

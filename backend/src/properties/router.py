@@ -5,6 +5,7 @@ from fastapi.params import Depends
 
 from ..config import settings
 from ..db import DynamoDB
+from ..schemas import CommonParams
 from .schemas import PropertyQueryParams
 from .service import PropertyService
 
@@ -14,16 +15,19 @@ router = APIRouter(prefix=f"{settings.API_V1_STR}/properties", tags=["properties
 @router.get("")
 def get_properties(
     params: Annotated[PropertyQueryParams, Depends()],
+    q: Annotated[CommonParams, Depends()],
     db: Annotated[DynamoDB, Depends()],
 ):
-    properties = PropertyService.get_properties(params, db)
+    property_service = PropertyService(db)
+    properties = property_service.get_properties(params, q)
 
     return properties
 
 
 @router.get("/{property_id}")
 def get_property(property_id: int, db: Annotated[DynamoDB, Depends()]):
-    property = PropertyService.get_property(property_id, db)
+    property_service = PropertyService(db)
+    property = property_service.get_property(property_id)
 
     if property:
         return property
