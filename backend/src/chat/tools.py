@@ -5,7 +5,7 @@ from langchain.callbacks.manager import (
 from langchain.tools import BaseTool
 
 from ..config import settings
-from ..properties.schemas import PropertyQueryParams
+from ..properties.schemas import BuildingType, PropertyQueryParams
 
 BACKEND_URL = f"http://{settings.HOST}:{settings.PORT}"
 
@@ -21,7 +21,7 @@ class FindPropertiesTool(BaseTool):
         min_price: int | None = None,
         max_price: int | None = None,
         district: str | None = None,
-        building_type: str | None = None,
+        building_type: BuildingType | None = None,
         min_life_sq: int | None = None,
         max_life_sq: int | None = None,
         min_build_year: int | None = None,
