@@ -50,7 +50,7 @@ class DynamoDB:
                         "ReadCapacityUnits": 3,
                         "WriteCapacityUnits": 3,
                     },
-                    "Projection": {"ProjectionType": "KEYS_ONLY"},
+                    "Projection": {"ProjectionType": "ALL"},
                 },
                 {
                     "IndexName": "GSI2",
