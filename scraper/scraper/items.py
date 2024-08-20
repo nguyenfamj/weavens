@@ -16,6 +16,7 @@ class ScraperItem(Item):
 
 
 class OikotieItem(Item):
+    id = Field(input_processor=Identity(), output_processor=TakeFirst())
     url = Field(input_processor=Identity(), output_processor=TakeFirst())
 
     # Basic information
@@ -23,7 +24,7 @@ class OikotieItem(Item):
     city = Field(input_processor=Identity(), output_processor=TakeFirst())
     house_number = Field(input_processor=Identity(), output_processor=TakeFirst())
     district = Field(input_processor=Identity(), output_processor=TakeFirst())
-    oikotie_id = Field(input_processor=Identity(), output_processor=TakeFirst())
+    item_number = Field(input_processor=Identity(), output_processor=TakeFirst())
     floor = Field(input_processor=Identity(), output_processor=TakeFirst())
     total_floors = Field(input_processor=Identity(), output_processor=TakeFirst())
     life_sq = Field(input_processor=Identity(), output_processor=TakeFirst())
