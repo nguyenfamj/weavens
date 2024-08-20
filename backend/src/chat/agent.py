@@ -4,12 +4,11 @@ from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
+from ..db import CHAT_HISTORY_TABLE_NAME
 from .model import llm_with_tools
 from .schemas import Input, Output
 from .session import get_session_history
 from .tools import tools
-
-CHAT_HISTORY_TABLE_NAME = "ChatHistories"
 
 prompt = ChatPromptTemplate.from_messages(
     [

@@ -18,20 +18,11 @@ class PropertyService:
         response = self.table.query(**query)
 
         response["Items"] = response["Items"][q.offset : q.offset + q.limit]
-        count = response["Count"]
-        page_size = len(response["Items"])
-
-        ids = [{"id": item["id"]} for item in response["Items"]]
-
-        result = self.resource.batch_get_item(
-            RequestItems={OIKOTIE_TABLE_NAME: {"Keys": ids}},
-        )
-        response["Items"] = result["Responses"][OIKOTIE_TABLE_NAME]
         response["Pagination"] = {
             "Page": q.offset // q.limit + 1,
-            "TotalPages": count // q.limit + 1,
-            "PageSize": page_size,
-            "TotalItems": count,
+            "TotalPages": response["Count"] // q.limit + 1,
+            "PageSize": len(response["Items"]),
+            "TotalItems": response["Count"],
         }
 
         return response
@@ -87,7 +78,8 @@ class PropertyService:
 
         query = dict(
             IndexName="GSI1",
-            TableName=OIKOTIE_TABLE_NAME,
+            ProjectionExpression="city,sales_price,#location,district,life_sq,build_year,floor,building_type,housing_type,property_ownership,condominium_payment",
+            ExpressionAttributeNames={"#location": "location"},
         )
 
         for k, v in expressions.items():
