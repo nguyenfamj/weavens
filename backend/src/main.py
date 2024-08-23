@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from mangum import Mangum
 
 from .chat.router import router as chat_router
 from .config import settings
@@ -14,3 +15,6 @@ app.include_router(chat_router)
 @app.get("/healthcheck", include_in_schema=False)
 def healthcheck():
     return {"status": "ok"}
+
+
+handler = Mangum(app, lifespan="off")
