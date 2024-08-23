@@ -13,3 +13,9 @@ class Environment(str, Enum):
     def is_production(self) -> bool:
         return self == Environment.PRODUCTION
 
+
+class Database:
+    RESOURCE_NAME = "dynamodb"
+
+    PROPERTIES_TABLE_NAME = "OikotieProperties"
+    CHAT_HISTORY_TABLE_NAME = "ChatHistories"
