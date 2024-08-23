@@ -1,20 +1,26 @@
 import boto3
 
 from .config import settings
+from .constants import Database
 
 OIKOTIE_TABLE_NAME = "OikotieProperties"
 CHAT_HISTORY_TABLE_NAME = "ChatHistories"
 
 
 class DynamoDB:
-    def __init__(self):
-        self.endpoint_url = settings.DYNAMODB_ENDPOINT_URL
-        self.session = boto3.Session(
-            region_name=settings.REGION_NAME,
-            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        )
-        self.resource = self.session.resource(
-            "dynamodb",
-            endpoint_url=self.endpoint_url,
-        )
+    instance = None
+
+    def __new__(cls):
+        if cls.instance is None:
+            cls.instance = super().__new__(cls)
+            cls.instance.session = boto3.Session(
+                region_name=settings.REGION_NAME,
+            )
+            cls.instance.resource = cls.instance.session.resource(
+                Database.RESOURCE_NAME
+            )
+        return cls.instance
+
+
+def get_db() -> DynamoDB:
+    return DynamoDB()

@@ -2,16 +2,17 @@ from functools import reduce
 
 from boto3.dynamodb.conditions import Attr, Key
 
-from ..db import OIKOTIE_TABLE_NAME
+from ..constants import Database
+from ..db import DynamoDB
 from ..schemas import CommonParams
 from .schemas import PropertyQueryParams
 
 
 class PropertyService:
-    def __init__(self, db):
+    def __init__(self, db: DynamoDB):
         self.db = db
         self.resource = self.db.resource
-        self.table = self.resource.Table(OIKOTIE_TABLE_NAME)
+        self.table = self.resource.Table(Database.PROPERTIES_TABLE_NAME)
 
     def get_properties(self, params: PropertyQueryParams, q: CommonParams):
         query = self._build_query(params)
