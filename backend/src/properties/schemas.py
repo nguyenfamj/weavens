@@ -13,7 +13,7 @@ class BuildingType(str, Enum):
 
 
 class PropertyQueryParams(BaseModel):
-    city: str | None = Field(description="The city to search for properties in.")
+    city: str = Field(description="The city to search for properties in.")
     min_price: int | None = Field(description="The minimum price of the property.")
     max_price: int | None = Field(description="The maximum price of the property.")
     district: str | None = Field(description="The district of the property.")
