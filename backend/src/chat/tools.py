@@ -16,7 +16,7 @@ class FindPropertiesTool(BaseTool):
 
     def _run(
         self,
-        city: str | None = None,
+        city: str,
         min_price: int | None = None,
         max_price: int | None = None,
         district: str | None = None,
