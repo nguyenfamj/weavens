@@ -4,8 +4,10 @@ from boto3.dynamodb.conditions import Attr, Key
 
 from ..constants import Database
 from ..db import DynamoDB
+from ..logging import Logger
 from ..schemas import CommonParams
 from .schemas import PropertyQueryParams
+logger = Logger(__name__).logger
 
 
 class PropertyService:
@@ -15,7 +17,12 @@ class PropertyService:
         self.table = self.resource.Table(Database.PROPERTIES_TABLE_NAME)
 
     def get_properties(self, params: PropertyQueryParams, q: CommonParams):
-        query = self._build_query(params)
+        logger.debug(
+            "Called: %s(params: %s, q: %s)",
+            self.get_properties.__name__,
+            params.__dict__,
+            q.__dict__,
+        )
         response = self.table.query(**query)
 
         response["Items"] = response["Items"][q.offset : q.offset + q.limit]
@@ -29,6 +36,9 @@ class PropertyService:
         return response
 
     def get_property(self, property_id: int):
+        logger.debug(
+            "Called: %s(property_id: %s)", self.get_property.__name__, property_id
+        )
         response = self.table.get_item(Key={"id": property_id})
 
         return response
