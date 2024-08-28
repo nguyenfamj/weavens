@@ -16,6 +16,7 @@ langserve = "^0.2.2"
 sse-starlette = "^2.1.2"
 langchain-community = "^0.2.10"
 langchain-openai = "^0.1.20"
+mangum = "^0.17.0"
 
 [build-system]
 requires = ["poetry-core"]
