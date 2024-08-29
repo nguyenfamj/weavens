@@ -47,7 +47,7 @@ class FindPropertiesTool(BaseTool):
 
         response = property_service.get_properties(params, q)
 
-        return {"data": response["Items"]}
+        return {"data": response.data}
 
 
 tools = [FindPropertiesTool()]
