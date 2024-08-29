@@ -6,11 +6,12 @@ terraform {
   }
 }
 
-# module "dynamoDB" {
-#   source                    = "./modules/dynamodb"
-#   property_table_name       = local.property_table_name
-#   chat_histories_table_name = local.chat_histories_table_name
-# }
+# --- DynamoDB ---
+module "dynamoDB" {
+  source                    = "./modules/dynamodb"
+  property_table_name       = local.property_table_name
+  chat_histories_table_name = local.chat_histories_table_name
+}
 
 # --- ECR ---
 module "ecr" {
