@@ -4,7 +4,7 @@ from mangum import Mangum
 from .chat.router import router as chat_router
 from .config import settings
 from .logging import Logger
-from .properties.router import router as properties_router
+from .middlewares import ExceptionMiddleware
 
 app = FastAPI(
     title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
@@ -16,6 +16,8 @@ logger = Logger(__name__).logger
 logger.debug(
     "Application is running with settings \n%s", settings.model_dump_json(indent=2)
 )
+# Add middleware
+app.add_middleware(ExceptionMiddleware)
 
 
 @app.get("/healthcheck", include_in_schema=False)
