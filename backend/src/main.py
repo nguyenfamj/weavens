@@ -1,21 +1,25 @@
 from fastapi import FastAPI
 from mangum import Mangum
 
-from .chat.router import router as chat_router
 from .config import settings
 from .logging import Logger
 from .middlewares import ExceptionMiddleware
+from .router import api_router
 
-app = FastAPI(
-    title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
-)
-app.include_router(properties_router)
-app.include_router(chat_router)
-
+# Initialize logger
 logger = Logger(__name__).logger
 logger.debug(
     "Application is running with settings \n%s", settings.model_dump_json(indent=2)
 )
+
+# Initialize FastAPI app
+app = FastAPI(
+    title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
+)
+
+# Add routers
+app.include_router(api_router)
+
 # Add middleware
 app.add_middleware(ExceptionMiddleware)
 
@@ -26,4 +30,5 @@ def healthcheck():
     return {"status": "ok"}
 
 
+# Wrap FastAPI app with Mangum for AWS Lambda
 handler = Mangum(app, lifespan="off")
