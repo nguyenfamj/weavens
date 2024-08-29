@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter
 from fastapi.params import Depends
 
 from ..config import settings

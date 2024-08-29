@@ -1,6 +1,9 @@
 from enum import Enum
+from typing import Any
 
 from langchain_core.pydantic_v1 import BaseModel, Field
+
+from ..schemas import BaseResponse, Pagination
 
 
 class BuildingType(str, Enum):
@@ -32,3 +35,8 @@ class PropertyQueryParams(BaseModel):
     max_build_year: int | None = Field(
         description="The maximum year the property was built."
     )
+
+
+class PropertyResponse(BaseResponse):
+    data: list | Any | None = None
+    pagination: Pagination | None = None

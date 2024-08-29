@@ -1,8 +1,10 @@
+from fastapi import status
+
 from ..constants import Database
 from ..db import DynamoDB
 from ..logging import Logger
-from ..schemas import CommonParams
-from .schemas import PropertyQueryParams
+from ..schemas import CommonParams, Pagination
+from .schemas import PropertyQueryParams, PropertyResponse
 from .utils import build_query
 
 logger = Logger(__name__).logger
@@ -24,15 +26,18 @@ class PropertyService:
         query = build_query(params)
         response = self.table.query(**query)
 
-        response["Items"] = response["Items"][q.offset : q.offset + q.limit]
-        response["Pagination"] = {
-            "Page": q.offset // q.limit + 1,
-            "TotalPages": response["Count"] // q.limit + 1,
-            "PageSize": len(response["Items"]),
-            "TotalItems": response["Count"],
-        }
+        response_out = PropertyResponse(
+            status_code=status.HTTP_200_OK,
+            data=response["Items"],
+            pagination=Pagination(
+                page=q.offset // q.limit + 1,
+                total_pages=response["Count"] // q.limit + 1,
+                page_size=len(response["Items"]),
+                total_items=response["Count"],
+            ),
+        )
 
-        return response
+        return response_out
 
     def get_property(self, property_id: int):
         logger.debug(
@@ -40,4 +45,9 @@ class PropertyService:
         )
         response = self.table.get_item(Key={"id": property_id})
 
-        return response
+        response_out = PropertyResponse(
+            status_code=status.HTTP_200_OK,
+            data=response.get("Item"),
+        )
+
+        return response_out
