@@ -11,5 +11,6 @@ RUN poetry config virtualenvs.create false \
     && poetry install --no-dev
 
 COPY ./src ./src
+COPY ./.env.prod ./.env
 
 CMD [ "src.main.handler"]
