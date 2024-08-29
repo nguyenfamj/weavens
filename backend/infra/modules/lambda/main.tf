@@ -4,6 +4,7 @@ resource "aws_lambda_function" "api" {
   image_uri     = "${var.ecr_repo_url}:latest"
   architectures = ["arm64"]
   package_type  = "Image"
+  timeout       = var.lambda_timeout
 
   depends_on = [
     var.image_id,
