@@ -13,10 +13,12 @@ class FindPropertiesTool(BaseTool):
     name = "find_properties"
     description = "A tool to find properties in a city."
     args_schema = PropertyQueryParams
+    handle_tool_error = True
+    handle_validation_error = True
 
     def _run(
         self,
-        city: str,
+        city: str | None = None,
         min_price: int | None = None,
         max_price: int | None = None,
         district: str | None = None,
