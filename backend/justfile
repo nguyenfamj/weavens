@@ -7,3 +7,9 @@ dev:
     poetry env use 3.10.14
     poetry install --no-root
     poetry run bash scripts/start_dev.sh
+
+apply:
+    cd infra && terraform init && terraform apply --auto-approve
+
+destroy:
+    cd infra && terraform destroy --auto-approve
