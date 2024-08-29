@@ -15,5 +15,7 @@ class Settings(BaseSettings):
 
     REGION_NAME: str = "eu-north-1"
 
+    LOG_LEVEL: str = "INFO"
+
 
 settings = Settings()
