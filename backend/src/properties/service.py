@@ -1,3 +1,5 @@
+from math import ceil
+
 from fastapi import status
 
 from ..constants import Database
@@ -28,11 +30,11 @@ class PropertyService:
 
         response_out = PropertyResponse(
             status_code=status.HTTP_200_OK,
-            data=response["Items"],
+            data=response["Items"][q.offset : q.offset + q.limit],
             pagination=Pagination(
                 page=q.offset // q.limit + 1,
-                total_pages=response["Count"] // q.limit + 1,
-                page_size=len(response["Items"]),
+                total_pages=ceil(response["Count"] / q.limit),
+                page_size=q.limit,
                 total_items=response["Count"],
             ),
         )
