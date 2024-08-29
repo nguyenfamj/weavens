@@ -1,3 +1,6 @@
+from enum import Enum
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -17,5 +20,12 @@ class BaseResponse(BaseModel):
     status_code: int
 
 
+class Status(str, Enum):
+    SUCCESS = "success"
+    ERROR = "error"
+
+
 class ErrorResponse(BaseResponse):
-    detail: str
+    status: Status
+    status_code: int
+    error: dict[str, Any]
