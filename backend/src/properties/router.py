@@ -22,7 +22,7 @@ def get_properties(
     property_service = PropertyService(db)
     response = property_service.get_properties(params, q)
     if not response.data:
-        raise NotFoundHTTPException()
+        raise NotFoundHTTPException({"details": "No properties found"})
 
     return response
 
@@ -35,6 +35,8 @@ def get_property(
     property_service = PropertyService(db)
     response = property_service.get_property(property_id)
     if not response.data:
-        raise NotFoundHTTPException()
+        raise NotFoundHTTPException(
+            {"details": "Not found property with the ID: %s" % property_id}
+        )
 
     return response

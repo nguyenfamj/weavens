@@ -1,11 +1,21 @@
-from fastapi import status
+from typing import Any
+
+from fastapi import HTTPException, status
 
 
-class DetailHTTPException(Exception):
+class DetailHTTPException(HTTPException):
     STATUS_CODE: int
-    DETAIL: str
+    DETAIL: dict[str, Any]
+
+    def __init__(self):
+        super().__init__(status_code=self.STATUS_CODE, detail=self.DETAIL)
 
 
 class NotFoundHTTPException(DetailHTTPException):
     STATUS_CODE = status.HTTP_404_NOT_FOUND
-    DETAIL = "Not found"
+    DETAIL = {"message": "Not found"}
+
+    def __init__(self, detail: dict[str, Any] = None):
+        if detail:
+            self.DETAIL.update(detail)
+        super().__init__()
