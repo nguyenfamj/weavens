@@ -18,7 +18,9 @@ class PropertyService:
         self.resource = self.db.resource
         self.table = self.resource.Table(Database.PROPERTIES_TABLE_NAME)
 
-    def get_properties(self, params: PropertyQueryParams, q: CommonParams):
+    def get_properties(
+        self, params: PropertyQueryParams, q: CommonParams
+    ) -> PropertyResponse:
         logger.debug(
             "Called: %s(params: %s, q: %s)",
             self.get_properties.__name__,
@@ -41,7 +43,7 @@ class PropertyService:
 
         return response_out
 
-    def get_property(self, property_id: int):
+    def get_property(self, property_id: int) -> PropertyResponse:
         logger.debug(
             "Called: %s(property_id: %s)", self.get_property.__name__, property_id
         )
