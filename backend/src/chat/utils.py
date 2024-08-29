@@ -1,3 +1,5 @@
+import json
+
 import boto3
 from botocore.exceptions import ClientError
 
@@ -19,8 +21,9 @@ def get_secret():
         logger.info(f"Getting secret value for {secret_name}")
         get_secret_value_response = client.get_secret_value(SecretId=secret_name)
         secret = get_secret_value_response["SecretString"]
+        secret_dict = json.loads(secret)
 
-        return secret
+        return secret_dict.get("OPENAI_API_KEY", None)
     except ClientError as e:
         logger.error(f"Failed to get secret value: {e}")
 
