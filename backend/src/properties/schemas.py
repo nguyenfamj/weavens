@@ -1,7 +1,8 @@
 from enum import Enum
-from typing import Any
 
-from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
+from langchain_core.pydantic_v1 import Field
+from pydantic import BaseModel
 
 from ..schemas import BaseResponse, Pagination
 
@@ -15,7 +16,18 @@ class BuildingType(str, Enum):
     OTHER = "other"
 
 
-class PropertyQueryParams(BaseModel):
+class HousingType(str, Enum):
+    OWNERSHIP = "ownership"
+    RIGHT_OF_RESIDENCE = "right of residence"
+
+
+class PropertyOwnershipType(str, Enum):
+    OWN = "own"
+    OPTIONAL_RENT = "optional rent"
+    RENT = "rent"
+
+
+class PropertyQueryParams(BaseModelV1):
     city: str = Field(description="The city to search for properties in.")
     min_price: int | None = Field(description="The minimum price of the property.")
     max_price: int | None = Field(description="The maximum price of the property.")
@@ -37,6 +49,20 @@ class PropertyQueryParams(BaseModel):
     )
 
 
+class Property(BaseModel):
+    city: str
+    sales_price: float | None = None
+    location: str | None = None
+    district: str | None = None
+    life_sq: float | None = None
+    build_year: int | None = None
+    floor: str | None = None
+    building_type: BuildingType | None = None
+    housing_type: HousingType | None = None
+    property_ownership: PropertyOwnershipType | None = None
+    condominium_payment: float | None = None
+
+
 class PropertyResponse(BaseResponse):
-    data: list | Any | None = None
+    data: list[Property] | Property | None = None
     pagination: Pagination | None = None
