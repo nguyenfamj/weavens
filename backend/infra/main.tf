@@ -34,6 +34,7 @@ module "lambda" {
   lambda_role_arn      = module.iam.lambda_role_arn
   ecr_repo_url         = module.ecr.ecr_repo_url
   lambda_function_name = local.lambda_function_name
+  lambda_timeout       = local.lambda_timeout
 
   image_id                      = module.ecr.image.id
   iam_role_policy_attachment_id = module.iam.iam_role_policy_attachment.id
