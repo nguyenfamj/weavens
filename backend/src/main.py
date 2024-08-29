@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from mangum import Mangum
 
 from .config import settings
+from .exception_handlers import exception_handlers
 from .logging import Logger
-from .middlewares import ExceptionMiddleware
 from .router import api_router
 
 # Initialize logger
@@ -14,14 +14,13 @@ logger.debug(
 
 # Initialize FastAPI app
 app = FastAPI(
-    title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    title=settings.PROJECT_NAME,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    exception_handlers=exception_handlers,
 )
 
 # Add routers
 app.include_router(api_router)
-
-# Add middleware
-app.add_middleware(ExceptionMiddleware)
 
 
 @app.get("/healthcheck", include_in_schema=False)
