@@ -7,13 +7,13 @@ from ..config import settings
 from ..db import DynamoDB, get_db
 from ..exceptions import NotFoundHTTPException
 from ..schemas import CommonParams
-from .schemas import PropertyQueryParams
+from .schemas import PropertyQueryParams, PropertyResponse
 from .service import PropertyService
 
 router = APIRouter(prefix=f"{settings.API_V1_STR}/properties", tags=["properties"])
 
 
-@router.get("")
+@router.get("", response_model=PropertyResponse)
 def get_properties(
     params: Annotated[PropertyQueryParams, Depends()],
     q: Annotated[CommonParams, Depends()],
@@ -27,7 +27,7 @@ def get_properties(
     return response
 
 
-@router.get("/{property_id}")
+@router.get("/{property_id}", response_model=PropertyResponse)
 def get_property(
     property_id: int,
     db: Annotated[DynamoDB, Depends(get_db)],
