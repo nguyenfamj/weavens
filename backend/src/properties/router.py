@@ -5,6 +5,7 @@ from fastapi.params import Depends
 
 from ..config import settings
 from ..db import DynamoDB, get_db
+from ..exceptions import NotFoundHTTPException
 from ..schemas import CommonParams
 from .schemas import PropertyQueryParams
 from .service import PropertyService
@@ -19,9 +20,11 @@ def get_properties(
     db: Annotated[DynamoDB, Depends(get_db)],
 ):
     property_service = PropertyService(db)
-    properties = property_service.get_properties(params, q)
+    response = property_service.get_properties(params, q)
+    if not response.data:
+        raise NotFoundHTTPException()
 
-    return properties
+    return response
 
 
 @router.get("/{property_id}")
@@ -30,9 +33,8 @@ def get_property(
     db: Annotated[DynamoDB, Depends(get_db)],
 ):
     property_service = PropertyService(db)
-    property = property_service.get_property(property_id)
+    response = property_service.get_property(property_id)
+    if not response.data:
+        raise NotFoundHTTPException()
 
-    if property:
-        return property
-
-    return Response(status_code=status.HTTP_404_NOT_FOUND)
+    return response
