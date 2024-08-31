@@ -2,12 +2,12 @@ from enum import Enum
 
 
 class Environment(str, Enum):
-    DEVELOPMENT = "DEVELOPMENT"
+    LOCAL = "LOCAL"
     PRODUCTION = "PRODUCTION"
 
     @property
-    def is_development(self) -> bool:
-        return self == Environment.DEVELOPMENT
+    def is_local(self) -> bool:
+        return self == Environment.LOCAL
 
     @property
     def is_production(self) -> bool:
@@ -19,3 +19,8 @@ class Database:
 
     PROPERTIES_TABLE_NAME = "OikotieProperties"
     CHAT_HISTORY_TABLE_NAME = "ChatHistories"
+
+
+class Secret:
+    SERVICE_NAME = "secretsmanager"
+    OPENAI_API_KEY = "house-hunt/openai"
