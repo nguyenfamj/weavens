@@ -11,9 +11,9 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "House Hunt"
     API_V1_STR: str = "/api/v1"
 
-    ENVIRONMENT: Environment = Environment.PRODUCTION
+    ENVIRONMENT: Environment
 
-    REGION_NAME: str = "eu-north-1"
+    REGION_NAME: str = "us-east-1"
 
     LOG_LEVEL: str = "INFO"
 

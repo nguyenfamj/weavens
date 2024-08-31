@@ -13,6 +13,11 @@ variable "lambda_function_name" {
   type        = string
 }
 
+variable "lambda_timeout" {
+  description = "The amount of time in seconds that Lambda has to run the function"
+  type        = number
+}
+
 variable "image_id" {
   description = "The ID of the deployed Docker image to ECR"
   type        = string

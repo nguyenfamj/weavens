@@ -17,7 +17,10 @@ class DynamoDB:
                 region_name=settings.REGION_NAME,
             )
             cls.instance.resource = cls.instance.session.resource(
-                Database.RESOURCE_NAME
+                Database.RESOURCE_NAME,
+                endpoint_url="http://localhost:8000"
+                if settings.ENVIRONMENT.is_local
+                else None,
             )
         return cls.instance
 
