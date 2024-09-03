@@ -1,6 +1,8 @@
 import re
 from decimal import Decimal
 
+from .constants import BOOLEAN_TRANSLATIONS
+
 
 class TextUtils:
     @staticmethod
@@ -19,6 +21,11 @@ class TextUtils:
     @staticmethod
     def cast_to_int(text: str) -> int:
         return int(text)
+
+    @staticmethod
+    def cast_to_bool(text: str) -> bool:
+        if text.lower() in BOOLEAN_TRANSLATIONS.keys():
+            return BOOLEAN_TRANSLATIONS[text.lower()]
 
     @staticmethod
     def extract_price(text: str) -> Decimal:

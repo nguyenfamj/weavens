@@ -19,7 +19,13 @@ class ExtractPricePipeline:
     def process_item(self, item, spider: Spider):
         if spider.name == "oikotie":
             adapter = ItemAdapter(item)
-            fields = ["price_no_tax", "sales_price", "condominium_payment"]
+            fields = [
+                "price_no_tax",
+                "sales_price",
+                "condominium_payment",
+                "water_charge",
+                "maintenance_charge",
+            ]
             for field in fields:
                 if adapter.get(field):
                     adapter[field] = TextUtils.extract_price(adapter[field])
@@ -31,7 +37,7 @@ class ExtractAreaPipeline:
     def process_item(self, item, spider: Spider):
         if spider.name == "oikotie":
             adapter = ItemAdapter(item)
-            fields = ["life_sq"]
+            fields = ["life_sq", "property_size"]
             for field in fields:
                 if adapter.get(field):
                     adapter[field] = TextUtils.extract_area(adapter[field])
@@ -42,10 +48,24 @@ class ExtractAreaPipeline:
 class ExtractCastToIntPipeline:
     def process_item(self, item, spider: Spider):
         adapter = ItemAdapter(item)
-        fields = ["id", "build_year"]
+        fields = ["id", "build_year", "total_floors", "number_of_rooms"]
         for field in fields:
             if adapter.get(field):
                 adapter[field] = TextUtils.cast_to_int(adapter[field])
+
+        return item
+
+
+class ExtractCastToBoolPipeline:
+    def process_item(self, item, spider: Spider):
+        if spider.name == "oikotie":
+            adapter = ItemAdapter(item)
+            fields = ["building_has_elevator", "building_has_sauna", "has_balcony"]
+            for field in fields:
+                if adapter.get(field):
+                    print(f"Field: {field}, Value: {adapter[field]}")
+                    adapter[field] = TextUtils.cast_to_bool(adapter[field])
+                    print(f"Field: {field}, Value: {adapter[field]}")
 
         return item
 
@@ -109,7 +129,7 @@ class PutToDynamoDBPipeline:
         pass
 
     def process_item(self, item, spider: Spider):
-        processed_item = {k: v for k, v in ItemAdapter(item).asdict().items() if v}
+        processed_item = {k: v for k, v in ItemAdapter(item).asdict().items()}
         if spider.name == "oikotie_url":
             processed_item.update({"translated": 0, "crawled": 0})
             self.db.table.put_item(Item=processed_item)
