@@ -86,6 +86,7 @@ ITEM_PIPELINES = {
     "scraper.pipelines.ExtractPricePipeline": 200,
     "scraper.pipelines.ExtractAreaPipeline": 300,
     "scraper.pipelines.ExtractCastToBoolPipeline": 350,
+    "scraper.pipelines.ExtractFloorNumberPipeline": 360,
     "scraper.pipelines.TranslationPipeline": 400,
     "scraper.pipelines.PutToDynamoDBPipeline": 500,
 }
