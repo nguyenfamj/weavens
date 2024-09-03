@@ -63,9 +63,21 @@ class ExtractCastToBoolPipeline:
             fields = ["building_has_elevator", "building_has_sauna", "has_balcony"]
             for field in fields:
                 if adapter.get(field):
-                    print(f"Field: {field}, Value: {adapter[field]}")
                     adapter[field] = TextUtils.cast_to_bool(adapter[field])
-                    print(f"Field: {field}, Value: {adapter[field]}")
+
+        return item
+
+
+class ExtractFloorNumberPipeline:
+    def process_item(self, item, spider: Spider):
+        if spider.name == "oikotie":
+            adapter = ItemAdapter(item)
+            field = "floor"
+            if adapter.get(field) and isinstance(adapter[field], str):
+                try:
+                    adapter[field] = int(adapter[field].split("/")[0])
+                except ValueError:
+                    pass
 
         return item
 
