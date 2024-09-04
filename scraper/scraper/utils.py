@@ -7,7 +7,9 @@ from .constants import BOOLEAN_TRANSLATIONS
 class TextUtils:
     @staticmethod
     def strip_join(text_list: list[str], join_element: str = " ") -> str:
-        return join_element.join(text.strip() for text in text_list if text is not None)
+        return join_element.join(
+            text.strip() for text in text_list if text and text != " "
+        )
 
     @staticmethod
     def extract_area(text: str) -> Decimal:
