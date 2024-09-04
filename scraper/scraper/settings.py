@@ -81,8 +81,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    "scraper.pipelines.DuplicateFilterPipeline": 150,
-    "scraper.pipelines.TranslationPipeline": 400,
+    "scraper.pipelines.DuplicateFilterPipeline": 100,
     "scraper.pipelines.PutToDynamoDBPipeline": 500,
 }
 
