@@ -16,8 +16,8 @@ class ScraperItem(Item):
 
 
 class OikotieItem(Item):
-    id = Field(input_processor=Identity(), output_processor=TakeFirst())
-    url = Field(input_processor=Identity(), output_processor=TakeFirst())
+    # Image urls
+    image_urls = Field(output_processor=Identity())
 
     # Basic information
     location = Field(input_processor=TextUtils.strip_join, output_processor=TakeFirst())
