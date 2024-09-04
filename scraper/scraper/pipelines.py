@@ -33,18 +33,6 @@ class ExtractPricePipeline:
         return item
 
 
-class ExtractCastToBoolPipeline:
-    def process_item(self, item, spider: Spider):
-        if spider.name == "oikotie":
-            adapter = ItemAdapter(item)
-            fields = ["building_has_elevator", "building_has_sauna", "has_balcony"]
-            for field in fields:
-                if adapter.get(field):
-                    adapter[field] = ProcessorUtils.cast_to_bool(adapter[field])
-
-        return item
-
-
 class ExtractFloorNumberPipeline:
     def process_item(self, item, spider: Spider):
         if spider.name == "oikotie":
