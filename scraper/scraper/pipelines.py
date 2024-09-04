@@ -12,25 +12,6 @@ from .constants import (
     PROPERTY_OWNERSHIP_TRANSLATIONS,
 )
 from .db import DynamoDB
-from .utils import ProcessorUtils
-
-
-class ExtractPricePipeline:
-    def process_item(self, item, spider: Spider):
-        if spider.name == "oikotie":
-            adapter = ItemAdapter(item)
-            fields = [
-                "price_no_tax",
-                "sales_price",
-                "condominium_payment",
-                "water_charge",
-                "maintenance_charge",
-            ]
-            for field in fields:
-                if adapter.get(field):
-                    adapter[field] = ProcessorUtils.extract_price(adapter[field])
-
-        return item
 
 
 class ExtractFloorNumberPipeline:
