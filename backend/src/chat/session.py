@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from langchain_community.chat_message_histories import DynamoDBChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 
-from ..db import DynamoDB
+from ..db import get_db
 
 PRIMARY_KEY_NAME = "SessionId"
 
@@ -24,7 +24,7 @@ def _create_table(table_name: str):
     Args:
         table_name (str): The name of the table to create.
     """
-    db = DynamoDB()
+    db = get_db()
     table = db.resource.create_table(
         TableName=table_name,
         KeySchema=[
@@ -52,7 +52,7 @@ def get_session_history(table_name: str) -> Callable[[str], BaseChatMessageHisto
     if not table_name:
         raise ValueError("Table name must be provided.")
 
-    db = DynamoDB()
+    db = get_db()
     table = db.resource.Table(table_name)
 
     try:
@@ -72,7 +72,6 @@ def get_session_history(table_name: str) -> Callable[[str], BaseChatMessageHisto
         return DynamoDBChatMessageHistory(
             table_name=table_name,
             session_id=session_id,
-            endpoint_url=db.endpoint_url,
             primary_key_name=PRIMARY_KEY_NAME,
             boto3_session=db.session,
         )

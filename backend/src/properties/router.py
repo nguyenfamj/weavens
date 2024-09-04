@@ -1,35 +1,42 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter
 from fastapi.params import Depends
 
 from ..config import settings
-from ..db import DynamoDB
+from ..db import DynamoDB, get_db
+from ..exceptions import NotFoundHTTPException
 from ..schemas import CommonParams
-from .schemas import PropertyQueryParams
+from .schemas import PropertyQueryParams, PropertyResponse
 from .service import PropertyService
 
 router = APIRouter(prefix=f"{settings.API_V1_STR}/properties", tags=["properties"])
 
 
-@router.get("")
+@router.get("", response_model=PropertyResponse)
 def get_properties(
     params: Annotated[PropertyQueryParams, Depends()],
     q: Annotated[CommonParams, Depends()],
-    db: Annotated[DynamoDB, Depends()],
+    db: Annotated[DynamoDB, Depends(get_db)],
 ):
     property_service = PropertyService(db)
-    properties = property_service.get_properties(params, q)
+    response = property_service.get_properties(params, q)
+    if not response.data:
+        raise NotFoundHTTPException({"details": "No properties found"})
 
-    return properties
+    return response
 
 
-@router.get("/{property_id}")
-def get_property(property_id: int, db: Annotated[DynamoDB, Depends()]):
+@router.get("/{property_id}", response_model=PropertyResponse)
+def get_property(
+    property_id: int,
+    db: Annotated[DynamoDB, Depends(get_db)],
+):
     property_service = PropertyService(db)
-    property = property_service.get_property(property_id)
+    response = property_service.get_property(property_id)
+    if not response.data:
+        raise NotFoundHTTPException(
+            {"details": "Not found property with the ID: %s" % property_id}
+        )
 
-    if property:
-        return property
-
-    return Response(status_code=status.HTTP_404_NOT_FOUND)
+    return response

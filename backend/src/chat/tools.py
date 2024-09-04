@@ -1,19 +1,20 @@
-import requests
 from langchain.callbacks.manager import (
     CallbackManagerForToolRun,
 )
 from langchain.tools import BaseTool
 
-from ..config import settings
+from ..db import get_db
 from ..properties.schemas import BuildingType, PropertyQueryParams
-
-BACKEND_URL = f"http://{settings.HOST}:{settings.PORT}"
+from ..properties.service import PropertyService
+from ..schemas import CommonParams
 
 
 class FindPropertiesTool(BaseTool):
     name = "find_properties"
     description = "A tool to find properties in a city."
     args_schema = PropertyQueryParams
+    handle_tool_error = True
+    handle_validation_error = True
 
     def _run(
         self,
@@ -40,11 +41,15 @@ class FindPropertiesTool(BaseTool):
             "min_build_year": min_build_year,
             "max_build_year": max_build_year,
         }
-        response = requests.get(
-            f"{BACKEND_URL}/{settings.API_V1_STR}/properties", params=params
-        )
+        params = PropertyQueryParams(**params)
+        q = CommonParams()
 
-        return {"data": response.json()["Items"]}
+        db = get_db()
+        property_service = PropertyService(db)
+
+        response = property_service.get_properties(params, q)
+
+        return {"data": response.data}
 
 
 tools = [FindPropertiesTool()]
