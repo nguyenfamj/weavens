@@ -81,7 +81,6 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    "scraper.pipelines.ExtractCastToIntPipeline": 100,
     "scraper.pipelines.DuplicateFilterPipeline": 150,
     "scraper.pipelines.ExtractPricePipeline": 200,
     "scraper.pipelines.ExtractAreaPipeline": 300,

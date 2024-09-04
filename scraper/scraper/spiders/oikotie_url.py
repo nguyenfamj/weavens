@@ -1,9 +1,8 @@
 from scrapy import Request, Spider
 from scrapy.http import Response
-from scrapy.loader import ItemLoader
 from scrapy_playwright.page import PageMethod
 
-from ..items import OikotieItem
+from ..items import OikotieItem, OikotieItemLoader
 
 
 class OikotieUrlSpider(Spider):
@@ -38,7 +37,8 @@ class OikotieUrlSpider(Spider):
         await page.close()
 
         for link in response.css("a.ot-card-v2"):
-            il = ItemLoader(item=OikotieItem(), selector=link)
+            il = OikotieItemLoader(item=OikotieItem(), selector=link)
             il.add_css("url", "::attr(href)")
             il.add_css("id", "::attr(analytics-click-card-id)")
+
             yield il.load_item()
