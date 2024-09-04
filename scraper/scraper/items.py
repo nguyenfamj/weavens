@@ -48,7 +48,9 @@ class OikotieItem(Item):
     completed_renovations = Field()
     has_sauna = Field()
     sauna_details = Field()
-    housing_type = Field()
+    housing_type = Field(
+        input_processor=MapCompose(ProcessorUtils.translate_housing_type)
+    )
     services = Field()
     additional_info = Field()
     property_id = Field()
@@ -74,7 +76,9 @@ class OikotieItem(Item):
     # House and property
     is_brand_new = Field()
     housing_company_name = Field()
-    building_type = Field()
+    building_type = Field(
+        input_processor=MapCompose(ProcessorUtils.translate_building_type)
+    )
     build_year = Field(input_processor=MapCompose(int))
     build_year_details = Field()
     number_of_apartments = Field()
@@ -96,7 +100,9 @@ class OikotieItem(Item):
     plan = Field()
     traffic_communication = Field()
     heating = Field()
-    property_ownership = Field()
+    property_ownership = Field(
+        input_processor=MapCompose(ProcessorUtils.translate_property_ownership)
+    )
     # Spaces and material
     parking_space_description = Field()
     common_spaces = Field()
