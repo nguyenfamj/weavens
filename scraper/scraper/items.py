@@ -27,7 +27,7 @@ class OikotieItem(Item):
     house_number = Field()
     district = Field()
     item_number = Field()
-    floor = Field()
+    floor = Field(input_processor=MapCompose(ProcessorUtils.extract_floor_number))
     total_floors = Field(input_processor=MapCompose(int))
     life_sq = Field(input_processor=MapCompose(ProcessorUtils.extract_area))
     property_sq = Field()
