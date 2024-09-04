@@ -83,7 +83,6 @@ ROBOTSTXT_OBEY = True
 ITEM_PIPELINES = {
     "scraper.pipelines.DuplicateFilterPipeline": 150,
     "scraper.pipelines.ExtractPricePipeline": 200,
-    "scraper.pipelines.ExtractCastToBoolPipeline": 350,
     "scraper.pipelines.ExtractFloorNumberPipeline": 360,
     "scraper.pipelines.TranslationPipeline": 400,
     "scraper.pipelines.PutToDynamoDBPipeline": 500,
