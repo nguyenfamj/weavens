@@ -39,3 +39,10 @@ class ProcessorUtils:
             return Decimal(price_str)
         else:
             return None
+
+    @staticmethod
+    def extract_floor_number(text: str) -> int | None:
+        try:
+            return int(text.split("/")[0])
+        except ValueError:
+            return None
