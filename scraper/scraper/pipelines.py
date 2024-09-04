@@ -33,18 +33,6 @@ class ExtractPricePipeline:
         return item
 
 
-class ExtractAreaPipeline:
-    def process_item(self, item, spider: Spider):
-        if spider.name == "oikotie":
-            adapter = ItemAdapter(item)
-            fields = ["life_sq", "property_size"]
-            for field in fields:
-                if adapter.get(field):
-                    adapter[field] = ProcessorUtils.extract_area(adapter[field])
-
-        return item
-
-
 class ExtractCastToBoolPipeline:
     def process_item(self, item, spider: Spider):
         if spider.name == "oikotie":
