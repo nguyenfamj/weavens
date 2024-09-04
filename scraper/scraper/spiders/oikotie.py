@@ -4,12 +4,11 @@ from typing import Any
 from boto3.dynamodb.conditions import Key
 from redis import from_url
 from scrapy.http import Response
-from scrapy.loader import ItemLoader
 from scrapy_redis.spiders import RedisSpider
 
 from ..constants import TITLE_TO_FIELD
 from ..db import DynamoDB
-from ..items import OikotieItem
+from ..items import OikotieItem, OikotieItemLoader
 from ..settings import DYNAMODB_ENDPOINT_URL, DYNAMODB_TABLE_NAME, REDIS_URL
 
 
@@ -32,7 +31,7 @@ class OikotieSpider(RedisSpider):
         url = response.url
         id = url.split("/")[-1]
 
-        il = ItemLoader(item=OikotieItem(), response=response)
+        il = OikotieItemLoader(item=OikotieItem(), response=response)
         il.add_value("url", url)
         il.add_value("id", id)
 

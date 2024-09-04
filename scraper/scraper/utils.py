@@ -4,7 +4,7 @@ from decimal import Decimal
 from .constants import BOOLEAN_TRANSLATIONS
 
 
-class TextUtils:
+class ProcessorUtils:
     @staticmethod
     def strip_join(text_list: list[str], join_element: str = " ") -> str:
         return join_element.join(
@@ -21,8 +21,9 @@ class TextUtils:
             return None
 
     @staticmethod
-    def cast_to_int(text: str) -> int:
-        return int(text)
+    def cast_to_bool(text: str) -> bool:
+        if text.lower() in BOOLEAN_TRANSLATIONS.keys():
+            return BOOLEAN_TRANSLATIONS[text.lower()]
 
     @staticmethod
     def cast_to_bool(text: str) -> bool:

@@ -12,7 +12,7 @@ from .constants import (
     PROPERTY_OWNERSHIP_TRANSLATIONS,
 )
 from .db import DynamoDB
-from .utils import TextUtils
+from .utils import ProcessorUtils
 
 
 class ExtractPricePipeline:
@@ -28,7 +28,7 @@ class ExtractPricePipeline:
             ]
             for field in fields:
                 if adapter.get(field):
-                    adapter[field] = TextUtils.extract_price(adapter[field])
+                    adapter[field] = ProcessorUtils.extract_price(adapter[field])
 
         return item
 
@@ -40,18 +40,33 @@ class ExtractAreaPipeline:
             fields = ["life_sq", "property_size"]
             for field in fields:
                 if adapter.get(field):
-                    adapter[field] = TextUtils.extract_area(adapter[field])
+                    adapter[field] = ProcessorUtils.extract_area(adapter[field])
 
         return item
 
 
-class ExtractCastToIntPipeline:
+class ExtractCastToBoolPipeline:
     def process_item(self, item, spider: Spider):
-        adapter = ItemAdapter(item)
-        fields = ["id", "build_year", "total_floors", "number_of_rooms"]
-        for field in fields:
-            if adapter.get(field):
-                adapter[field] = TextUtils.cast_to_int(adapter[field])
+        if spider.name == "oikotie":
+            adapter = ItemAdapter(item)
+            fields = ["building_has_elevator", "building_has_sauna", "has_balcony"]
+            for field in fields:
+                if adapter.get(field):
+                    adapter[field] = ProcessorUtils.cast_to_bool(adapter[field])
+
+        return item
+
+
+class ExtractFloorNumberPipeline:
+    def process_item(self, item, spider: Spider):
+        if spider.name == "oikotie":
+            adapter = ItemAdapter(item)
+            field = "floor"
+            if adapter.get(field) and isinstance(adapter[field], str):
+                try:
+                    adapter[field] = int(adapter[field].split("/")[0])
+                except ValueError:
+                    pass
 
         return item
 
