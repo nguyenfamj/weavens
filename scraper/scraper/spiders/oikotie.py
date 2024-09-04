@@ -36,6 +36,9 @@ class OikotieSpider(RedisSpider):
         il.add_value("url", url)
         il.add_value("id", id)
 
+        # Extract image urls
+        il.add_xpath("image_urls", '//div[@class="galleria"]/a/@href')
+
         # Extract data from table
         table_xpath = '//dt[text()="{title}"]/following-sibling::dd[1]//text()'
         for title, field in self.title_to_field.items():
