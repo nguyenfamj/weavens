@@ -18,5 +18,23 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Git credentials
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Create release tag
+        id: create_tag
+        run: |
+          echo "::set-output name=release_tag::v$(date +%Y.%m.%d).$(date +%s)"
+
+      - name: Tag ref
+        run: |
+          git tag -a ${{ steps.create_tag.outputs.release_tag }} -m "Release ${{ steps.create_tag.outputs.release_tag }}" ${{ github.sha }}
+          git push origin ${{ steps.create_tag.outputs.release_tag }}
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.create_tag.outputs.release_tag }}
