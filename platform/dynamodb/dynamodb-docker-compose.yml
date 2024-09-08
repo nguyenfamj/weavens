@@ -1,28 +1,27 @@
-version: "3.9"
 services:
   dynamodb:
     image: amazon/dynamodb-local:latest
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    command: '-jar DynamoDBLocal.jar -sharedDb -dbPath ./data'
     healthcheck:
-      test: ["CMD-SHELL", "curl -v http://dynamodb:8000"]
+      test: ['CMD-SHELL', 'curl -v http://dynamodb:8000']
       interval: 3s
       timeout: 3s
       retries: 5
       start_period: 3s
     ports:
-      - "${DYNAMODB_PORT}:8000"
+      - '${DYNAMODB_PORT}:8000'
     volumes:
-      - "./data:/home/dynamodblocal/data"
+      - 'data:/home/dynamodblocal/data'
     restart: always
     working_dir: /home/dynamodblocal
 
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin:latest
     ports:
-      - "${DYNAMODB_ADMIN_PORT}:8001"
+      - '${DYNAMODB_ADMIN_PORT}:8001'
     environment:
-      DYNAMO_ENDPOINT: "http://dynamodb:8000"
-      AWS_REGION: "eu-west-2"
+      DYNAMO_ENDPOINT: 'http://dynamodb:8000'
+      AWS_REGION: 'eu-west-2'
       AWS_ACCESS_KEY_ID: local
       AWS_SECRET_ACCESS_KEY: local
     depends_on:
