@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   redis:
     container_name: redis-stack
@@ -7,10 +5,10 @@ services:
     environment:
       - REDIS_ARGS=--appendonly yes
     ports:
-      - "${REDIS_PORT}:6379"
-      - "${REDIS_ADMIN_PORT}:8001"
+      - '${REDIS_PORT}:6379'
+      - '${REDIS_ADMIN_PORT}:8001'
     volumes:
-      - ./data:/data
+      - data:/data
 
 volumes:
   data:

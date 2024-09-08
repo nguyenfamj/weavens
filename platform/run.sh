@@ -3,11 +3,14 @@
 service=$1  # Service as the first argument
 cmd=$2      # Command as the second argument
 
+# Project names
+COMPOSE_PROJECT_NAME="platform"
+export COMPOSE_PROJECT_NAME="$COMPOSE_PROJECT_NAME"
+
 # Service names
 ALL="all"
 DYNAMODB="dynamodb"
 REDIS="redis"
-AIRFLOW="airflow"
 RESTART_SLEEP_SEC=2
 
 usage() {
@@ -17,7 +20,6 @@ usage() {
     echo "  $ALL"
     echo "  $DYNAMODB"
     echo "  $REDIS"
-    echo "  $AIRFLOW"
     echo "Available commands:"
     echo "  up           run container"
     echo "  down         stop and remove container"
@@ -80,15 +82,6 @@ down_redis() {
     down "$REDIS" "$@"
 }
 
-# AIRFLOW
-up_airflow() {
-    up "$AIRFLOW" "$@"
-}
-
-down_airflow() {
-    down "$AIRFLOW" "$@"
-}
-
 if [[ "$1" == "-h" ]]; then
     usage
     exit 0
@@ -107,80 +100,69 @@ fi
 shift 2
 
 case $cmd in
-    up)
-        case $service in
-            "$ALL")
-                up_all "$@"
-                ;;
-            "$DYNAMODB")
-                up_dynamodb "$@"
-                ;;
-            "$REDIS")
-                up_redis "$@"
-                ;;
-            "$AIRFLOW")
-                up_airflow "$@"
-                ;;
-            *)
-                echo "Unknown service"
-                usage
-                exit 1
-                ;;
-        esac
+up)
+    case $service in
+    "$ALL")
+        up_all "$@"
         ;;
-    down)
-        case $service in
-            "$ALL")
-                down_all "$@"
-                ;;
-            "$DYNAMODB")
-                down_dynamodb "$@"
-                ;;
-            "$REDIS")
-                down_redis "$@"
-                ;;
-            "$AIRFLOW")
-                down_airflow "$@"
-                ;;
-            *)
-                echo "Unknown service"
-                usage
-                exit 1
-                ;;
-        esac
+    "$DYNAMODB")
+        up_dynamodb "$@"
         ;;
-    restart)
-        case $service in
-            "$ALL")
-                down_all "$@"
-                sleep $RESTART_SLEEP_SEC
-                up_all "$@"
-                ;;
-            "$DYNAMODB")
-                down_dynamodb "$@"
-                sleep $RESTART_SLEEP_SEC
-                up_dynamodb "$@"
-                ;;
-            "$REDIS")
-                down_redis "$@"
-                sleep $RESTART_SLEEP_SEC
-                up_redis "$@"
-                ;;
-            "$AIRFLOW")
-                down_airflow "$@"
-                sleep $RESTART_SLEEP_SEC
-                up_airflow "$@"
-                ;;
-            *)
-                echo "Unknown service"
-                usage
-                exit 1
-                ;;
-        esac
+    "$REDIS")
+        up_redis "$@"
         ;;
     *)
-        echo "Unknown command"
+        echo "Unknown service"
         usage
         exit 1
         ;;
+    esac
+    ;;
+down)
+    case $service in
+    "$ALL")
+        down_all "$@"
+        ;;
+    "$DYNAMODB")
+        down_dynamodb "$@"
+        ;;
+    "$REDIS")
+        down_redis "$@"
+        ;;
+    *)
+        echo "Unknown service"
+        usage
+        exit 1
+        ;;
+    esac
+    ;;
+restart)
+    case $service in
+    "$ALL")
+        down_all "$@"
+        sleep $RESTART_SLEEP_SEC
+        up_all "$@"
+        ;;
+    "$DYNAMODB")
+        down_dynamodb "$@"
+        sleep $RESTART_SLEEP_SEC
+        up_dynamodb "$@"
+        ;;
+    "$REDIS")
+        down_redis "$@"
+        sleep $RESTART_SLEEP_SEC
+        up_redis "$@"
+        ;;
+    *)
+        echo "Unknown service"
+        usage
+        exit 1
+        ;;
+    esac
+    ;;
+*)
+    echo "Unknown command"
+    usage
+    exit 1
+    ;;
 esac
