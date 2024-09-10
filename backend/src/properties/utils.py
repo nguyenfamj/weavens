@@ -29,32 +29,23 @@ def build_query(params: PropertyQueryParams, projection_expression: str) -> dict
             Key("sales_price").lte(params.max_price)
         )
 
-    if params.district:
-        expressions["FilterExpression"].append(Attr("district").eq(params.district))
-    if params.min_life_sq:
-        expressions["FilterExpression"].append(Attr("life_sq").gte(params.min_life_sq))
-    if params.max_life_sq:
-        expressions["FilterExpression"].append(Attr("life_sq").lte(params.max_life_sq))
-    if params.min_build_year:
-        expressions["FilterExpression"].append(
-            Attr("build_year").gte(params.min_build_year)
-        )
-    if params.max_build_year:
-        expressions["FilterExpression"].append(
-            Attr("build_year").lte(params.max_build_year)
-        )
-    if params.building_type:
-        expressions["FilterExpression"].append(
-            Attr("building_type").eq(params.building_type)
-        )
-    if params.min_number_of_bedrooms:
-        expressions["FilterExpression"].append(
-            Attr("number_of_bedrooms").gte(params.min_number_of_bedrooms)
-        )
-    if params.max_number_of_bedrooms:
-        expressions["FilterExpression"].append(
-            Attr("number_of_bedrooms").lte(params.max_number_of_bedrooms)
-        )
+    # Handle filter for string attributes
+    string_attribute_dict = {
+        "district": params.district,
+        "building_type": params.building_type,
+    }
+    _handle_string_attribute(string_attribute_dict, expressions)
+
+    # Handle filter for number attributes
+    number_attribute_dict = {
+        "min_life_sq": params.min_life_sq,
+        "max_life_sq": params.max_life_sq,
+        "min_build_year": params.min_build_year,
+        "max_build_year": params.max_build_year,
+        "min_number_of_bedrooms": params.min_number_of_bedrooms,
+        "max_number_of_bedrooms": params.max_number_of_bedrooms,
+    }
+    _handle_number_attribute(number_attribute_dict, expressions)
 
     # Handle filter for boolean attributes
     boolean_attributes_dict = {
@@ -62,14 +53,7 @@ def build_query(params: PropertyQueryParams, projection_expression: str) -> dict
         "building_has_elevator": params.building_has_elevator,
         "building_has_sauna": params.building_has_sauna,
     }
-    for attr_name, attr_value in boolean_attributes_dict.items():
-        if attr_value is not None:
-            if attr_value:
-                expressions["FilterExpression"].append(Attr(attr_name).eq(True))
-            else:
-                expressions["FilterExpression"].append(
-                    Attr(attr_name).eq(False) | Attr(attr_name).not_exists()
-                )
+    _handle_boolean_attribute(boolean_attributes_dict, expressions)
 
     query = dict(
         IndexName="GSI1",
@@ -82,3 +66,31 @@ def build_query(params: PropertyQueryParams, projection_expression: str) -> dict
             query[k] = reduce(lambda x, y: x & y, v)
 
     return query
+
+
+def _handle_boolean_attribute(
+    dictionary: dict[str, bool], expressions: dict[str, list]
+):
+    for key, value in dictionary.items():
+        if value is not None:
+            if value:
+                expressions["FilterExpression"].append(Attr(key).eq(True))
+            else:
+                expressions["FilterExpression"].append(
+                    Attr(key).eq(False) | Attr(key).not_exists()
+                )
+
+
+def _handle_string_attribute(dictionary: dict[str, str], expressions: dict[str, list]):
+    for key, value in dictionary.items():
+        if value is not None:
+            expressions["FilterExpression"].append(Attr(key).eq(value))
+
+
+def _handle_number_attribute(dictionary: dict[str, int], expressions: dict[str, list]):
+    for key, value in dictionary.items():
+        if value is not None:
+            if key.startswith("min_"):
+                expressions["FilterExpression"].append(Attr(key[4:]).gte(value))
+            elif key.startswith("max_"):
+                expressions["FilterExpression"].append(Attr(key[4:]).lte(value))
