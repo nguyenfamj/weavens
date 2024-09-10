@@ -1,6 +1,3 @@
-from langchain.callbacks.manager import (
-    CallbackManagerForToolRun,
-)
 from langchain.tools import BaseTool
 
 from ..db import get_db
@@ -27,7 +24,11 @@ class FindPropertiesTool(BaseTool):
         max_life_sq: int | None = None,
         min_build_year: int | None = None,
         max_build_year: int | None = None,
-        run_manager: CallbackManagerForToolRun | None = None,
+        min_number_of_bedrooms: int | None = None,
+        max_number_of_bedrooms: int | None = None,
+        has_balcony: bool | None = None,
+        building_has_elevator: bool | None = None,
+        building_has_sauna: bool | None = None,
     ):
         """Use the tool to find properties."""
         params = {
@@ -40,6 +41,11 @@ class FindPropertiesTool(BaseTool):
             "max_life_sq": max_life_sq,
             "min_build_year": min_build_year,
             "max_build_year": max_build_year,
+            "min_number_of_bedrooms": min_number_of_bedrooms,
+            "max_number_of_bedrooms": max_number_of_bedrooms,
+            "has_balcony": has_balcony,
+            "building_has_elevator": building_has_elevator,
+            "building_has_sauna": building_has_sauna,
         }
         params = PropertyQueryParams(**params)
         q = CommonParams()
