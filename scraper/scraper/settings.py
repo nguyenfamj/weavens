@@ -82,6 +82,7 @@ ROBOTSTXT_OBEY = True
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "scraper.pipelines.DuplicateFilterPipeline": 100,
+    "scraper.pipelines.ExtractNumberOfBedroomsPipeline": 200,
     "scraper.pipelines.PutToDynamoDBPipeline": 500,
 }
 
