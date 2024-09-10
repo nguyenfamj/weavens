@@ -1,24 +1,25 @@
 services:
   dynamodb:
     image: amazon/dynamodb-local:latest
-    command: '-jar DynamoDBLocal.jar -sharedDb -dbPath ./data'
     healthcheck:
       test: ['CMD-SHELL', 'curl -v http://dynamodb:8000']
       interval: 3s
       timeout: 3s
       retries: 5
       start_period: 3s
+    user: root
     ports:
-      - '${DYNAMODB_PORT}:8000'
+      - '8000:8000'
     volumes:
-      - 'data:/home/dynamodblocal/data'
-    restart: always
+      - dynamodb-data:/home/dynamodblocal/data
     working_dir: /home/dynamodblocal
+    command: '-jar DynamoDBLocal.jar -sharedDb -dbPath ./data'
+    restart: always
 
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin:latest
     ports:
-      - '${DYNAMODB_ADMIN_PORT}:8001'
+      - '8001:8001'
     environment:
       DYNAMO_ENDPOINT: 'http://dynamodb:8000'
       AWS_REGION: 'eu-west-2'
@@ -27,6 +28,16 @@ services:
     depends_on:
       dynamodb:
         condition: service_healthy
+  redis:
+    container_name: redis-stack
+    image: redis/redis-stack:edge
+    environment:
+      - REDIS_ARGS=--appendonly yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
 
 volumes:
-  data:
+  redis-data:
+  dynamodb-data:
