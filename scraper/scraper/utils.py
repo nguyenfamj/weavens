@@ -1,11 +1,15 @@
 import re
 from decimal import Decimal
 
+from .constants import BOOLEAN_TRANSLATIONS
+
 
 class TextUtils:
     @staticmethod
     def strip_join(text_list: list[str], join_element: str = " ") -> str:
-        return join_element.join(text.strip() for text in text_list if text is not None)
+        return join_element.join(
+            text.strip() for text in text_list if text and text != " "
+        )
 
     @staticmethod
     def extract_area(text: str) -> Decimal:
@@ -19,6 +23,11 @@ class TextUtils:
     @staticmethod
     def cast_to_int(text: str) -> int:
         return int(text)
+
+    @staticmethod
+    def cast_to_bool(text: str) -> bool:
+        if text.lower() in BOOLEAN_TRANSLATIONS.keys():
+            return BOOLEAN_TRANSLATIONS[text.lower()]
 
     @staticmethod
     def extract_price(text: str) -> Decimal:
