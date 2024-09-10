@@ -7,11 +7,10 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import os
-
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path="../platform/redis/.env")
-load_dotenv(dotenv_path="../platform/dynamodb/.env")
+if os.environ.get("ENVIRONMENT") != "production":
+    load_dotenv(dotenv_path=".env")
 
 BOT_NAME = "scraper"
 
@@ -19,16 +18,16 @@ SPIDER_MODULES = ["scraper.spiders"]
 NEWSPIDER_MODULE = "scraper.spiders"
 
 # DYNAMODB variables
-DYNAMODB_HOST = os.getenv("DYNAMODB_HOST")
-DYNAMODB_PORT = os.getenv("DYNAMODB_PORT")
+DYNAMODB_HOST = os.getenv("DYNAMODB_HOST", "localhost")
+DYNAMODB_PORT = os.getenv("DYNAMODB_PORT", "8000")
 DYNAMODB_ENDPOINT_URL = f"http://{DYNAMODB_HOST}:{DYNAMODB_PORT}"
 DYNAMODB_TABLE_NAME = "OikotieProperties"
 
 # Redis variables
-REDIS_HOST = os.getenv("REDIS_HOST")
-REDIS_PORT = os.getenv("REDIS_PORT")
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = os.getenv("REDIS_PORT", "6379")
 REDIS_DB = os.getenv("REDIS_DB")
-REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = "scraper (+http://www.yourdomain.com)"

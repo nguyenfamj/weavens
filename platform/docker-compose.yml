@@ -9,7 +9,7 @@ services:
       start_period: 3s
     user: root
     ports:
-      - '8000:8000'
+      - '${DYNAMODB_PORT}:8000'
     volumes:
       - dynamodb-data:/home/dynamodblocal/data
     working_dir: /home/dynamodblocal
@@ -19,7 +19,7 @@ services:
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin:latest
     ports:
-      - '8001:8001'
+      - '${DYNAMODB_ADMIN_PORT}:8001'
     environment:
       DYNAMO_ENDPOINT: 'http://dynamodb:8000'
       AWS_REGION: 'eu-west-2'
@@ -34,7 +34,7 @@ services:
     environment:
       - REDIS_ARGS=--appendonly yes
     ports:
-      - '6379:6379'
+      - '${REDIS_PORT}:6379'
     volumes:
       - redis-data:/data
 
