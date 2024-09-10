@@ -2,7 +2,10 @@ from functools import reduce
 
 from boto3.dynamodb.conditions import Attr, Key
 
+from ..logging import Logger
 from .schemas import PropertyQueryParams
+
+logger = Logger(__name__).logger
 
 
 def build_query(params: PropertyQueryParams):
@@ -44,6 +47,29 @@ def build_query(params: PropertyQueryParams):
         expressions["FilterExpression"].append(
             Attr("building_type").eq(params.building_type)
         )
+    if params.min_number_of_bedrooms:
+        expressions["FilterExpression"].append(
+            Attr("number_of_bedrooms").gte(params.min_number_of_bedrooms)
+        )
+    if params.max_number_of_bedrooms:
+        expressions["FilterExpression"].append(
+            Attr("number_of_bedrooms").lte(params.max_number_of_bedrooms)
+        )
+
+    # Handle filter for boolean attributes
+    boolean_attributes_dict = {
+        "has_balcony": params.has_balcony,
+        "building_has_elevator": params.building_has_elevator,
+        "building_has_sauna": params.building_has_sauna,
+    }
+    for attr_name, attr_value in boolean_attributes_dict.items():
+        if attr_value is not None:
+            if attr_value:
+                expressions["FilterExpression"].append(Attr(attr_name).eq(True))
+            else:
+                expressions["FilterExpression"].append(
+                    Attr(attr_name).eq(False) | Attr(attr_name).not_exists()
+                )
 
     query = dict(
         IndexName="GSI1",

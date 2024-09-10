@@ -47,6 +47,19 @@ class PropertyQueryParams(BaseModelV1):
     max_build_year: int | None = Field(
         description="The maximum year the property was built."
     )
+    min_number_of_bedrooms: int | None = Field(
+        description="The minimum number of bedrooms"
+    )
+    max_number_of_bedrooms: int | None = Field(
+        description="The maximum number of bedrooms"
+    )
+    has_balcony: bool | None = Field(description="Whether the property has a balcony")
+    building_has_elevator: bool | None = Field(
+        description="Whether the building has an elevator"
+    )
+    building_has_sauna: bool | None = Field(
+        description="Whether the building has a sauna"
+    )
 
 
 class Property(BaseModel):
@@ -56,7 +69,7 @@ class Property(BaseModel):
     district: str | None = None
     life_sq: float | None = None
     build_year: int | None = None
-    floor: str | None = None
+    floor: int | None = None
     building_type: BuildingType | None = None
     housing_type: HousingType | None = None
     property_ownership: PropertyOwnershipType | None = None
