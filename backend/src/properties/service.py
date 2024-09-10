@@ -27,7 +27,9 @@ class PropertyService:
             params.__dict__,
             q.__dict__,
         )
-        query = build_query(params)
+
+        projection_expression = "city,sales_price,#location,district,life_sq,build_year,floor,building_type,housing_type,property_ownership,condominium_payment"
+        query = build_query(params, projection_expression)
         response = self.table.query(**query)
 
         response_out = PropertyResponse(
