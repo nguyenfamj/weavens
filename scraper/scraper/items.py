@@ -114,6 +114,9 @@ class OikotieItem(Item):
     contact_person_email = Field()
     contact_person_phone_number = Field()
 
+    # Additional fields
+    number_of_bedrooms = Field()
+
 
 class OikotieItemLoader(ItemLoader):
     default_input_processor = Identity()

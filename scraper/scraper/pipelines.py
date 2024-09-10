@@ -31,6 +31,19 @@ class DuplicateFilterPipeline:
         return item
 
 
+class ExtractNumberOfBedroomsPipeline:
+    def process_item(self, item, spider: Spider):
+        adapter = ItemAdapter(item)
+        number_of_rooms = adapter.get("number_of_rooms")
+        if number_of_rooms and number_of_rooms > 0:
+            if number_of_rooms > 1:
+                item["number_of_bedrooms"] = number_of_rooms - 1
+            else:
+                item["number_of_bedrooms"] = 1
+
+        return item
+
+
 class PutToDynamoDBPipeline:
     def __init__(self, table_name, endpoint_url):
         self.table_name = table_name
