@@ -8,7 +8,7 @@ from .schemas import PropertyQueryParams
 logger = Logger(__name__).logger
 
 
-def build_query(params: PropertyQueryParams):
+def build_query(params: PropertyQueryParams, projection_expression: str) -> dict:
     expressions = {
         "KeyConditionExpression": [],
         "FilterExpression": [],
@@ -73,7 +73,7 @@ def build_query(params: PropertyQueryParams):
 
     query = dict(
         IndexName="GSI1",
-        ProjectionExpression="city,sales_price,#location,district,life_sq,build_year,floor,building_type,housing_type,property_ownership,condominium_payment",
+        ProjectionExpression=projection_expression,
         ExpressionAttributeNames={"#location": "location"},
     )
 
