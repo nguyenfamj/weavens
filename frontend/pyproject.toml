@@ -10,6 +10,7 @@ python = "^3.10"
 streamlit = "^1.37.0"
 watchdog = "^4.0.1"
 streamlit-chat = "^0.1.1"
+httpx = "^0.27.2"
 
 
 [build-system]
