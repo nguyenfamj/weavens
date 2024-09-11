@@ -1,62 +1,118 @@
+import asyncio
+from typing import AsyncGenerator
 from uuid import uuid4
 
-import requests
 import streamlit as st
+from client import GraphClient
 
 st.set_page_config(page_title="Langchain App", page_icon="🦜", layout="wide")
 
 STARTING_MESSAGE = {
-    "role": "assistant",
+    "type": "ai",
     "content": "Hello! How can I help you today?",
 }
 BACKEND_URL = "http://0.0.0.0:8686"
 
 
-# Side bar
-def generate_session_id():
-    session_id = str(uuid4())
-    st.session_state.session_id = session_id
-    st.session_state.messages = [STARTING_MESSAGE]
+async def main():
+    # Side bar
+    with st.sidebar:
+
+        def generate_session_id():
+            session_id = str(uuid4())
+            st.session_state.session_id = session_id
+            st.session_state.messages = [STARTING_MESSAGE]
+
+        st.write("Session ID:")
+        st.code(st.session_state.get("session_id"))
+        st.button("Generate Session ID", on_click=generate_session_id)
+
+    # App title
+    st.title(":speaking_head_in_silhouette: Chatbot")
+
+    if "messages" not in st.session_state.keys():
+        st.session_state.messages = [STARTING_MESSAGE]
+
+    async def amessage_iter():
+        for m in st.session_state.messages:
+            yield m
+
+    await draw_message(amessage_iter())
+
+    if human_input := st.chat_input():
+        if not st.session_state.get("session_id"):
+            st.error("Please generate a session ID first.")
+            st.stop()
+
+        st.session_state.messages.append({"type": "human", "content": human_input})
+        st.chat_message("human").write(human_input)
+
+        client = GraphClient(base_url=BACKEND_URL, timeout=30)
+        try:
+            stream = client.astream(
+                message=human_input,
+                thread_id=st.session_state.session_id,
+            )
+            await draw_message(stream, is_new=True)
+        except Exception as e:
+            st.session_state.messages[-1] = {
+                "type": "ai",
+                "content": f"An error occurred: {e}",
+            }
 
 
-st.sidebar.write("Session ID:")
-st.sidebar.code(st.session_state.get("session_id"))
-st.sidebar.button("Generate Session ID", on_click=generate_session_id)
+async def draw_message(
+    messages_agen: AsyncGenerator[str, None],
+    is_new: bool = False,
+):
+    # Keep track of the last message container
+    last_message_type = None
+    st.session_state.last_message = None
+
+    # Placeholder for intermediate streaming tokens
+    streaming_content = ""
+    streaming_placeholder = None
+
+    # Iterate over the messages and draw them
+    while msg := await anext(messages_agen, None):  # noqa: F821
+        # str message represents an intermediate token being streamed
+        if isinstance(msg, str):
+            # If placeholder is empty, this is the first token of a new message
+            # being streamed. We need to do setup.
+            if not streaming_placeholder:
+                if last_message_type != "ai":
+                    last_message_type = "ai"
+                    st.session_state.last_message = st.chat_message("ai")
+                with st.session_state.last_message:
+                    streaming_placeholder = st.empty()
+
+            streaming_content += msg
+            streaming_placeholder.write(streaming_content)
+            continue
+        match msg["type"]:
+            case "human":
+                last_message_type = "human"
+                st.chat_message("human").write(msg["content"])
+            case "ai":
+                # If we're rendering new messages, store the message in session state
+                if is_new:
+                    st.session_state.messages.append(msg)
+
+                # If the last message type was not assistant, create a new chat message
+                if last_message_type != "ai":
+                    last_message_type = "ai"
+                    st.session_state.last_message = st.chat_message("ai")
+
+                with st.session_state.last_message:
+                    # If the message has content, write it out.
+                    # Reset the streaming variables to prepare for the next message.
+                    if msg["content"]:
+                        if streaming_placeholder:
+                            streaming_placeholder.write(msg["content"])
+                            streaming_content = ""
+                            streaming_placeholder = None
+                        else:
+                            st.write(msg["content"])
 
 
-# App title
-st.title(":speaking_head_in_silhouette: Chatbot")
-
-if "messages" not in st.session_state.keys():
-    st.session_state.messages = [STARTING_MESSAGE]
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
-
-if human_input := st.chat_input():
-    if not st.session_state.get("session_id"):
-        st.error("Please generate a session ID first.")
-        st.stop()
-    st.session_state.messages.append({"role": "user", "content": human_input})
-    with st.chat_message("user"):
-        st.write(human_input)
-    payload = {
-        "input": {
-            "human_input": human_input,
-        },
-        "config": {"configurable": {"session_id": st.session_state.session_id}},
-    }
-    try:
-        with st.spinner("Processing..."):
-            response = requests.post(f"{BACKEND_URL}/api/v1/chat/invoke", json=payload)
-            response.raise_for_status()
-    except requests.exceptions.RequestException:
-        st.chat_message("assistant").write(
-            "Sorry, there was an unexpected error! Please try again later."
-        )
-        st.stop()
-    else:
-        message = response.json().get("output", {}).get("output", "")
-        st.session_state.messages.append({"role": "assistant", "content": message})
-        st.chat_message("assistant").write(message)
+asyncio.run(main())
