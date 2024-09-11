@@ -3,14 +3,13 @@ from typing import Annotated
 from fastapi import APIRouter
 from fastapi.params import Depends
 
-from ..config import settings
 from ..db import DynamoDB, get_db
 from ..exceptions import NotFoundHTTPException
 from ..schemas import CommonParams
 from .schemas import PropertyQueryParams, PropertyResponse
 from .service import PropertyService
 
-router = APIRouter(prefix=f"{settings.API_V1_STR}/properties", tags=["properties"])
+router = APIRouter(tags=["properties"])
 
 
 @router.get("", response_model=PropertyResponse)
