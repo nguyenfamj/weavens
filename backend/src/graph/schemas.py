@@ -12,3 +12,7 @@ class MessageState(TypedDict):
 class UserInput(BaseModel):
     message: str
     thread_id: str
+
+
+class StreamUserInput(UserInput):
+    stream_tokens: bool = True
