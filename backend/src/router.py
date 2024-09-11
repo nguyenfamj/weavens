@@ -4,6 +4,7 @@ from fastapi.routing import APIRouter
 
 from .chat.router import router as chat_router
 from .config import settings
+from .graph.router import router as graph_router
 from .properties.router import router as properties_router
 from .schemas import ErrorResponse
 
@@ -18,3 +19,4 @@ api_router = APIRouter(
 )
 api_router.include_router(properties_router, prefix="/properties")
 api_router.include_router(chat_router, prefix="/chat")
+api_router.include_router(graph_router, prefix="/graph")
