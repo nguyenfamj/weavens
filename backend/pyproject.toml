@@ -17,6 +17,7 @@ sse-starlette = "^2.1.2"
 langchain-community = "^0.2.10"
 langchain-openai = "^0.1.20"
 mangum = "^0.17.0"
+langgraph = "^0.2.19"
 
 [build-system]
 requires = ["poetry-core"]
