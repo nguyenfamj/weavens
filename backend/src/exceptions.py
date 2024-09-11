@@ -16,3 +16,8 @@ class DetailHTTPException(HTTPException):
 class NotFoundHTTPException(DetailHTTPException):
     STATUS_CODE = status.HTTP_404_NOT_FOUND
     DETAIL = {"message": "Not found"}
+
+
+class InternalServerErrorHTTPException(DetailHTTPException):
+    STATUS_CODE = status.HTTP_500_INTERNAL_SERVER_ERROR
+    DETAIL = {"message": "Internal server error"}
