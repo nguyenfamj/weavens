@@ -27,9 +27,9 @@ class AssistantNode:
         )
         self.llm_with_tools = self.llm.bind_tools(tools)
 
-    def __call__(self, state: MessageState, config) -> MessageState:
+    async def __call__(self, state: MessageState, config) -> MessageState:
         messages = state["messages"]
-        response = self.llm_with_tools.invoke(messages, config)
+        response = await self.llm_with_tools.ainvoke(messages, config)
 
         return {"messages": [response]}
 
