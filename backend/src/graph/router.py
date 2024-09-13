@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 from langchain_core.callbacks import AsyncCallbackHandler
 
 from ..exceptions import InternalServerErrorHTTPException
-from .graph import graph
+from .graph import compile_graph
 from .schemas import StreamUserInput, UserInput
 from .utils import parse_input
 
@@ -23,6 +23,7 @@ async def invoke(user_input: UserInput):
     """
     parsed_input = parse_input(user_input)
     try:
+        graph = await compile_graph()
         response = await graph.ainvoke(**parsed_input)
 
         return response["messages"][-1]
@@ -58,6 +59,7 @@ async def message_generator(user_input: StreamUserInput) -> AsyncGenerator:
     # Pass the graph's stream of messages to the queue in a separate task, so
     # we can yield the messages to the client in the main thread.
     async def run_agent_stream():
+        graph = await compile_graph()
         async for s in graph.astream(**parsed_input, stream_mode="updates"):
             await output_queue.put(s)
         await output_queue.put(None)
