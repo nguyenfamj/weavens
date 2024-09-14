@@ -25,32 +25,12 @@ from langgraph.checkpoint.base import (
 from langgraph.checkpoint.serde.base import SerializerProtocol
 from yarl import URL
 
-
-class CompositeKey(TypedDict):
-    PK: str
-    SK: str
-
-
-class BaseConfigurable(TypedDict):
-    thread_id: str
-    checkpoint_ns: str
-    checkpoint_id: str
-
-
-class CheckpointConfigurable(BaseConfigurable):
-    pass
-
-
-class WritesConfigurable(BaseConfigurable):
-    task_id: str
-    idx: int | None = None
-
-
-class WritesData(TypedDict):
-    channel: str
-    type: str
-    value: bytes
-
+from .schemas import (
+    CheckpointConfigurable,
+    CompositeKey,
+    WritesConfigurable,
+    WritesData,
+)
 
 DYNAMODB_KEY_SEPARATOR = "#"
 

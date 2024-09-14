@@ -16,3 +16,29 @@ class UserInput(BaseModel):
 
 class StreamUserInput(UserInput):
     stream_tokens: bool = True
+
+
+class CompositeKey(TypedDict):
+    PK: str
+    SK: str
+
+
+class BaseConfigurable(TypedDict):
+    thread_id: str
+    checkpoint_ns: str
+    checkpoint_id: str
+
+
+class CheckpointConfigurable(BaseConfigurable):
+    pass
+
+
+class WritesConfigurable(BaseConfigurable):
+    task_id: str
+    idx: int | None = None
+
+
+class WritesData(TypedDict):
+    channel: str
+    type: str
+    value: bytes
