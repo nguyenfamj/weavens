@@ -1,9 +1,8 @@
 from contextlib import asynccontextmanager
 from typing import (
     Any,
-    AsyncGenerator,
     AsyncIterator,
-    TypedDict,
+    Sequence,
 )
 
 from aiodynamo.client import Client, Table
@@ -38,6 +37,20 @@ DYNAMODB_KEY_SEPARATOR = "#"
 def _make_checkpoint_key(
     thread_id: str, checkpoint_ns: str, checkpoint_id: str
 ) -> CompositeKey:
+    """Generates a composite key for a checkpoint.
+
+    The key is formatted as follows:
+        PK: "checkpoint#<thread_id>"
+        SK: "<checkpoint_ns>#<checkpoint_id>"
+
+    Args:
+        thread_id (str): The thread ID of the checkpoint.
+        checkpoint_ns (str): The namespace of the checkpoint.
+        checkpoint_id (str): The ID of the checkpoint.
+
+    Returns:
+        CompositeKey: The composite key for the checkpoint.
+    """
     return {
         "PK": DYNAMODB_KEY_SEPARATOR.join(["checkpoint", thread_id]),
         "SK": DYNAMODB_KEY_SEPARATOR.join([checkpoint_ns, checkpoint_id]),
@@ -51,6 +64,22 @@ def _make_writes_key(
     task_id: str,
     idx: int | None,
 ) -> CompositeKey:
+    """Generates a composite key for a writes entry.
+
+    The key is formatted as follows:
+        PK: "writes#<thread_id>"
+        SK: "<checkpoint_ns>#<checkpoint_id>#<task_id>[#<idx>]"
+
+    Args:
+        thread_id (str): The thread ID of the checkpoint.
+        checkpoint_ns (str): The namespace of the checkpoint.
+        checkpoint_id (str): The ID of the checkpoint.
+        task_id (str): The ID of the task.
+        idx (int | None): The index of the write entry.
+
+    Returns:
+        CompositeKey: The composite key for the writes entry.
+    """
     if idx is None:
         return {
             "PK": DYNAMODB_KEY_SEPARATOR.join(["writes", thread_id]),
@@ -66,6 +95,17 @@ def _make_writes_key(
 
 
 def _parse_checkpoint_key(key: CompositeKey) -> CheckpointConfigurable:
+    """Parses a checkpoint key into its components.
+
+    Args:
+        key (CompositeKey): The composite checkpoint key.
+
+    Raises:
+        ValueError: If the key is not a valid checkpoint key.
+
+    Returns:
+        CheckpointConfigurable: The configurable components of the checkpoint key.
+    """
     namespace, thread_id = key["PK"].split(DYNAMODB_KEY_SEPARATOR)
     checkpoint_ns, checkpoint_id = key["SK"].split(DYNAMODB_KEY_SEPARATOR)
 
@@ -80,6 +120,17 @@ def _parse_checkpoint_key(key: CompositeKey) -> CheckpointConfigurable:
 
 
 def _parse_writes_key(key: CompositeKey) -> WritesConfigurable:
+    """Parses a writes key into its components.
+
+    Args:
+        key (CompositeKey): The composite writes key.
+
+    Raises:
+        ValueError: If the key is not a valid writes key.
+
+    Returns:
+        WritesConfigurable: The configurable components of the writes key.
+    """
     namespace, thread_id = key["PK"].split(DYNAMODB_KEY_SEPARATOR)
     checkpoint_ns, checkpoint_id, task_id, *idx = key["SK"].split(
         DYNAMODB_KEY_SEPARATOR
@@ -99,7 +150,20 @@ def _parse_writes_key(key: CompositeKey) -> WritesConfigurable:
 
 def _filter_keys(
     keys: list[CompositeKey], before: RunnableConfig | None, limit: int | None
-) -> list:
+) -> list[CompositeKey]:
+    """Filters a list of keys based on the before and limit parameters.
+
+    The keys are sorted in descending order (newest first). If the before parameter is provided, only keys created before
+    the specified checkpoint are returned. If the limit parameter is provided, only the first n keys are returned.
+
+    Args:
+        keys (list[CompositeKey]): The list of keys to filter.
+        before (RunnableConfig | None): The configuration of the checkpoint to filter keys before.
+        limit (int | None): The maximum number of keys to return.
+
+    Returns:
+        list[CompositeKey]: The filtered list of keys.
+    """
     if before:
         keys = [
             key
@@ -120,6 +184,15 @@ def _filter_keys(
 def _dump_writes(
     serde: SerializerProtocol, writes: tuple[str, Any]
 ) -> list[WritesData]:
+    """Serializes a list of writes into a list of serialized writes.
+
+    Args:
+        serde (SerializerProtocol): The serializer protocol to use.
+        writes (tuple[str, Any]): The list of writes to serialize.
+
+    Returns:
+        list[WritesData]: The list of serialized writes.
+    """
     serialized_writes: list[WritesData] = []
     for channel, value in writes:
         type_, serialized_value = serde.dumps_typed(value)
@@ -133,6 +206,15 @@ def _dump_writes(
 def _load_writes(
     serde: SerializerProtocol, task_id_to_data: dict[tuple[str, str], dict]
 ) -> list[PendingWrite]:
+    """Deserializes a dictionary of writes into a list of pending writes.
+
+    Args:
+        serde (SerializerProtocol): The serializer protocol to use.
+        task_id_to_data (dict[tuple[str, str], dict]): The dictionary of task ID to data mappings.
+
+    Returns:
+        list[PendingWrite]: The list of pending writes.
+    """
     writes = [
         (
             task_id,
@@ -151,6 +233,17 @@ def _parse_checkpoint_data(
     data: dict,
     pending_writes: list[PendingWrite] | None = None,
 ) -> CheckpointTuple | None:
+    """Parses a checkpoint data entry into a CheckpointTuple.
+
+    Args:
+        serde (SerializerProtocol): The serializer protocol to use.
+        key (CompositeKey): The composite key of the checkpoint.
+        data (dict): The data of the checkpoint.
+        pending_writes (list[PendingWrite] | None): The pending writes. Defaults to None.
+
+    Returns:
+        CheckpointTuple | None: The parsed checkpoint tuple, or None if the data is invalid.
+    """
     if not data:
         return None
 
@@ -236,6 +329,20 @@ class DynamoDBSaver(BaseCheckpointSaver):
         metadata: CheckpointMetadata,
         new_versions: ChannelVersions,
     ) -> RunnableConfig:
+        """Save a checkpoint to the database asynchronously.
+
+        This method saves a checkpoint to DynamoDB. The checkpoint is associated
+        with the provided config and its parent config (if any).
+
+        Args:
+            config (RunnableConfig): The config to associate with the checkpoint.
+            checkpoint (Checkpoint): The checkpoint to save.
+            metadata (CheckpointMetadata): Additional metadata to save with the checkpoint.
+            new_versions (ChannelVersions): New channel versions as of this write.
+
+        Returns:
+            RunnableConfig: Updated configuration after storing the checkpoint.
+        """
         thread_id = config["configurable"]["thread_id"]
         checkpoint_ns = config["configurable"]["checkpoint_ns"]
         checkpoint_id = checkpoint["id"]
@@ -268,9 +375,21 @@ class DynamoDBSaver(BaseCheckpointSaver):
     async def aput_writes(
         self,
         config: RunnableConfig,
-        writes: list[tuple[str | Any]],
+        writes: Sequence[tuple[str, Any]],
         task_id: str,
     ) -> RunnableConfig:
+        """Store intermediate writes linked to a checkpoint asynchronously.
+
+        This method saves intermediate writes associated with a checkpoint to the database.
+
+        Args:
+            config (RunnableConfig): Configuration of the related checkpoint.
+            writes (Sequence[tuple[str, Any]]): List of writes to store, each as (channel, value) pair.
+            task_id (str): Identifier for the task creating the writes.
+
+        Returns:
+            RunnableConfig: Updated configuration after storing the writes.
+        """
         thread_id = config["configurable"]["thread_id"]
         checkpoint_ns = config["configurable"]["checkpoint_ns"]
         checkpoint_id = config["configurable"]["checkpoint_id"]
@@ -283,6 +402,19 @@ class DynamoDBSaver(BaseCheckpointSaver):
         return config
 
     async def aget_tuple(self, config: RunnableConfig) -> CheckpointTuple | None:
+        """Get a checkpoint tuple from DynamoDB asynchronously.
+
+        This method retrieves a checkpoint tuple from DynamoDB based on the
+        provided config. If the config contains a "checkpoint_id" key, the checkpoint with
+        the matching thread ID and checkpoint ID is retrieved. Otherwise, the latest checkpoint
+        for the given thread ID is retrieved.
+
+        Args:
+            config (RunnableConfig): The config to use for retrieving the checkpoint.
+
+        Returns:
+            CheckpointTuple | None: The retrieved checkpoint tuple, or None if no matching checkpoint was found.
+        """
         thread_id = config["configurable"]["thread_id"]
         checkpoint_ns = config["configurable"].get("checkpoint_ns", "")
         checkpoint_id = get_checkpoint_id(config)
@@ -338,7 +470,21 @@ class DynamoDBSaver(BaseCheckpointSaver):
         filter: dict[str, Any] | None = None,
         before: RunnableConfig | None = None,
         limit: int | None = None,
-    ) -> AsyncGenerator[CheckpointTuple, None]:
+    ) -> AsyncIterator[CheckpointTuple]:
+        """List checkpoints from DynamoDB asynchronously.
+
+        This method retrieves a list of checkpoint tuples from DynamoDB based
+        on the provided config. The checkpoints are ordered by checkpoint ID in descending order (newest first).
+
+        Args:
+            config (RunnableConfig | None): Base configuration for filtering checkpoints.
+            filter (dict[str, Any] | None): Additional filtering criteria for metadata. Defaults to None.
+            before (RunnableConfig | None): If provided, only checkpoints before the specified checkpoint ID are returned. Defaults to None.
+            limit (int | None): Maximum number of checkpoints to return. Defaults to None.
+
+        Yields:
+            AsyncIterator[CheckpointTuple]: An asynchronous iterator of matching checkpoint tuples.
+        """
         thread_id = config["configurable"]["thread_id"]
         checkpoint_ns = config["configurable"].get("checkpoint_ns", "")
         key = _make_checkpoint_key(thread_id, checkpoint_ns, "")
@@ -362,6 +508,16 @@ class DynamoDBSaver(BaseCheckpointSaver):
     async def _aget_checkpoint_key(
         self, thread_id: str, checkpoint_ns: str, checkpoint_id: str | None
     ) -> CompositeKey | None:
+        """Determines the latest checkpoint key
+
+        Args:
+            thread_id (str): The thread ID of the checkpoint.
+            checkpoint_ns (str): The namespace of the checkpoint.
+            checkpoint_id (str | None): The ID of the checkpoint
+
+        Returns:
+            CompositeKey | None: The latest checkpoint key.
+        """
         if checkpoint_id:
             return _make_checkpoint_key(thread_id, checkpoint_ns, checkpoint_id)
 
