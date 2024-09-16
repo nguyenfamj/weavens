@@ -7,10 +7,6 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import os
-from dotenv import load_dotenv
-
-if os.environ.get("ENVIRONMENT") != "production":
-    load_dotenv(dotenv_path=".env")
 
 BOT_NAME = "scraper"
 
@@ -26,8 +22,10 @@ DYNAMODB_TABLE_NAME = "OikotieProperties"
 # Redis variables
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", "6379")
-REDIS_DB = os.getenv("REDIS_DB")
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+
+# Storage variables
+S3_BUCKET = os.getenv("S3_BUCKET", "local-storage")
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = "scraper (+http://www.yourdomain.com)"
@@ -82,6 +80,7 @@ ROBOTSTXT_OBEY = True
 ITEM_PIPELINES = {
     "scraper.pipelines.DuplicateFilterPipeline": 100,
     "scraper.pipelines.ExtractNumberOfBedroomsPipeline": 200,
+    "scraper.pipelines.PutToS3Pipeline": 400,
     "scraper.pipelines.PutToDynamoDBPipeline": 500,
 }
 
