@@ -4,7 +4,6 @@ from langgraph.prebuilt import ToolNode, tools_condition
 
 from ..chat.tools import tools
 from ..chat.utils import get_openai_api_key
-from .checkpoint import DynamoDBSaver
 from .schemas import MessageState
 
 OPENAI_API_KEY = get_openai_api_key()
@@ -42,13 +41,3 @@ builder.add_node("tools", ToolNode(tools))
 builder.add_edge(START, "assistant")
 builder.add_conditional_edges("assistant", tools_condition)
 builder.add_edge("tools", "assistant")
-
-
-# Compile
-async def compile_graph():
-    async with DynamoDBSaver.from_conn_info(
-        region="us-east-1", table_name="Checkpoints"
-    ) as checkpointer:
-        graph = builder.compile(checkpointer=checkpointer)
-
-        return graph
