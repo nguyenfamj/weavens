@@ -298,8 +298,7 @@ class DynamoDBSaver(BaseCheckpointSaver):
     async def from_conn_info(
         cls, *, region: str, table_name: str
     ) -> AsyncIterator["DynamoDBSaver"]:
-        try:
-            session = ClientSession()
+        async with ClientSession() as session:
             client = Client(
                 http=AIOHTTP(session),
                 credentials=Credentials.auto(),
@@ -310,17 +309,14 @@ class DynamoDBSaver(BaseCheckpointSaver):
 
             if not await table.exists():
                 await table.create(
-                    Throughput(read=3, write=3),
-                    KeySchema(
+                    keys=KeySchema(
                         KeySpec("PK", KeyType.string),
                         KeySpec("SK", KeyType.string),
                     ),
+                    throughput=Throughput(read=3, write=3),
                 )
 
-            yield cls(client, table)
-        finally:
-            pass
-            # await session.close()
+            yield cls(region, table)
 
     async def aput(
         self,
