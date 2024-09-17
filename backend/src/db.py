@@ -5,6 +5,7 @@ from .constants import Database
 
 OIKOTIE_TABLE_NAME = "OikotieProperties"
 CHAT_HISTORY_TABLE_NAME = "ChatHistories"
+CHECKPOINTS_TABLE_NAME = "Checkpoints"
 
 
 class DynamoDB:

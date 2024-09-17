@@ -6,6 +6,8 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from langchain_core.callbacks import AsyncCallbackHandler
 
+from ..config import settings
+from ..db import CHECKPOINTS_TABLE_NAME
 from ..exceptions import InternalServerErrorHTTPException
 from .checkpoint import DynamoDBSaver
 from .graph import builder
@@ -25,7 +27,7 @@ async def invoke(user_input: UserInput):
     parsed_input = parse_input(user_input)
     try:
         async with DynamoDBSaver.from_conn_info(
-            region="eu-north-1", table_name="Checkpoints"
+            region=settings.REGION_NAME, table_name=CHECKPOINTS_TABLE_NAME
         ) as checkpointer:
             graph = builder.compile(checkpointer=checkpointer)
             response = await graph.ainvoke(**parsed_input)
@@ -64,7 +66,7 @@ async def message_generator(user_input: StreamUserInput) -> AsyncGenerator:
     # we can yield the messages to the client in the main thread.
     async def run_agent_stream():
         async with DynamoDBSaver.from_conn_info(
-            region="eu-north-1", table_name="Checkpoints"
+            region=settings.REGION_NAME, table_name=CHECKPOINTS_TABLE_NAME
         ) as checkpointer:
             graph = builder.compile(checkpointer=checkpointer)
             async for s in graph.astream(**parsed_input, stream_mode="updates"):

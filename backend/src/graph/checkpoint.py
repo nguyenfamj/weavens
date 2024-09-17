@@ -24,6 +24,7 @@ from langgraph.checkpoint.base import (
 from langgraph.checkpoint.serde.base import SerializerProtocol
 from yarl import URL
 
+from ..config import settings
 from .schemas import (
     CheckpointConfigurable,
     CompositeKey,
@@ -298,23 +299,29 @@ class DynamoDBSaver(BaseCheckpointSaver):
     async def from_conn_info(
         cls, *, region: str, table_name: str
     ) -> AsyncIterator["DynamoDBSaver"]:
+        endpoint = None
+
+        if settings.ENVIRONMENT.is_local:
+            endpoint = URL.build(scheme="http", host="localhost", port=8000)
+
         async with ClientSession() as session:
             client = Client(
                 http=AIOHTTP(session),
                 credentials=Credentials.auto(),
                 region=region,
-                endpoint=URL.build(scheme="http", host="localhost", port=8000),
+                endpoint=endpoint,
             )
             table = client.table(table_name)
 
-            if not await table.exists():
-                await table.create(
-                    keys=KeySchema(
-                        KeySpec("PK", KeyType.string),
-                        KeySpec("SK", KeyType.string),
-                    ),
-                    throughput=Throughput(read=3, write=3),
-                )
+            if settings.ENVIRONMENT.is_local:
+                if not await table.exists():
+                    await table.create(
+                        keys=KeySchema(
+                            KeySpec("PK", KeyType.string),
+                            KeySpec("SK", KeyType.string),
+                        ),
+                        throughput=Throughput(read=3, write=3),
+                    )
 
             yield cls(region, table)
 
