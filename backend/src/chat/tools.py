@@ -1,4 +1,5 @@
 from langchain.tools import BaseTool
+from pydantic import Field
 
 from ..db import get_db
 from ..properties.schemas import BuildingType, PropertyQueryParams
@@ -7,11 +8,11 @@ from ..schemas import CommonParams
 
 
 class FindPropertiesTool(BaseTool):
-    name = "find_properties"
-    description = "A tool to find properties in a city."
-    args_schema = PropertyQueryParams
-    handle_tool_error = True
-    handle_validation_error = True
+    name: str = "find_properties"
+    description: str = "A tool to find properties in a city."
+    args_schema: PropertyQueryParams = Field(PropertyQueryParams)
+    handle_tool_error: bool = True
+    handle_validation_error: bool = True
 
     def _run(
         self,

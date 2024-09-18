@@ -220,7 +220,7 @@ def _load_writes(
         (
             task_id,
             data["channel"],
-            serde.loads_typed(data["type"], data["value"].decode()),
+            serde.loads_typed(data["type"], data["value"]),
         )
         for (task_id, _), data in task_id_to_data.items()
     ]
@@ -261,8 +261,8 @@ def _parse_checkpoint_data(
         }
     }
 
-    checkpoint = serde.loads_typed((data["type"], data["checkpoint"].decode()))
-    metadata = serde.loads(data["metadata"].decode())
+    checkpoint = serde.loads_typed((data["type"], data["checkpoint"]))
+    metadata = serde.loads(data["metadata"])
     parent_checkpoint_id = data.get("parent_checkpoint_id", "")
     parent_config = (
         {
