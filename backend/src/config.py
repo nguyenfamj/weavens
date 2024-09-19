@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     ENVIRONMENT: Environment
 
-    REGION_NAME: str = "us-east-1"
+    REGION_NAME: str = "eu-north-1"
 
     LOG_LEVEL: str = "INFO"
 
