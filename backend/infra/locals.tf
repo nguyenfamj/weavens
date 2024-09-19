@@ -1,5 +1,5 @@
 locals {
-  region = "us-east-1"
+  region = "eu-north-1"
 
   property_table_name       = "OikotieProperties"
   chat_histories_table_name = "ChatHistories"
