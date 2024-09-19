@@ -2,9 +2,9 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import START, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 
-from ..chat.tools import tools
-from ..chat.utils import get_openai_api_key
 from .schemas import MessageState
+from .tools import tools
+from .utils import get_openai_api_key
 
 OPENAI_API_KEY = get_openai_api_key()
 
