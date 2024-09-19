@@ -23,4 +23,4 @@ class Database:
 
 class Secret:
     SERVICE_NAME = "secretsmanager"
-    OPENAI_API_KEY = "house-hunt/openai"
+    OPENAI_API_KEY = "house-hunt/openai-secret"
