@@ -62,19 +62,26 @@ resource "aws_dynamodb_table" "oikotie_properties" {
   }
 }
 
-resource "aws_dynamodb_table" "chat_histories" {
-  name           = var.chat_histories_table_name
+resource "aws_dynamodb_table" "checkpoints" {
+  name           = var.checkpoint_table_name
   billing_mode   = "PROVISIONED"
   read_capacity  = 3
   write_capacity = 3
-  hash_key       = "SessionId"
+  hash_key       = "PK"
+  range_key      = "SK"
 
   attribute {
-    name = "SessionId"
+    name = "PK"
+    type = "S"
+  }
+
+  attribute {
+    name = "SK"
     type = "S"
   }
 
   tags = {
-    Name = var.chat_histories_table_name
+    Name = var.checkpoint_table_name
   }
+
 }
