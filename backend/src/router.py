@@ -2,7 +2,6 @@ from fastapi import status
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRouter
 
-from .chat.router import router as chat_router
 from .config import settings
 from .graph.router import router as graph_router
 from .properties.router import router as properties_router
@@ -18,5 +17,4 @@ api_router = APIRouter(
     prefix=settings.API_V1_STR,
 )
 api_router.include_router(properties_router, prefix="/properties")
-api_router.include_router(chat_router, prefix="/chat")
 api_router.include_router(graph_router, prefix="/graph")
