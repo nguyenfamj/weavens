@@ -8,9 +8,9 @@ terraform {
 
 # --- DynamoDB ---
 module "dynamoDB" {
-  source                    = "./modules/dynamodb"
-  property_table_name       = local.property_table_name
-  chat_histories_table_name = local.chat_histories_table_name
+  source                = "./modules/dynamodb"
+  property_table_name   = local.property_table_name
+  checkpoint_table_name = local.checkpoint_table_name
 }
 
 # --- ECR ---

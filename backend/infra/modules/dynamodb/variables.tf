@@ -3,7 +3,7 @@ variable "property_table_name" {
   type        = string
 }
 
-variable "chat_histories_table_name" {
-  description = "The name of the DynamoDB table for storing chat histories"
+variable "checkpoint_table_name" {
+  description = "The name of the DynamoDB table for storing checkpoints"
   type        = string
 }
