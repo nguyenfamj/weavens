@@ -39,3 +39,13 @@ module "lambda" {
   image_id                      = module.ecr.image.id
   iam_role_policy_attachment_id = module.iam.iam_role_policy_attachment.id
 }
+
+# --- API Gateway ---
+module "api_gateway" {
+  source = "./modules/api_gateway"
+
+  api_gateway_name = local.api_gateway_name
+
+  lambda_function_name = local.lambda_function_name
+  lambda_invoke_arn    = module.lambda.lambda_invoke_arn
+}
