@@ -21,7 +21,7 @@ resource "aws_api_gateway_method" "get_health_check" {
   rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
 }
 
-resource "aws_api_gateway_integration" "lambda_intergration" {
+resource "aws_api_gateway_integration" "get_health_check" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
   resource_id = aws_api_gateway_resource.health_check.id
   http_method = aws_api_gateway_method.get_health_check.http_method
@@ -33,10 +33,88 @@ resource "aws_api_gateway_integration" "lambda_intergration" {
   depends_on = [var.lambda_invoke_arn]
 }
 
+resource "aws_api_gateway_resource" "api" {
+  parent_id   = aws_api_gateway_rest_api.api_gateway.root_resource_id
+  path_part   = "api"
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+}
+
+resource "aws_api_gateway_resource" "v1" {
+  parent_id   = aws_api_gateway_resource.api.id
+  path_part   = "v1"
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+}
+
+resource "aws_api_gateway_resource" "graph" {
+  parent_id   = aws_api_gateway_resource.v1.id
+  path_part   = "graph"
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+}
+
+resource "aws_api_gateway_resource" "graph_invoke" {
+  parent_id   = aws_api_gateway_resource.graph.id
+  path_part   = "invoke"
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+}
+resource "aws_api_gateway_method" "post_invoke" {
+  authorization = "NONE"
+  http_method   = "POST"
+  resource_id   = aws_api_gateway_resource.graph_invoke.id
+  rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
+}
+
+
+resource "aws_api_gateway_integration" "post_graph_invoke" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.graph_invoke.id
+  http_method = aws_api_gateway_method.post_invoke.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.lambda_invoke_arn
+
+  depends_on = [var.lambda_invoke_arn]
+}
+
+resource "aws_api_gateway_resource" "graph_stream" {
+  parent_id   = aws_api_gateway_resource.graph.id
+  path_part   = "stream"
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+}
+
+resource "aws_api_gateway_method" "post_stream" {
+  authorization = "NONE"
+  http_method   = "POST"
+  resource_id   = aws_api_gateway_resource.graph_stream.id
+  rest_api_id   = aws_api_gateway_rest_api.api_gateway.id
+}
+
+resource "aws_api_gateway_integration" "post_graph_stream" {
+  rest_api_id = aws_api_gateway_rest_api.api_gateway.id
+  resource_id = aws_api_gateway_resource.graph_stream.id
+  http_method = aws_api_gateway_method.post_stream.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.lambda_invoke_arn
+
+  depends_on = [var.lambda_invoke_arn]
+}
+
 resource "aws_api_gateway_deployment" "deployment" {
   rest_api_id = aws_api_gateway_rest_api.api_gateway.id
 
-  depends_on = [aws_api_gateway_integration.lambda_intergration]
+  triggers = {
+    redeployment = sha1((jsonencode([
+      aws_api_gateway_integration.get_health_check.uri,
+      aws_api_gateway_integration.post_graph_invoke.uri,
+      aws_api_gateway_integration.post_graph_stream.uri
+    ])))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_api_gateway_stage" "prod" {
