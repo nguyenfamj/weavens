@@ -11,7 +11,7 @@ STARTING_MESSAGE = {
     "type": "ai",
     "content": "Hello! How can I help you today?",
 }
-BACKEND_URL = "http://0.0.0.0:8686"
+BACKEND_URL = st.secrets["BACKEND_URL"]
 
 
 async def main():
