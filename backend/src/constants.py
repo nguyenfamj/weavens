@@ -18,7 +18,7 @@ class Database:
     RESOURCE_NAME = "dynamodb"
 
     PROPERTIES_TABLE_NAME = "Properties"
-    CHAT_HISTORY_TABLE_NAME = "ChatHistories"
+    CHECKPOINTS_TABLE_NAME = "Checkpoints"
 
 
 class Secret:
