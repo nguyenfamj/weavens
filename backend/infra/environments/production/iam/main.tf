@@ -11,7 +11,8 @@ module "iam_nova_developer" {
   policy_arns = [
     "arn:aws:iam::aws:policy/IAMUserChangePassword",
     "arn:aws:iam::aws:policy/IAMSelfManageServiceSpecificCredentials",
-    "arn:aws:iam::aws:policy/IAMFullAccess"
+    "arn:aws:iam::aws:policy/IAMFullAccess",
+    module.iam_policy_assume_infrastructure_admin_role.arn
   ]
 
   tags = {
@@ -52,6 +53,22 @@ module "iam_infrastructure_admin_role" {
     Terraform   = true
     Role        = "InfrastructureAdmin"
   }
+}
 
-  depends_on = [module.iam_nova_developer]
+module "iam_policy_assume_infrastructure_admin_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.44.0"
+
+  name = "AssumeInfrastructureAdminRole"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "sts:AssumeRole"
+        Resource = module.iam_infrastructure_admin_role.iam_role_arn
+      }
+    ]
+  })
 }
