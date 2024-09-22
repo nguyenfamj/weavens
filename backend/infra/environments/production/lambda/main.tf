@@ -5,7 +5,6 @@ module "lambda_function" {
 
   function_name  = "house-hunt"
   create_package = false
-  timeout        = 20
 
   create_role     = true
   role_name       = "LambdaExecutionRole"
