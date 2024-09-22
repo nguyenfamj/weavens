@@ -45,3 +45,7 @@ module "api_gateway" {
 
   lambda_function_arn = module.lambda.lambda_function_arn
 }
+
+module "docs_scraper" {
+  source = "./docs_scraper"
+}
