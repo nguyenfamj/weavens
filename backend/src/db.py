@@ -3,7 +3,7 @@ import boto3
 from .config import settings
 from .constants import Database
 
-OIKOTIE_TABLE_NAME = "OikotieProperties"
+OIKOTIE_TABLE_NAME = "Properties"
 CHAT_HISTORY_TABLE_NAME = "ChatHistories"
 CHECKPOINTS_TABLE_NAME = "Checkpoints"
 
