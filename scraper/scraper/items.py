@@ -118,6 +118,50 @@ class OikotieItem(Item):
     number_of_bedrooms = Field()
 
 
+class BlogItem(Item):
+    site = Field()
+    url = Field()
+    title = Field()
+    content_text = Field(
+        input_processor=MapCompose(
+            ProcessorUtils.get_text_from_html,
+        ),
+    )
+    content_html = Field(
+        input_processor=MapCompose(
+            ProcessorUtils.remove_html_attributes,
+            ProcessorUtils.clean_html_space,
+            ProcessorUtils.remove_empty_tags,
+        ),
+    )
+    author = Field()
+    main_image_url = Field()
+    created_at = Field(input_processor=MapCompose(ProcessorUtils.parse_date))
+    updated_at = Field(input_processor=MapCompose(ProcessorUtils.parse_date))
+    content_type = Field()
+
+
+class ScrapeMetadata(Item):
+    initial_url = Field()
+    scraped_at = Field()
+    status = Field()
+    error_message = Field()
+
+
+class OutputTakeFirstItemLoader(ItemLoader):
+    default_output_processor = TakeFirst()
+
+    def __init__(
+        self,
+        item: Any = None,
+        selector: Selector | None = None,
+        parent: ItemLoader | None = None,
+        response: Response | None = None,
+        **context: Any,
+    ):
+        super().__init__(item, selector, response, parent, **context)
+
+
 class OikotieItemLoader(ItemLoader):
     default_input_processor = Identity()
     default_output_processor = TakeFirst()
