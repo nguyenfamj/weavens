@@ -13,6 +13,8 @@ playwright = "^1.45.0"
 scrapy-redis = "^0.9.1"
 python-dotenv = "^1.0.1"
 boto3 = "^1.34.146"
+dateparser = "^1.2.0"
+beautifulsoup4 = "^4.12.3"
 
 [tool.poetry.group.dev.dependencies]
 Scrapy = "^2.11.2"
