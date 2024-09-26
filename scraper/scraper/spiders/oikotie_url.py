@@ -17,7 +17,7 @@ class OikotieUrlSpider(Spider):
 
     def start_requests(self):
         # TODO: Change the range to the desired number of pages
-        for i in range(1, 10):
+        for i in range(1, 2):
             url = f"https://asunnot.oikotie.fi/myytavat-asunnot?pagination={i}"
 
             yield Request(
