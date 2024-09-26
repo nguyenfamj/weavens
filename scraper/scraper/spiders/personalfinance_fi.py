@@ -1,8 +1,10 @@
 from datetime import datetime
+
 from scrapy import Spider
 from scrapy.http import Request, Response
 from scrapy.utils.sitemap import Sitemap
-from ..items import ScrapeMetadata, BlogItem, OutputTakeFirstItemLoader
+
+from ..items import BlogItem, OutputTakeFirstItemLoader, ScrapeMetadata
 
 
 class PersonalFinanceFISpider(Spider):

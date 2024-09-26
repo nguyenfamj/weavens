@@ -2,11 +2,12 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-import os
 import json
+import os
 import re
-import boto3
 from datetime import datetime
+
+import boto3
 from itemadapter import ItemAdapter
 from scrapy import Spider
 from scrapy.exceptions import DropItem
@@ -15,16 +16,14 @@ from .db import DynamoDB
 
 
 class DuplicateFilterPipeline:
-    def __init__(self, table_name, endpoint_url):
+    def __init__(self, table_name):
         self.table_name = table_name
-        self.endpoint_url = endpoint_url
-        self.db = DynamoDB(table_name=self.table_name, endpoint_url=self.endpoint_url)
+        self.db = DynamoDB(table_name=self.table_name)
 
     @classmethod
     def from_crawler(cls, crawler):
-        table_name = crawler.settings.get("DYNAMODB_TABLE_NAME")
-        endpoint_url = crawler.settings.get("DYNAMODB_ENDPOINT_URL")
-        return cls(table_name=table_name, endpoint_url=endpoint_url)
+        table_name = crawler.settings.get("PROPERTY_TABLE_NAME")
+        return cls(table_name=table_name)
 
     def process_item(self, item, spider: Spider):
         adapter = ItemAdapter(item)
@@ -50,16 +49,14 @@ class ExtractNumberOfBedroomsPipeline:
 
 
 class PutToDynamoDBPipeline:
-    def __init__(self, table_name, endpoint_url):
+    def __init__(self, table_name):
         self.table_name = table_name
-        self.endpoint_url = endpoint_url
-        self.db = DynamoDB(table_name=self.table_name, endpoint_url=self.endpoint_url)
+        self.db = DynamoDB(table_name=self.table_name)
 
     @classmethod
     def from_crawler(cls, crawler):
-        table_name = crawler.settings.get("DYNAMODB_TABLE_NAME")
-        endpoint_url = crawler.settings.get("DYNAMODB_ENDPOINT_URL")
-        return cls(table_name=table_name, endpoint_url=endpoint_url)
+        table_name = crawler.settings.get("PROPERTY_TABLE_NAME")
+        return cls(table_name=table_name)
 
     def open_spider(self, spider: Spider):
         pass
@@ -105,7 +102,7 @@ class PutToS3Pipeline:
             json_data = json.dumps(item, ensure_ascii=False, indent=4)
 
             # Check if the environment is production
-            if os.environ.get("ENVIRONMENT") == "production":
+            if os.environ.get("ENVIRONMENT") == "PRODUCTION":
                 # S3 client
                 s3_client = boto3.client("s3")
 
@@ -123,7 +120,7 @@ class PutToS3Pipeline:
                 except Exception as e:
                     print(f"Error uploading item to S3: {e}")
             elif (
-                os.environ.get("ENVIRONMENT") == "development"
+                os.environ.get("ENVIRONMENT") == "LOCAL"
                 and self.bucket_name == "local-storage"
             ):
                 print(f"Saving item to local storage: {object_key}")
