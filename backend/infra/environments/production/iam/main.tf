@@ -34,6 +34,8 @@ module "iam_infrastructure_admin_role" {
     # TODO: This role should be here just temporarily until we have a proper CI/CD setup
     module.iam_nova_developer.iam_user_arn
   ]
+  # TODO: Enforce MFA for this role when we have proper SSO setup
+  role_requires_mfa = false
 
   custom_role_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
