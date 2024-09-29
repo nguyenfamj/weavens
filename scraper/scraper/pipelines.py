@@ -6,10 +6,10 @@ import os
 import json
 import re
 import boto3
-from datetime import datetime
 from itemadapter import ItemAdapter
 from scrapy import Spider
 from scrapy.exceptions import DropItem
+from pathlib import Path
 
 from .db import DynamoDB
 
@@ -91,16 +91,17 @@ class PutToS3Pipeline:
 
     def process_item(self, item, spider: Spider):
         if spider.name == "personalfinance_fi":
+            if not item["url"]:
+                raise DropItem(f"No URL in item (Spider: {spider.name})")
             # Extract the desired part from the URL using regex
             url_pattern = r"https?://(?:www\.)?(.+?)/?$"
             match = re.search(url_pattern, item["url"])
 
             object_key = None
-            today_str = datetime.now().strftime("%d%m%Y")
             if match:
-                object_key = f"{today_str}/{match.group(1)}.json"
+                object_key = f"{match.group(1)}.json"
             else:
-                object_key = f"{today_str}/{item['url']}.json"
+                object_key = f"{item['url']}.json"
 
             json_data = json.dumps(item, ensure_ascii=False, indent=4)
 
@@ -122,16 +123,14 @@ class PutToS3Pipeline:
                     print(f"Uploaded item to S3: {object_key}")
                 except Exception as e:
                     print(f"Error uploading item to S3: {e}")
-            elif (
-                os.environ.get("ENVIRONMENT") == "development"
-                and self.bucket_name == "local-storage"
-            ):
-                print(f"Saving item to local storage: {object_key}")
-                file_path = os.path.join(".data", object_key)
+            elif os.environ.get("ENVIRONMENT") == "development":
+                # Save to home directory of the OS
+                file_path = os.path.join(Path.home(), self.bucket_name, object_key)
                 # Ensure the directory exists
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
                 with open(file_path, "w") as f:
                     f.write(json_data)
+                print(f"Saved item to file system: {file_path}")
             else:
                 print(
                     "Not in development or production, skipping saving to S3 or local storage"
