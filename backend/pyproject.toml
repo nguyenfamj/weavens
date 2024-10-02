@@ -19,6 +19,7 @@ langchain-openai = ">=0.2,<0.3"
 mangum = "^0.17.0"
 langgraph = ">=0.2.20,<0.3"
 aiodynamo = {extras = ["aiohttp"], version = "^24.7"}
+chromadb = "^0.5.11"
 
 [build-system]
 requires = ["poetry-core"]
