@@ -25,7 +25,7 @@ REDIS_PORT = os.getenv("REDIS_PORT", "6379")
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
 
 # Storage variables
-S3_BUCKET = os.getenv("S3_BUCKET", "local-storage")
+S3_BUCKET = os.getenv("S3_BUCKET", "docs-scraper-lake")
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = "scraper (+http://www.yourdomain.com)"
