@@ -9,7 +9,7 @@ from scrapy_redis.spiders import RedisSpider
 from ..constants import TITLE_TO_FIELD
 from ..db import DynamoDB
 from ..items import OikotieItem, OikotieItemLoader
-from ..settings import DYNAMODB_ENDPOINT_URL, DYNAMODB_TABLE_NAME, REDIS_URL
+from ..settings import PROPERTY_TABLE_NAME, REDIS_URL
 
 
 class OikotieSpider(RedisSpider):
@@ -48,10 +48,7 @@ class OikotieSpider(RedisSpider):
     def add_url_to_redis_client(self):
         redis_client = from_url(REDIS_URL)
 
-        db = DynamoDB(
-            table_name=DYNAMODB_TABLE_NAME,
-            endpoint_url=DYNAMODB_ENDPOINT_URL,
-        )
+        db = DynamoDB(table_name=PROPERTY_TABLE_NAME)
 
         items = db.table.query(
             IndexName="GSI3",

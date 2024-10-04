@@ -12,6 +12,10 @@ terraform {
 provider "aws" {
   region  = "eu-north-1"
   profile = "default"
+
+  assume_role {
+    role_arn = "arn:aws:iam::484907490685:role/InfrastructureAdmin"
+  }
 }
 
 provider "docker" {
