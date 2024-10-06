@@ -13,3 +13,12 @@ apply:
 
 destroy:
     cd infra && terraform destroy --auto-approve
+
+test:
+    poetry run pytest -v
+
+test-coverage:
+    poetry run pytest -v --cov=src --cov-config=.coveragerc --cov-report=term-missing
+
+test-coverage-html:
+    poetry run pytest -v --cov=src --cov-config=.coveragerc --cov-report=html
