@@ -20,6 +20,8 @@ mangum = "^0.17.0"
 langgraph = ">=0.2.20,<0.3"
 aiodynamo = {extras = ["aiohttp"], version = "^24.7"}
 chromadb = "^0.5.11"
+pytest = "^8.3.3"
+pytest-cov = "^5.0.0"
 
 [build-system]
 requires = ["poetry-core"]
