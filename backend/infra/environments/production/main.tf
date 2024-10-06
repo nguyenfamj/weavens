@@ -11,7 +11,7 @@ terraform {
 
 provider "aws" {
   region  = "eu-north-1"
-  profile = "default"
+  profile = "nova.developer"
 
   assume_role {
     role_arn = "arn:aws:iam::484907490685:role/InfrastructureAdmin"
@@ -24,10 +24,6 @@ provider "docker" {
     username = data.aws_ecr_authorization_token.token.user_name
     password = data.aws_ecr_authorization_token.token.password
   }
-}
-
-module "iam" {
-  source = "./iam"
 }
 
 module "dynamodb" {
