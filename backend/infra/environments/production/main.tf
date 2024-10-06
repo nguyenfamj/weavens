@@ -34,18 +34,6 @@ module "ecr" {
   source = "./ecr"
 }
 
-module "lambda" {
-  source = "./lambda"
-
-  image_uri = module.ecr.image_uri
-}
-
-module "api_gateway" {
-  source = "./api_gateway"
-
-  lambda_function_arn = module.lambda.lambda_function_arn
-}
-
 module "docs_scraper" {
   source = "./docs_scraper"
 }
