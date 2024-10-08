@@ -1,6 +1,6 @@
-from fastapi import FastAPI
-from mangum import Mangum
 from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
 
 from .chroma import ChromaWrapper
 from .config import settings
@@ -39,7 +39,3 @@ app.include_router(api_router)
 def healthcheck():
     logger.debug("GET /healthcheck")
     return {"status": "ok"}
-
-
-# Wrap FastAPI app with Mangum for AWS Lambda
-handler = Mangum(app, lifespan="off")
