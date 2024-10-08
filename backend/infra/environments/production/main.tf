@@ -11,7 +11,7 @@ terraform {
 
 provider "aws" {
   region  = "eu-north-1"
-  profile = "default"
+  profile = "nova.developer"
 
   assume_role {
     role_arn = "arn:aws:iam::484907490685:role/InfrastructureAdmin"
@@ -26,10 +26,6 @@ provider "docker" {
   }
 }
 
-module "iam" {
-  source = "./iam"
-}
-
 module "dynamodb" {
   source = "./dynamodb"
 }
@@ -38,18 +34,19 @@ module "ecr" {
   source = "./ecr"
 }
 
-module "lambda" {
-  source = "./lambda"
-
-  image_uri = module.ecr.image_uri
-}
-
-module "api_gateway" {
-  source = "./api_gateway"
-
-  lambda_function_arn = module.lambda.lambda_function_arn
-}
-
 module "docs_scraper" {
   source = "./docs_scraper"
+}
+
+module "vpc" {
+  source = "./vpc"
+}
+
+module "ec2" {
+  source = "./ec2"
+
+  vpc_id                    = module.vpc.vpc_id
+  public_subnet_ids         = module.vpc.public_subnet_ids
+  private_subnet_ids        = module.vpc.private_subnet_ids
+  default_security_group_id = module.vpc.default_security_group_id
 }
