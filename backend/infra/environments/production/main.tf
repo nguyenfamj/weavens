@@ -27,7 +27,7 @@ provider "docker" {
 }
 
 module "dynamodb" {
-  source = "./dynamodb"
+  source = "../../modules/dynamodb"
 }
 
 module "ecr" {

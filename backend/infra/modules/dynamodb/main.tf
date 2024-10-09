@@ -70,3 +70,46 @@ module "checkpoints" {
     Terraform   = true
   }
 }
+
+module "scrape_jobs_table" {
+  source = "terraform-aws-modules/dynamodb-table/aws"
+
+  name     = "ScrapeJobs"
+  hash_key = "id"
+
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 1
+  write_capacity = 1
+
+  attributes = [
+    { name = "id", type = "S" },
+  ]
+
+  tags = {
+    Environment = "production"
+    Terraform   = true
+  }
+}
+
+module "scraped_content_table" {
+  source = "terraform-aws-modules/dynamodb-table/aws"
+
+  name     = "ScrapedContent"
+  hash_key = "url"
+
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 1
+  write_capacity = 1
+
+  attributes = [
+    {
+      name = "url"
+      type = "S"
+    },
+  ]
+
+  tags = {
+    Environment = "production"
+    Terraform   = true
+  }
+}
