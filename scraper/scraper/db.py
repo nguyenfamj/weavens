@@ -1,5 +1,4 @@
 import boto3
-from botocore.exceptions import ClientError
 
 from .settings import ENVIRONMENT
 
@@ -29,17 +28,16 @@ class DynamoDB:
         self.table_name = table_name
         self.table = self.resource.Table(self.table_name)
 
-        try:
-            self.table.load()
-        except ClientError:
-            if ENVIRONMENT == "LOCAL":
-                self.table = self._create_table(self.table_name)
+        self.table.load()
 
     def _create_table(self, table_name: str):
         """Create a table in the database.
 
         Args:
             table_name (str): The name of the table to create.
+
+        Deprecated:
+            This method is deprecated and will be removed in future versions.
         """
         table = self.resource.create_table(
             TableName=table_name,
