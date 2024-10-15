@@ -8,6 +8,29 @@ from .constants import (
     HOUSING_TYPE_TRANSLATIONS,
     PROPERTY_OWNERSHIP_TRANSLATIONS,
 )
+from scrapy.http import Response
+
+
+class ScraperUtils:
+    @staticmethod
+    def extract_important_urls_from_response(
+        response: Response,
+    ) -> list[dict[str, str]]:
+        urls = response.css("a::attr(href)").getall()
+        extracted_urls = []
+
+        for url in urls:
+            absolute_url = response.urljoin(url)
+            if absolute_url.endswith(".pdf"):
+                extracted_urls.append(
+                    {
+                        "url": absolute_url,
+                        "type": "media",
+                        "mime_type": "application/pdf",
+                    }
+                )
+
+        return extracted_urls
 
 
 class ProcessorUtils:
