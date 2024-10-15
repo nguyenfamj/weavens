@@ -18,6 +18,9 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "LOCAL")
 
 # DYNAMODB variables
 PROPERTY_TABLE_NAME = "Properties"
+SCRAPED_CONTENT_TABLE_NAME = "ScrapedContent"
+
+SCRAPED_CONTENT_BATCH_SIZE = 25
 
 # Redis variables
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
@@ -82,6 +85,7 @@ ITEM_PIPELINES = {
     "scraper.pipelines.ExtractNumberOfBedroomsPipeline": 200,
     "scraper.pipelines.PutToS3Pipeline": 400,
     "scraper.pipelines.PutToDynamoDBPipeline": 500,
+    "scraper.pipelines.PutToDynamoDBBatchPipeline": 600,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
