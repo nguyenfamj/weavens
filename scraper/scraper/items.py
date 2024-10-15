@@ -141,6 +141,13 @@ class BlogItem(Item):
     content_type = Field()
 
 
+class ScrapeContentItem(Item):
+    url = Field()
+    type = Field()
+    mime_type = Field()
+    source_page = Field()
+
+
 class ScrapeMetadata(Item):
     initial_url = Field()
     scraped_at = Field()
