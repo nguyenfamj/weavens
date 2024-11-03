@@ -4,6 +4,12 @@ from .config import settings
 from .constants import Database
 
 
+dynamodb = boto3.resource(
+    "dynamodb",
+    endpoint_url="http://localhost:8000" if settings.ENVIRONMENT.is_local else None,
+)
+
+
 class DynamoDB:
     instance = None
 

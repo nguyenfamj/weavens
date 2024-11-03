@@ -19,6 +19,8 @@ class Database:
 
     PROPERTIES_TABLE_NAME = "Properties"
     CHECKPOINTS_TABLE_NAME = "Checkpoints"
+    SCRAPED_URL_TRACKER_TABLE_NAME = "ScrapedUrlTracker"
+    SCRAPED_CONTENT_TABLE_NAME = "ScrapedContent"
 
 
 class Secret:

@@ -20,5 +20,7 @@ provider "aws" {
 }
 
 module "dynamodb" {
-  source = "../../modules/dynamodb"
+  source          = "../../modules/dynamodb"
+  enable_tags     = false
+  tag_environment = "local"
 }

@@ -43,10 +43,10 @@ module "properties" {
     }
   ]
 
-  tags = {
-    Environment = "production"
+  tags = var.enable_tags ? {
+    Environment = var.tag_environment
     Terraform   = true
-  }
+  } : null
 }
 
 module "checkpoints" {
@@ -65,10 +65,10 @@ module "checkpoints" {
     { name = "SK", type = "S" }
   ]
 
-  tags = {
-    Environment = "production"
+  tags = var.enable_tags ? {
+    Environment = var.tag_environment
     Terraform   = true
-  }
+  } : null
 }
 
 module "scrape_jobs_table" {
@@ -83,12 +83,25 @@ module "scrape_jobs_table" {
 
   attributes = [
     { name = "id", type = "S" },
+    { name = "type", type = "S" },
+    { name = "status", type = "S" }
   ]
 
-  tags = {
-    Environment = "production"
+  global_secondary_indexes = [
+    {
+      name            = "TypeByStatusGSI"
+      hash_key        = "type"
+      range_key       = "status"
+      read_capacity   = 1
+      write_capacity  = 1
+      projection_type = "KEYS_ONLY"
+    }
+  ]
+
+  tags = var.enable_tags ? {
+    Environment = var.tag_environment
     Terraform   = true
-  }
+  } : null
 }
 
 module "scraped_content_table" {
@@ -106,10 +119,29 @@ module "scraped_content_table" {
       name = "url"
       type = "S"
     },
+    {
+      name = "status"
+      type = "S"
+    },
+    {
+      name = "type"
+      type = "S"
+    }
   ]
 
-  tags = {
-    Environment = "production"
+  global_secondary_indexes = [
+    {
+      name            = "StatusByTypeGSI"
+      hash_key        = "status"
+      range_key       = "type"
+      projection_type = "KEYS_ONLY"
+      read_capacity   = 1
+      write_capacity  = 1
+    }
+  ]
+
+  tags = var.enable_tags ? {
+    Environment = var.tag_environment
     Terraform   = true
-  }
+  } : null
 }

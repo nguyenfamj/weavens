@@ -5,6 +5,7 @@ from fastapi.routing import APIRouter
 from .config import settings
 from .graph.router import router as graph_router
 from .properties.router import router as properties_router
+from .scraping.router import router as scraping_router
 from .schemas import ErrorResponse
 
 api_router = APIRouter(
@@ -18,3 +19,4 @@ api_router = APIRouter(
 )
 api_router.include_router(properties_router, prefix="/properties")
 api_router.include_router(graph_router, prefix="/graph")
+api_router.include_router(scraping_router, prefix="/scraping")
