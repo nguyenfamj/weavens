@@ -7,6 +7,7 @@ import os
 import re
 
 import boto3
+from botocore.exceptions import ClientError
 from itemadapter import ItemAdapter
 from scrapy import Spider
 from scrapy.exceptions import DropItem
@@ -73,6 +74,68 @@ class PutToDynamoDBPipeline:
             self.db.table.put_item(Item=processed_item)
 
         return item
+
+
+class PutToDynamoDBBatchPipeline:
+    def __init__(self, scraped_content_table_name, scraped_content_batch_size):
+        self.scraped_content_table_name = scraped_content_table_name
+        self.scraped_content_batch_size = scraped_content_batch_size
+        self.url_in_batch = set()
+        self.scraped_content_items = []
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        scraped_content_table_name = crawler.settings.get("SCRAPED_CONTENT_TABLE_NAME")
+        scraped_content_batch_size = crawler.settings.get("SCRAPED_CONTENT_BATCH_SIZE")
+        return cls(
+            scraped_content_table_name=scraped_content_table_name,
+            scraped_content_batch_size=scraped_content_batch_size,
+        )
+
+    def open_spider(self, spider: Spider):
+        self.scraped_content_table_session = DynamoDB(
+            table_name=self.scraped_content_table_name
+        )
+
+    def close_spider(self, spider: Spider):
+        self.batch_write_scraped_content()
+
+    def process_item(self, item, spider: Spider):
+        if (
+            spider.name == "personalfinance_fi_url"
+            or spider.name == "maanmittauslaitos_url"
+            or spider.name == "expat_finland_url"
+        ):
+            if (
+                not self.scraped_content_table_session.is_item_exists(
+                    hash_key_value={"url": item["url"]}
+                )
+                and item["url"] not in self.url_in_batch
+            ):
+                self.scraped_content_items.append(dict(item))
+                self.url_in_batch.add(item["url"])
+            else:
+                print(f"Item already exists in DynamoDB: {item['url']}")
+
+            # Safe mechanism in case the list has more items than the batch size
+            if len(self.scraped_content_items) >= self.scraped_content_batch_size:
+                self.batch_write_scraped_content()
+
+    def batch_write_scraped_content(self):
+        if not self.scraped_content_items:
+            return
+        try:
+            with self.scraped_content_table_session.table.batch_writer() as batch:
+                print(f"Writing {len(self.scraped_content_items)} items to DynamoDB")
+
+                for item in self.scraped_content_items:
+                    batch.put_item(Item=item)
+
+            # Reset batch
+            self.scraped_content_items = []
+            self.url_in_batch = set()
+        except ClientError as e:
+            raise DropItem(f"Failed to write items to DynamoDB: {str(e)}")
 
 
 class PutToS3Pipeline:
