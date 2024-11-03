@@ -19,7 +19,7 @@ scrape_jobs_table = dynamodb.Table("ScrapeJobs")
 scraped_content_table = dynamodb.Table("ScrapedContent")
 
 
-async def create_scrape_job_by_type(type: DocumentType) -> ScrapeJob:
+def create_scrape_job_by_type(type: DocumentType) -> ScrapeJob:
     """
     Create a new scrape job
     New jobs are created in default status of "IN_PROGRESS"
@@ -47,7 +47,7 @@ async def create_scrape_job_by_type(type: DocumentType) -> ScrapeJob:
         return item
 
 
-async def get_in_progress_jobs_by_type(type: DocumentType) -> list[str]:
+def get_in_progress_jobs_by_type(type: DocumentType) -> list[str]:
     """
     Get all the in progress scraping jobs by job type
     In progress jobs are those that has a status of "IN_PROGRESS"
@@ -70,7 +70,7 @@ async def get_in_progress_jobs_by_type(type: DocumentType) -> list[str]:
         return response["Items"]
 
 
-async def update_scrape_job_status(
+def update_scrape_job_status(
     job_id: str,
     status: ScrapeJobStatus,
     total_urls: int | None = None,
@@ -97,7 +97,7 @@ async def update_scrape_job_status(
         )
 
 
-async def get_all_web_document_urls_without_content() -> list[str]:
+def get_all_web_document_urls_without_content() -> list[str]:
     """
     Get all the urls that do not have content_html or content_md5
     """
@@ -127,7 +127,7 @@ async def get_all_web_document_urls_without_content() -> list[str]:
         return urls
 
 
-async def update_scraped_content_status_from_job(
+def update_scraped_content_status_from_job(
     url: str, job_id: str, status: ScrapedContentStatus
 ):
     try:
@@ -151,7 +151,7 @@ async def update_scraped_content_status_from_job(
         raise
 
 
-async def update_scraped_content_from_job(params: UpdateScrapedContentFromJobParams):
+def update_scraped_content_from_job(params: UpdateScrapedContentFromJobParams):
     try:
         scraped_content_table.update_item(
             Key={"url": params.url},

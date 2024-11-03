@@ -5,11 +5,12 @@ from .config import settings
 
 
 class Logger:
-    logger: logging.Logger = None
+    loggers = {}
 
     def __init__(self, name) -> None:
-        if not Logger.logger:
-            Logger.logger = self._init_logger(name)
+        if name not in Logger.loggers:
+            Logger.loggers[name] = self._init_logger(name)
+        self.logger = Logger.loggers[name]
 
     def _init_logger(self, name):
         logger = logging.getLogger(name)

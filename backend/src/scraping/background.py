@@ -14,7 +14,7 @@ from .schemas import (
 logger = Logger(__name__).logger
 
 
-async def scrape_urls_task(urls: list[str], job_id: str):
+def scrape_urls_task(urls: list[str], job_id: str):
     job_status = ScrapeJobStatus.IN_PROGRESS
     completed_urls = 0
     try:
@@ -31,13 +31,13 @@ async def scrape_urls_task(urls: list[str], job_id: str):
                 scraped_content = firecrawl_scrape(url)
             except Exception as e:
                 logger.error("Error scraping url %s: %s", url, e)
-                await update_scraped_content_status_from_job(
+                update_scraped_content_status_from_job(
                     url, job_id, ScrapedContentStatus.FAILED
                 )
                 continue
 
             # Save the scraped content to the database
-            await update_scraped_content_from_job(
+            update_scraped_content_from_job(
                 UpdateScrapedContentFromJobParams(
                     url=url,
                     status=ScrapedContentStatus.SCRAPED,
@@ -59,7 +59,7 @@ async def scrape_urls_task(urls: list[str], job_id: str):
             )
 
         # Update the job status to completed
-        await update_scrape_job_status(
+        update_scrape_job_status(
             job_id=job_id,
             status=job_status,
             total_urls=len(urls),
@@ -67,7 +67,7 @@ async def scrape_urls_task(urls: list[str], job_id: str):
         )
     except Exception as e:
         logger.error("Error while executing scrape job %s: %s", job_id, e)
-        await update_scrape_job_status(
+        update_scrape_job_status(
             job_id=job_id,
             status=ScrapeJobStatus.FAILED,
             total_urls=len(urls),
