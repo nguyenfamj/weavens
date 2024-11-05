@@ -47,7 +47,7 @@ def create_scrape_job_by_type(type: DocumentType) -> ScrapeJob:
         return item
 
 
-def get_in_progress_jobs_by_type(type: DocumentType) -> list[str]:
+def get_in_progress_jobs_by_type(type: DocumentType) -> list[ScrapeJob]:
     """
     Get all the in progress scraping jobs by job type
     In progress jobs are those that has a status of "IN_PROGRESS"
@@ -95,6 +95,7 @@ def update_scrape_job_status(
             err.response["Error"]["Code"],
             err.response["Error"]["Message"],
         )
+        raise
 
 
 def get_all_web_document_urls_without_content() -> list[str]:
