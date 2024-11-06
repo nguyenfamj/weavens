@@ -33,7 +33,7 @@ async def scrape_web_documents(background_tasks: BackgroundTasks):
         )
         raise HTTPException(status_code=500, detail=str(e))
 
-    background_tasks.add_task(scrape_urls_task, urls[:5], scrape_job.id)
+    background_tasks.add_task(scrape_urls_task, urls, scrape_job.id)
 
     return TriggerScrapeJobResponse(
         status_code=status.HTTP_202_ACCEPTED,

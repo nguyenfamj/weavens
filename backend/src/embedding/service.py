@@ -10,7 +10,7 @@ logger = Logger(__name__).logger
 class EmbeddingService:
     def __init__(self):
         self.document_collection = ChromaWrapper().document_collection
-        print("EmbeddingService initialized")
+        logger.info("EmbeddingService initialized")
 
     def query_similar_documents(self, query_text: str, n_results: int = 5) -> list[str]:
         """

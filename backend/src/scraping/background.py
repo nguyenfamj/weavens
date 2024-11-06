@@ -1,9 +1,12 @@
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 from .scrape_api import firecrawl_scrape
 from .service import (
     update_scraped_content_status_from_job,
     update_scraped_content_from_job,
     update_scrape_job_status,
 )
+from src.embedding.service import EmbeddingService
 from ..logging import Logger
 from .schemas import (
     ScrapedContentStatus,
@@ -15,6 +18,15 @@ logger = Logger(__name__).logger
 
 
 def scrape_urls_task(urls: list[str], job_id: str):
+    embedding_service = EmbeddingService()
+    text_splitter = RecursiveCharacterTextSplitter(
+        separators=["\n\n", "\n", " ", ""],
+        chunk_size=1000,
+        chunk_overlap=200,
+        length_function=len,
+        keep_separator=True,
+    )
+
     job_status = ScrapeJobStatus.IN_PROGRESS
     completed_urls = 0
     try:
@@ -46,6 +58,24 @@ def scrape_urls_task(urls: list[str], job_id: str):
                     last_scrape_job_id=job_id,
                     metadata=scraped_content["metadata"],
                 )
+            )
+
+            scraped_content_metadata = scraped_content["metadata"]
+
+            # Save embedded contents
+            # TODO: This should be a temporary solution until we can handle this with DynamoDB stream
+            text_chunks = text_splitter.split_text(scraped_content["markdown"])
+
+            logger.info("Adding %s chunks to vector collection", len(text_chunks))
+            embedding_service.add_text_chunks_to_collection(
+                text_chunks=text_chunks,
+                file_name=url,
+                shared_metadata={
+                    "title": scraped_content_metadata["title"],
+                    "language": scraped_content_metadata["language"],
+                    "sourceURL": scraped_content_metadata["sourceURL"],
+                    "author": scraped_content_metadata["author"],
+                },
             )
 
             # Increment the completed urls counter
