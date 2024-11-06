@@ -1,7 +1,8 @@
 from chromadb import Documents
 
+from src.core.logging import Logger
+
 from ..chroma import ChromaWrapper
-from ..logging import Logger
 from .utils import generate_text_chunk_fingerprint_with_file_name
 
 logger = Logger(__name__).logger

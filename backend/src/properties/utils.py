@@ -2,7 +2,7 @@ from functools import reduce
 
 from boto3.dynamodb.conditions import Attr, Key
 
-from ..logging import Logger
+from src.core.logging import Logger
 from .schemas import PropertyQueryParams
 
 logger = Logger(__name__).logger

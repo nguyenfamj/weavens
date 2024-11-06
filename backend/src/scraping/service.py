@@ -3,8 +3,8 @@ from botocore.exceptions import ClientError
 from uuid import uuid4
 from datetime import datetime
 
-from ..db import dynamodb
-from ..logging import Logger
+from src.core.db import dynamodb
+from src.core.logging import Logger
 from .schemas import (
     DocumentType,
     ScrapeJob,

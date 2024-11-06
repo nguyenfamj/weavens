@@ -6,9 +6,10 @@ from botocore.exceptions import ClientError
 from langchain_core.messages import HumanMessage
 from langchain_core.runnables import RunnableConfig
 
-from ..config import settings
+from src.core.config import settings
+from src.core.logging import Logger
+
 from ..constants import Secret
-from ..logging import Logger
 from .schemas import UserInput
 
 logger = Logger(__name__).logger

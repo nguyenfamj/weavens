@@ -24,7 +24,8 @@ from langgraph.checkpoint.base import (
 from langgraph.checkpoint.serde.base import SerializerProtocol
 from yarl import URL
 
-from ..config import settings
+from src.core.config import settings
+
 from .schemas import (
     CheckpointConfigurable,
     CompositeKey,

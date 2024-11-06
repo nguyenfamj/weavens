@@ -1,7 +1,7 @@
 import boto3
 
 from .config import settings
-from .constants import Database
+from ..constants import Database
 
 
 dynamodb = boto3.resource(

@@ -2,10 +2,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from src.core.logging import Logger
+from src.core.config import settings
+
 from .chroma import ChromaWrapper
-from .config import settings
 from .exception_handlers import exception_handlers
-from .logging import Logger
 from .router import api_router
 
 # Initialize logger

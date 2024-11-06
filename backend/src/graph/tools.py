@@ -1,7 +1,7 @@
 from langchain.tools import BaseTool
 from pydantic import Field
 
-from ..db import get_db
+from src.core.db import get_db
 from ..properties.schemas import BuildingType, PropertyQueryParams
 from ..properties.service import PropertyService
 from ..schemas import CommonParams
@@ -57,6 +57,11 @@ class FindPropertiesTool(BaseTool):
         response = property_service.get_properties(params, q)
 
         return {"data": response.data}
+
+
+class HouseBuyingKnowledgeTool(BaseTool):
+    name: str = "house_buying_knowledge"
+    description: str = "A tool to query for query for house buying knowledge that related to the user's query."
 
 
 tools = [FindPropertiesTool()]

@@ -6,7 +6,8 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from langchain_core.callbacks import AsyncCallbackHandler
 
-from ..config import settings
+from src.core.config import settings
+
 from ..constants import Database
 from ..exceptions import InternalServerErrorHTTPException
 from .checkpoint import DynamoDBSaver

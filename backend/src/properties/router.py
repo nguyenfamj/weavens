@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter
 from fastapi.params import Depends
 
-from ..db import DynamoDB, get_db
+from src.core.db import DynamoDB, get_db
 from ..exceptions import NotFoundHTTPException
 from ..schemas import CommonParams
 from .schemas import PropertyQueryParams, PropertyResponse

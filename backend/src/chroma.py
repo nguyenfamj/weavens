@@ -2,7 +2,7 @@ from chromadb import PersistentClient
 from chromadb.utils import embedding_functions
 
 from .graph.utils import get_openai_api_key
-from .logging import Logger
+from src.core.logging import Logger
 
 logger = Logger(__name__).logger
 

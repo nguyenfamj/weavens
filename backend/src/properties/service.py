@@ -2,9 +2,10 @@ from math import ceil
 
 from fastapi import status
 
+from src.core.db import DynamoDB
+from src.core.logging import Logger
+
 from ..constants import Database
-from ..db import DynamoDB
-from ..logging import Logger
 from ..schemas import CommonParams, Pagination
 from .schemas import PropertyQueryParams, PropertyResponse
 from .utils import build_query

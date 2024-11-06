@@ -7,7 +7,8 @@ from .service import (
     update_scrape_job_status,
 )
 from src.embedding.service import EmbeddingService
-from ..logging import Logger
+from src.core.logging import Logger
+
 from .schemas import (
     ScrapedContentStatus,
     ScrapeJobStatus,
