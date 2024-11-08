@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from fastapi.params import Depends
 
 from src.core.db import DynamoDB, get_db
-from ..exceptions import NotFoundHTTPException
+from src.common.exceptions import NotFoundHTTPException
 from ..schemas import CommonParams
 from .schemas import PropertyQueryParams, PropertyResponse
 from .service import PropertyService

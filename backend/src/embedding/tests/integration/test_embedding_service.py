@@ -1,17 +1,35 @@
 import pytest
+from unittest.mock import patch, Mock
+from chromadb.api.types import EmbeddingFunction
+
 from ...service import EmbeddingService
-from ....chroma import ChromaWrapper
+from ...vectordb import get_chroma_db
+
+
+class MockEmbeddingFunction(EmbeddingFunction):
+    def __call__(self, input: list[str]) -> list[list[float]]:
+        return [[0.1] * 1536 for _ in input]
 
 
 class TestAddTextChunksToCollection:
     @pytest.fixture(autouse=True)
     def setup(self):
-        # Initialize the ChromaWrapper
-        self.chroma_wrapper = ChromaWrapper()
-        self.chroma_wrapper.initialize()
-        self.document_collection = self.chroma_wrapper.document_collection
+        # Mock the OpenAIEmbeddingFunction
+        self.embeddings_patcher = patch(
+            "chromadb.utils.embedding_functions.OpenAIEmbeddingFunction",
+            return_value=MockEmbeddingFunction(),
+        )
+        self.embeddings_patcher.start()
 
+        # Initialize the ChromaWrapper
+        self.chroma_db = get_chroma_db()
+        self.chroma_db.initialize()
+        self.document_collection = self.chroma_db.document_collection
         self.embedding_service = EmbeddingService()
+
+    def teardown_method(self):
+        # Stop the patcher after each test
+        self.embeddings_patcher.stop()
 
     @pytest.mark.integration
     def test_should_add_to_collection_successfully(self):

@@ -4,8 +4,8 @@ from fastapi import status
 
 from src.core.db import DynamoDB
 from src.core.logging import Logger
+from src.common.constants import Database
 
-from ..constants import Database
 from ..schemas import CommonParams, Pagination
 from .schemas import PropertyQueryParams, PropertyResponse
 from .utils import build_query

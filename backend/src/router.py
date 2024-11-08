@@ -7,7 +7,6 @@ from src.core.config import settings
 from .graph.router import router as graph_router
 from .properties.router import router as properties_router
 from .scraping.router import router as scraping_router
-from .embedding.router import router as embedding_router
 from .schemas import ErrorResponse
 
 api_router = APIRouter(

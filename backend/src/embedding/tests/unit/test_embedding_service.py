@@ -7,13 +7,13 @@ from ...service import EmbeddingService
 class TestAddTextChunksToCollection:
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.mock_chroma_wrapper = Mock()
+        self.get_chroma_db = Mock()
         self.mock_document_collection = Mock()
-        self.mock_chroma_wrapper.document_collection = self.mock_document_collection
+        self.get_chroma_db.document_collection = self.mock_document_collection
 
-        self.mock_chroma_wrapper_class = patch(
-            "src.embedding.service.ChromaWrapper",
-            return_value=self.mock_chroma_wrapper,
+        self.get_chroma_db_patcher = patch(
+            "src.embedding.service.get_chroma_db",
+            return_value=self.get_chroma_db,
         ).start()
 
         self.mock_generate_fingerprint = patch(

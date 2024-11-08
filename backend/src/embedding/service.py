@@ -2,7 +2,7 @@ from chromadb import Documents
 
 from src.core.logging import Logger
 
-from ..chroma import ChromaWrapper
+from .vectordb import get_chroma_db
 from .utils import generate_text_chunk_fingerprint_with_file_name
 
 logger = Logger(__name__).logger
@@ -10,7 +10,7 @@ logger = Logger(__name__).logger
 
 class EmbeddingService:
     def __init__(self):
-        self.document_collection = ChromaWrapper().document_collection
+        self.document_collection = get_chroma_db().document_collection
         logger.info("EmbeddingService initialized")
 
     def query_similar_documents(self, query_text: str, n_results: int = 5) -> list[str]:
