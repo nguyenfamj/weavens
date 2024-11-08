@@ -19,12 +19,15 @@ def mock_deps_scrape_urls_task():
         "src.scraping.background.update_scraped_content_from_job"
     ) as mock_update_scraped_content_from_job, patch(
         "src.scraping.background.update_scrape_job_status"
-    ) as mock_update_scrape_job_status:
+    ) as mock_update_scrape_job_status, patch(
+        "src.scraping.background.EmbeddingService"
+    ) as mock_embedding_service:
         yield {
             "mock_firecrawl_scrape": mock_firecrawl_scrape,
             "mock_update_scraped_content_status_from_job": mock_update_scraped_content_status_from_job,
             "mock_update_scraped_content_from_job": mock_update_scraped_content_from_job,
             "mock_update_scrape_job_status": mock_update_scrape_job_status,
+            "mock_embedding_service": mock_embedding_service,
         }
 
 

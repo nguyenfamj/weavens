@@ -72,10 +72,10 @@ def scrape_urls_task(urls: list[str], job_id: str):
                 text_chunks=text_chunks,
                 file_name=url,
                 shared_metadata={
-                    "title": scraped_content_metadata["title"],
-                    "language": scraped_content_metadata["language"],
-                    "sourceURL": scraped_content_metadata["sourceURL"],
-                    "author": scraped_content_metadata["author"],
+                    "title": scraped_content_metadata.get("title"),
+                    "language": scraped_content_metadata.get("language"),
+                    "sourceURL": scraped_content_metadata.get("sourceURL"),
+                    "author": scraped_content_metadata.get("author"),
                 },
             )
 

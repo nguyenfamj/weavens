@@ -8,8 +8,8 @@ from langchain_core.runnables import RunnableConfig
 
 from src.core.config import settings
 from src.core.logging import Logger
+from src.common.constants import Secret
 
-from ..constants import Secret
 from .schemas import UserInput
 
 logger = Logger(__name__).logger

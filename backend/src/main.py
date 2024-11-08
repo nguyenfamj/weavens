@@ -5,9 +5,9 @@ from fastapi import FastAPI
 from src.core.logging import Logger
 from src.core.config import settings
 
-from .chroma import ChromaWrapper
-from .exception_handlers import exception_handlers
+from .common.exception_handlers import exception_handlers
 from .router import api_router
+from .embedding.vectordb import get_chroma_db
 
 # Initialize logger
 logger = Logger(__name__).logger
@@ -19,8 +19,8 @@ logger.debug(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize Chroma Client
-    chroma_wrapper = ChromaWrapper()
-    chroma_wrapper.initialize()
+    chroma_db = get_chroma_db()
+    chroma_db.initialize()
     yield
 
 
