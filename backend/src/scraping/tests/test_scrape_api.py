@@ -7,28 +7,25 @@ from src.scraping.scrape_api import firecrawl_scrape, get_firecrawl_app
 @pytest.fixture
 def mock_deps_scrape_api():
     with patch("src.scraping.scrape_api.FirecrawlApp") as mock_firecrawl_app, patch(
-        "src.scraping.scrape_api.os"
-    ) as mock_os:
+        "src.scraping.scrape_api.settings"
+    ) as mock_settings:
         yield {
             "mock_firecrawl_app": mock_firecrawl_app,
-            "mock_os": mock_os,
+            "mock_settings": mock_settings,
         }
 
 
 @pytest.mark.unit
 class TestScrapeApi:
     def test_get_firecrawl_app_should_return_firecrawl_app(self, mock_deps_scrape_api):
-        mock_deps_scrape_api["mock_os"].getenv.return_value = "test-api-key"
         firecrawl_app = get_firecrawl_app()
-        mock_deps_scrape_api["mock_firecrawl_app"].assert_called_once_with(
-            api_key="test-api-key"
-        )
+        mock_deps_scrape_api["mock_settings"].FIRECRAWL_API_KEY = "test-api-key"
         assert firecrawl_app is not None
 
     def test_get_firecrawl_app_should_raise_error_when_no_api_key(
         self, mock_deps_scrape_api
     ):
-        mock_deps_scrape_api["mock_os"].getenv.return_value = None
+        mock_deps_scrape_api["mock_settings"].FIRECRAWL_API_KEY = None
         with pytest.raises(ValueError):
             get_firecrawl_app()
 

@@ -18,7 +18,7 @@ class DynamoDB:
         if cls.instance is None:
             cls.instance = super().__new__(cls)
             cls.instance.session = boto3.Session(
-                region_name=settings.REGION_NAME,
+                region_name=settings.AWS_REGION_NAME,
             )
             cls.instance.resource = cls.instance.session.resource(
                 Database.RESOURCE_NAME,

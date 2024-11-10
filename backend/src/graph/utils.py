@@ -30,7 +30,7 @@ def parse_input(user_input: UserInput) -> dict[str, Any]:
 
 def _get_secret():
     secret_name = Secret.OPENAI_API_KEY
-    region_name = settings.REGION_NAME
+    region_name = settings.AWS_REGION_NAME
 
     session = boto3.session.Session(region_name=region_name)
     client = session.client(service_name=Secret.SERVICE_NAME, region_name=region_name)

@@ -1,10 +1,10 @@
-import os
-
 from firecrawl import FirecrawlApp
+
+from src.core.config import settings
 
 
 def get_firecrawl_app():
-    api_key = os.getenv("FIRECRAWL_API_KEY")
+    api_key = settings.FIRECRAWL_API_KEY
     if not api_key:
         raise ValueError("No API key provided")
     return FirecrawlApp(api_key=api_key)
