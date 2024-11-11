@@ -13,7 +13,7 @@ class EmbeddingService:
         self.document_collection = get_chroma_db().document_collection
         logger.info("EmbeddingService initialized")
 
-    def query_similar_documents(self, query_text: str, n_results: int = 5) -> list[str]:
+    def query_similar_documents(self, query_text: str, n_results: int = 5) -> dict:
         """
         Query similar documents to the query text.
         """

@@ -1,7 +1,8 @@
 from langchain_openai import ChatOpenAI
-from langgraph.graph import START, StateGraph
-from langgraph.prebuilt import ToolNode, tools_condition
+from langgraph.graph import StateGraph
+from langgraph.checkpoint.memory import MemorySaver
 
+from .nodes import pure_llm_answer
 from .schemas import MessageState
 from .tools import tools
 from .utils import get_openai_api_key
@@ -33,11 +34,17 @@ class AssistantNode:
 # Graph
 builder = StateGraph(MessageState)
 
-# Nodes
-builder.add_node("assistant", AssistantNode())
-builder.add_node("tools", ToolNode(tools))
+builder.set_entry_point("pure_llm_answer")
+builder.add_node("pure_llm_answer", pure_llm_answer)
 
-# Edges
-builder.add_edge(START, "assistant")
-builder.add_conditional_edges("assistant", tools_condition)
-builder.add_edge("tools", "assistant")
+
+# # Nodes
+# builder.add_node("assistant", AssistantNode())
+# builder.add_node("tools", ToolNode(tools))
+
+# # Edges
+# builder.add_edge(START, "assistant")
+# builder.add_conditional_edges("assistant", tools_condition)
+# builder.add_edge("tools", "assistant")
+
+default_agent = builder.compile(checkpointer=MemorySaver())

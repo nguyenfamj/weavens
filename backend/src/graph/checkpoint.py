@@ -286,7 +286,7 @@ def _parse_checkpoint_data(
     )
 
 
-class DynamoDBSaver(BaseCheckpointSaver):
+class AsyncDynamoDBSaver(BaseCheckpointSaver):
     client: Client
     table: Table
 
@@ -299,7 +299,7 @@ class DynamoDBSaver(BaseCheckpointSaver):
     @asynccontextmanager
     async def from_conn_info(
         cls, *, region: str, table_name: str
-    ) -> AsyncIterator["DynamoDBSaver"]:
+    ) -> AsyncIterator["AsyncDynamoDBSaver"]:
         endpoint = None
 
         if settings.ENVIRONMENT.is_local:
