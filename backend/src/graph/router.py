@@ -23,7 +23,7 @@ router = APIRouter(tags=["graph"])
 
 
 async def get_app_agents(request: Request) -> dict[str, CompiledStateGraph]:
-    return request.app.state.agents
+    return request.state.agents
 
 
 async def message_generator(

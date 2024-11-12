@@ -829,6 +829,20 @@ uvicorn = {version = ">=0.15.0", extras = ["standard"]}
 standard = ["uvicorn[standard] (>=0.15.0)"]
 
 [[package]]
+name = "fastapi-lifespan-manager"
+version = "0.1.4"
+description = "FastAPI Lifespan Manager"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "fastapi_lifespan_manager-0.1.4-py3-none-any.whl", hash = "sha256:9d18e2c01cd91432ed05c7f94a02bb43e9ad68a5a55ccc813005f0b5f79e8bd9"},
+    {file = "fastapi_lifespan_manager-0.1.4.tar.gz", hash = "sha256:1dc4a776cd4305bf7baf4791f148216c21ab966916216d72b5dc2a27a21d8d02"},
+]
+
+[package.dependencies]
+fastapi = ">=0.93.0"
+
+[[package]]
 name = "filelock"
 version = "3.16.1"
 description = "A platform independent file lock."
@@ -4266,4 +4280,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e0f12a956c6eb3395d76cb46bb727b1caa2b7a903623013961e16b8bdeb9f767"
+content-hash = "5a06063cf2f72d90ee2607c2a9df4724b2a78dd1f444766c6c9f3fa3fb158529"
