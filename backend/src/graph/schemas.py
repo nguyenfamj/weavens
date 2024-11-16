@@ -1,16 +1,38 @@
-from typing import Annotated, Any, Literal
+from typing import Any, Literal
+from enum import Enum
+from langgraph.graph import MessagesState
 
-from langgraph.graph.message import AnyMessage, add_messages
 from pydantic import BaseModel, Field
 from typing_extensions import NotRequired, TypedDict
 
 
-class OverallState(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
+class QuestionIntent(str, Enum):
+    GREETING = "greeting"
+    HOUSE_BUYING_KNOWLEDGE = "house_buying_knowledge_question"
+    FINDING_PROPERTY = "finding_property_finland"
+    UNSUPPORTED = "unsupported_intent"
 
 
-class MessageState(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
+class IntentDetectionResponse(BaseModel):
+    """Structured output of the intent of the user's message"""
+
+    intent: Literal[
+        QuestionIntent.GREETING,
+        QuestionIntent.HOUSE_BUYING_KNOWLEDGE,
+        QuestionIntent.FINDING_PROPERTY,
+        QuestionIntent.UNSUPPORTED,
+    ] = Field(
+        description="The classification of the intent of the user's message",
+        examples=[QuestionIntent.GREETING, QuestionIntent.HOUSE_BUYING_KNOWLEDGE],
+    )
+    reasoning: str = Field(
+        description="The reasoning for the intent classification",
+        examples=["The user said 'Hello' so it's a greeting"],
+    )
+
+
+class OverallState(MessagesState):
+    intent: QuestionIntent
 
 
 class UserInput(BaseModel):
