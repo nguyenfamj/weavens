@@ -1,8 +1,44 @@
 from scrapy import Request, Spider
 from scrapy.http import Response
 from scrapy_playwright.page import PageMethod
+from urllib.parse import quote
+import json
 
 from ..items import OikotieItem, OikotieItemLoader
+
+
+def build_url(
+    pagination: int,
+    locations: list[list[int, int, str]],
+    building_types: list[int],
+    room_counts: list[int],
+    habitation_types: list[int],
+):
+    json_locations = json.dumps(locations)
+    # Build building types string
+    building_types_str = "&".join(
+        [f"{quote('buildingType[]')}={bt}" for bt in building_types]
+    )
+
+    # Build room counts string
+    room_counts_str = "&".join([f"{quote('roomCount[]')}={rc}" for rc in room_counts])
+
+    # Build habitation types string
+    habitation_types_str = "&".join(
+        [f"{quote('habitationType[]')}={ht}" for ht in habitation_types]
+    )
+
+    # Hardcoded values for Uusimaa region
+    url = (
+        f"https://asunnot.oikotie.fi/myytavat-uudisasunnot/uusimaa/kerrostalo"
+        f"?pagination={pagination}"
+        f"&locations={quote(json_locations)}"
+        f"&{building_types_str}"
+        f"&{room_counts_str}"
+        f"&{habitation_types_str}"
+    )
+
+    return url
 
 
 class OikotieUrlSpider(Spider):
@@ -16,9 +52,14 @@ class OikotieUrlSpider(Spider):
     )
 
     def start_requests(self):
+        locations = [[39, 6, "Espoo"], [64, 6, "Helsinki"], [65, 6, "Vantaa"]]
+        building_types = [1, 256]
+        room_counts = [1, 2]
+        habitation_types = [1]
+
         # TODO: Change the range to the desired number of pages
-        for i in range(1, 2):
-            url = f"https://asunnot.oikotie.fi/myytavat-asunnot?pagination={i}"
+        for i in range(1, 20):
+            url = build_url(i, locations, building_types, room_counts, habitation_types)
 
             yield Request(
                 url,

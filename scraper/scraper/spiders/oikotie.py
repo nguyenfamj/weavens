@@ -23,6 +23,11 @@ class OikotieSpider(RedisSpider):
 
     title_to_field = TITLE_TO_FIELD
 
+    custom_settings = {
+        "DOWNLOAD_DELAY": 3,
+        "CONCURRENT_REQUESTS_PER_DOMAIN": 2,
+    }
+
     def __init__(self, name: str | None = name, **kwargs: Any):
         super().__init__(name, **kwargs)
         self.add_url_to_redis_client()
@@ -51,7 +56,7 @@ class OikotieSpider(RedisSpider):
         db = DynamoDB(table_name=PROPERTY_TABLE_NAME)
 
         items = db.table.query(
-            IndexName="GSI3",
+            IndexName="GSI2",
             KeyConditionExpression=(Key("crawled").eq(0)),
         ).get("Items", [])
 

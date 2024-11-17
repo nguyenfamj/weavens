@@ -83,23 +83,23 @@ TITLE_TO_FIELD = {
 
 PROPERTY_OWNERSHIP_TRANSLATIONS = {
     "oma": "own",
-    "valinnainen vuokratontti": "optional rent",
+    "valinnainen vuokratontti": "optional_rent",
     "vuokralla": "rent",
 }
 
 HOUSING_TYPE_TRANSLATIONS = {
     "omistus": "ownership",
-    "asumisoikeus": "right of residence",
+    "asumisoikeus": "right_of_residence",
 }
 
 BUILDING_TYPE_TRANSLATIONS = {
-    "kerrostalo": "apartment building",
-    "luhtitalo": "apartment building",
-    "erillistalo": "detached house",
-    "omakotitalo": "detached house",
-    "paritalo": "semi-detached house",
-    "puutalo-osake": "wooden house",
-    "rivitalo": "terraced house",
+    "kerrostalo": "apartment_building",
+    "luhtitalo": "apartment_building",
+    "erillistalo": "detached_house",
+    "omakotitalo": "detached_house",
+    "paritalo": "semi_detached_house",
+    "puutalo-osake": "wooden_house",
+    "rivitalo": "terraced_house",
     "muu": "other",
 }
 
