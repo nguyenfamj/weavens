@@ -77,10 +77,10 @@ class TestAddTextChunksToCollection:
     @pytest.mark.unit
     def test_query_similar_documents_should_return_correct_results(self):
         mock_query_results = {
-            "ids": ["id1", "id2"],
-            "documents": ["document1", "document2"],
-            "metadatas": [{"key": "value"}, {"key": "value"}],
-            "distances": [0.1, 0.2],
+            "ids": [["id1", "id2"]],
+            "documents": [["document1", "document2"]],
+            "metadatas": [[{"key": "value"}, {"key": "value"}]],
+            "distances": [[0.1, 0.2]],
         }
 
         self.mock_document_collection.query.return_value = mock_query_results

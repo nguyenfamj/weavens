@@ -31,8 +31,27 @@ class IntentDetectionResponse(BaseModel):
     )
 
 
+class GenerateKnowledgeAnswerResponse(BaseModel):
+    answer: str = Field(description="The answer to the user's question")
+
+
+class RetrievedDocument(BaseModel):
+    id: str
+    content: str
+    metadata: dict[str, Any]
+
+
 class OverallState(MessagesState):
     intent: QuestionIntent
+    documents: list[RetrievedDocument]
+
+
+class GraphNode(str, Enum):
+    PURE_LLM_ANSWER = "pure_llm_answer"
+    KNOWLEDGE_RETRIEVAL = "knowledge_retrieval"
+    DETECT_INTENT = "detect_intent"
+    GENERATE_RAG_KNOWLEDGE_ANSWER = "generate_rag_knowledge_answer"
+    REFUSE_UNSUPPORTED_INTENT = "refuse_unsupported_intent"
 
 
 class UserInput(BaseModel):

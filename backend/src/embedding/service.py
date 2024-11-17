@@ -11,7 +11,6 @@ logger = Logger(__name__).logger
 class EmbeddingService:
     def __init__(self):
         self.document_collection = get_chroma_db().document_collection
-        logger.info("EmbeddingService initialized")
 
     def query_similar_documents(self, query_text: str, n_results: int = 5) -> dict:
         """
@@ -23,9 +22,9 @@ class EmbeddingService:
             )
 
             results = {
-                "ids": response["ids"],
-                "documents": response["documents"],
-                "metadatas": response["metadatas"],
+                "ids": response["ids"][0],
+                "documents": response["documents"][0],
+                "metadatas": response["metadatas"][0],
             }
 
             return results

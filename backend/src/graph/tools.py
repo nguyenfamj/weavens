@@ -59,9 +59,4 @@ class FindPropertiesTool(BaseTool):
         return {"data": response.data}
 
 
-class HouseBuyingKnowledgeTool(BaseTool):
-    name: str = "house_buying_knowledge"
-    description: str = "A tool to query for query for house buying knowledge that related to the user's query."
-
-
 tools = [FindPropertiesTool()]
