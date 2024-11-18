@@ -100,6 +100,7 @@ def _setup_generate_knowledge_answer():
         model="gpt-4o-mini",
         temperature=0.4,
         streaming=True,
+        max_tokens=2048,
     )
 
     structured_answer_output_llm = llm.with_structured_output(

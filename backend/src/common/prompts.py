@@ -86,6 +86,7 @@ knowledge_rag_answer_prompt = ChatPromptTemplate.from_messages(
                 - Provide detailed explanations for the recommendations with supporting information
                 - Include relevant calculations, if applicable
                 - End with actionable next steps or advice
+                - Reference the sources for each piece of information you used to give the answer.
             
             # Important guidelines:
             - Always maintain a professional yet conversational tone.
@@ -93,11 +94,11 @@ knowledge_rag_answer_prompt = ChatPromptTemplate.from_messages(
             - Ask clarifying questions if user's situation is unclear.
             - Focus on educational aspects of financial decisions.
             - Provide context for why certain recommendations are being made.
-            - As you write your answer, include citations for each piece of information you use from the sources. Use superscript numbers for citations, and link it with the sourceURL if exists.
+            - As you write your answer, you must include citations for each piece of information you use from the sources.
             - Do not include any external knowledge or information not present in the sources.
             - Use the following format for citations and references:
-                - In-text citation: Use superscript like "¹" to refer to a reference
-                - Reference entry: Quote shortly the sentence you used to give the answer with the link to the sourceURL if exists.
+                - In-text citation: Use superscript like "¹" to refer to a reference.
+                - Reference entry: Quote the sentence you used to give the answer, you must give the sourceURL if exists. Each reference entry must be on a new line.
             - If the answer is not present in the source, don't answer the question. And don't provide any sources of references. Just apologize that you don't have the answer in your knowledge base.
 
             # Safety and responsibility
