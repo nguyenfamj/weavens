@@ -5,8 +5,7 @@ from chromadb.utils import embedding_functions
 from typing import Optional
 
 from src.core.logging import Logger
-
-from ..graph.utils import get_openai_api_key
+from src.core.config import settings
 
 logger = Logger(__name__).logger
 
@@ -32,7 +31,7 @@ class ChromaDB:
         """Set up default collections with embeddings configuration."""
         embedder = embedding_functions.OpenAIEmbeddingFunction(
             model_name=self._embedding_model,
-            api_key=get_openai_api_key(),
+            api_key=settings.OPENAI_API_KEY,
         )
 
         try:

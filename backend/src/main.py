@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import FastAPI
 from collections.abc import AsyncIterator
 from fastapi_lifespan_manager import LifespanManager, State
@@ -57,3 +58,18 @@ app.include_router(api_router)
 def healthcheck():
     logger.debug("GET /healthcheck")
     return {"status": "ok"}
+
+
+# For development
+if __name__ == "__main__":
+    uvicorn.run(
+        "src.main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        loop="uvloop",
+        log_level="debug",
+        reload=True,
+        reload_delay=10,
+        date_header=False,
+        server_header=False,
+    )

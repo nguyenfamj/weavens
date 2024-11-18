@@ -10,12 +10,7 @@ from .nodes import (
     refuse_unsupported_intent,
 )
 from .schemas import OverallState, GraphNode
-from .utils import get_openai_api_key
 
-OPENAI_API_KEY = get_openai_api_key()
-
-if not OPENAI_API_KEY:
-    raise ValueError("OPENAI_API_KEY is not set")
 
 # Graph
 builder = StateGraph(OverallState)

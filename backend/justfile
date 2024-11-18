@@ -4,9 +4,7 @@ default:
     just --list
 
 dev:
-    poetry env use 3.10.14
-    poetry install --no-root
-    poetry run bash scripts/start_dev.sh
+    poetry run python -m src.main
 
 apply:
     cd infra && terraform init && terraform apply --auto-approve

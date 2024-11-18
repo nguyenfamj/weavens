@@ -1,10 +1,15 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field
 
 from src.common.constants import Environment
 
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "House Hunt"
+
+    # Backend configs
+    HOST: str = Field(default="0.0.0.0")
+    PORT: int = Field(default=8000)
     API_V1_STR: str = "/api/v1"
     ENVIRONMENT: Environment
     LOG_LEVEL: str = "INFO"
