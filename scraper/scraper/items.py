@@ -29,7 +29,7 @@ class OikotieItem(Item):
     item_number = Field()
     floor = Field(input_processor=MapCompose(ProcessorUtils.extract_floor_number))
     total_floors = Field(input_processor=MapCompose(int))
-    life_sq = Field(input_processor=MapCompose(ProcessorUtils.extract_area))
+    living_area = Field(input_processor=MapCompose(ProcessorUtils.extract_area))
     property_sq = Field()
     total_sq = Field()
     room_info = Field()
@@ -57,17 +57,17 @@ class OikotieItem(Item):
     apartment_is = Field()
     telecommunication_services = Field()
     # Price and cost information
-    price_no_tax = Field(input_processor=MapCompose(ProcessorUtils.extract_price))
+    debt_free_price = Field(input_processor=MapCompose(ProcessorUtils.extract_price))
     sales_price = Field(input_processor=MapCompose(ProcessorUtils.extract_price))
     shared_loan_payment = Field()
     price_per_sq = Field()
     share_of_liabilities = Field()
     mortgages = Field()
     financial_charge = Field()
-    condominium_payment = Field(
+    maintenance_charge = Field(input_processor=MapCompose(ProcessorUtils.extract_price))
+    total_housing_charge = Field(
         input_processor=MapCompose(ProcessorUtils.extract_price)
     )
-    maintenance_charge = Field(input_processor=MapCompose(ProcessorUtils.extract_price))
     water_charge = Field(input_processor=MapCompose(ProcessorUtils.extract_price))
     water_charge_details = Field()
     heating_charge = Field()
@@ -100,8 +100,8 @@ class OikotieItem(Item):
     plan = Field()
     traffic_communication = Field()
     heating = Field()
-    property_ownership = Field(
-        input_processor=MapCompose(ProcessorUtils.translate_property_ownership)
+    plot_ownership = Field(
+        input_processor=MapCompose(ProcessorUtils.translate_plot_ownership)
     )
     # Spaces and material
     parking_space_description = Field()

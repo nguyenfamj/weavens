@@ -7,7 +7,7 @@ TITLE_TO_FIELD = {
     "Kaupunginosa": "district",
     # "Kohdenumero": "item_number",
     "Kerros": "floor",
-    "Asuinpinta-ala": "life_sq",
+    "Asuinpinta-ala": "living_area",
     # "Tontin pinta-ala": "property_sq",
     # "Kokonaispinta-ala": "total_sq",
     "Huoneiston kokoonpano": "room_info",
@@ -35,15 +35,15 @@ TITLE_TO_FIELD = {
     # =================
     # Hintatiedot ja muut kustannukset
     # =================
-    "Velaton hinta": "price_no_tax",
+    "Velaton hinta": "debt_free_price",
     "Myyntihinta": "sales_price",
     # "Lainaosuuden maksu": "shared_loan_payment",
     # "Neliöhinta": "price_per_sq",
     # "Velkaosuus": "share_of_liabilities",
     # "Kiinnitykset": "mortgages",
     # "Rahoitusvastike": "financial_charge",
-    "Hoitovastike": "condominium_payment",
-    "Yhtiövastike yhteensä": "maintenance_charge",
+    "Hoitovastike": "maintenance_charge",
+    "Yhtiövastike yhteensä": "total_housing_charge",
     "Vesimaksu": "water_charge",
     # "Vesimaksun lisätiedot": "water_charge_details",
     # "Lämmityskustannukset": "heating_charge",
@@ -72,7 +72,7 @@ TITLE_TO_FIELD = {
     # "Kaavatilanne": "plan",
     # "Liikenneyhteydet": "traffic_communication",
     "Lämmitys": "heating",
-    "Tontin omistus": "property_ownership",
+    "Tontin omistus": "plot_ownership",
     # =================
     # Tilat ja materiaalit
     # =================
@@ -81,7 +81,7 @@ TITLE_TO_FIELD = {
     # "Pintamateriaalit": "wallcovering",
 }
 
-PROPERTY_OWNERSHIP_TRANSLATIONS = {
+PLOT_OWNERSHIP_TRANSLATIONS = {
     "oma": "own",
     "valinnainen vuokratontti": "optional_rent",
     "vuokralla": "rent",

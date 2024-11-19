@@ -6,7 +6,7 @@ from .constants import (
     BOOLEAN_TRANSLATIONS,
     BUILDING_TYPE_TRANSLATIONS,
     HOUSING_TYPE_TRANSLATIONS,
-    PROPERTY_OWNERSHIP_TRANSLATIONS,
+    PLOT_OWNERSHIP_TRANSLATIONS,
 )
 from scrapy.http import Response
 
@@ -76,8 +76,8 @@ class ProcessorUtils:
             return None
 
     @staticmethod
-    def translate_property_ownership(text: str) -> str:
-        return PROPERTY_OWNERSHIP_TRANSLATIONS.get(text.lower(), text)
+    def translate_plot_ownership(text: str) -> str:
+        return PLOT_OWNERSHIP_TRANSLATIONS.get(text.lower(), text)
 
     @staticmethod
     def translate_housing_type(text: str) -> str:
