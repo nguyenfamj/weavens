@@ -1,4 +1,5 @@
 from enum import Enum
+from decimal import Decimal
 
 from pydantic import BaseModel, Field
 
@@ -6,22 +7,22 @@ from ..schemas import BaseResponse, Pagination
 
 
 class BuildingType(str, Enum):
-    APARTMENT = "apartment building"
-    DETACHED = "detached house"
-    SEMI_DETACHED = "semi-detached house"
-    WOODEN = "wooden house"
-    TERRACED = "terraced house"
+    APARTMENT = "apartment_building"
+    DETACHED = "detached_house"
+    SEMI_DETACHED = "semi_detached_house"
+    WOODEN = "wooden_house"
+    TERRACED = "terraced_house"
     OTHER = "other"
 
 
 class HousingType(str, Enum):
     OWNERSHIP = "ownership"
-    RIGHT_OF_RESIDENCE = "right of residence"
+    RIGHT_OF_RESIDENCE = "right_of_residence"
 
 
 class PropertyOwnershipType(str, Enum):
     OWN = "own"
-    OPTIONAL_RENT = "optional rent"
+    OPTIONAL_RENT = "optional_rent"
     RENT = "rent"
 
 
@@ -61,17 +62,44 @@ class PropertyQueryParams(BaseModel):
 
 
 class Property(BaseModel):
+    id: int
+    oikotie_id: int
+    url: str
+    image_urls: list[str]
+
+    # Address information
+    location: str
     city: str
-    sales_price: float | None = None
-    location: str | None = None
-    district: str | None = None
-    life_sq: float | None = None
-    build_year: int | None = None
-    floor: int | None = None
+    district: str
+
+    # Property information
     building_type: BuildingType | None = None
     housing_type: HousingType | None = None
-    property_ownership: PropertyOwnershipType | None = None
-    condominium_payment: float | None = None
+    build_year: int | None = None
+    floor: int | None = None
+    total_floors: int | None = None
+    living_area: Decimal | None = None
+    plot_area: Decimal | None = None
+    plot_ownership: PropertyOwnershipType | None = None
+    apartment_layout: str | None = None
+    number_of_rooms: int | None = None
+    has_balcony: bool | None = None
+    building_has_elevator: bool | None = None
+    building_has_sauna: bool | None = None
+    has_energy_certificate: str | None = None
+    energy_class: str | None = None
+    heating: str | None = None
+
+    # Renovation information
+    future_renovations: str | None = None
+    completed_renovations: str | None = None
+
+    # Sales information
+    debt_free_price: Decimal | None = None
+    sales_price: Decimal | None = None
+    maintenance_charge: Decimal | None = None
+    total_housing_charge: Decimal | None = None
+    water_charge: Decimal | None = None
 
 
 class PropertyResponse(BaseResponse):

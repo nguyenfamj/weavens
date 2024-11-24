@@ -39,6 +39,7 @@ class OikotieSpider(RedisSpider):
         il = OikotieItemLoader(item=OikotieItem(), response=response)
         il.add_value("url", url)
         il.add_value("id", id)
+        il.add_value("oikotie_id", id)
 
         # Extract image urls
         il.add_xpath("image_urls", '//div[@class="galleria"]/a/@href')

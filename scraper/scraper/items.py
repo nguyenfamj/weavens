@@ -16,6 +16,7 @@ from .utils import ProcessorUtils
 
 class OikotieItem(Item):
     id = Field(input_processor=MapCompose(int))
+    oikotie_id = Field(input_processor=MapCompose(int))
     url = Field()
 
     # Image urls
@@ -32,7 +33,7 @@ class OikotieItem(Item):
     living_area = Field(input_processor=MapCompose(ProcessorUtils.extract_area))
     property_sq = Field()
     total_sq = Field()
-    room_info = Field()
+    apartment_layout = Field()
     number_of_rooms = Field(input_processor=MapCompose(int))
     condition = Field()
     condition_details = Field()
@@ -91,7 +92,7 @@ class OikotieItem(Item):
     energy_class = Field()
     has_energy_certificate = Field()
     antenna_system = Field()
-    property_size = Field(input_processor=MapCompose(ProcessorUtils.extract_area))
+    plot_area = Field(input_processor=MapCompose(ProcessorUtils.extract_area))
     property_size_unit = Field()
     property_owner = Field()
     maintenance = Field()
