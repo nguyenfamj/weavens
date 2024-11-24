@@ -57,7 +57,7 @@ class OikotieSpider(RedisSpider):
         db = DynamoDB(table_name=PROPERTY_TABLE_NAME)
 
         items = db.table.query(
-            IndexName="GSI2",
+            IndexName="CrawledUrlGSI",
             KeyConditionExpression=(Key("crawled").eq(0)),
         ).get("Items", [])
 
