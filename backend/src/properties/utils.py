@@ -1,9 +1,11 @@
 from functools import reduce
-
+from decimal import Decimal
+from typing import Tuple, Optional
+from fastapi import HTTPException, status
 from boto3.dynamodb.conditions import Attr, Key
 
 from src.core.logging import Logger
-from .schemas import PropertyQueryParams
+from .schemas import PropertyQueryParams, SearchPropertiesFilters, DynamoDBIndexConfig
 
 logger = Logger(__name__).logger
 
@@ -94,3 +96,113 @@ def _handle_number_attribute(dictionary: dict[str, int], expressions: dict[str, 
                 expressions["FilterExpression"].append(Attr(key[4:]).gte(value))
             elif key.startswith("max_"):
                 expressions["FilterExpression"].append(Attr(key[4:]).lte(value))
+
+
+AVAILABLE_INDICES = {
+    "city-debt_free_price": DynamoDBIndexConfig(
+        index_name="CityByDebtFreePriceGSI",
+        partition_key="city",
+        sort_key="debt_free_price",
+    ),
+    "district-debt_free_price": DynamoDBIndexConfig(
+        index_name="DistrictByDebtFreePriceGSI",
+        partition_key="district",
+        sort_key="debt_free_price",
+    ),
+}
+
+
+def get_optimal_index_and_conditions(
+    filters: SearchPropertiesFilters,
+) -> Tuple[DynamoDBIndexConfig, Key]:
+    """
+    Determine the most efficient index and build key conditions based on provided filters.
+    Returns tuple of (DynamoDBIndexConfig, key_conditions)
+    """
+    if filters.city or (
+        filters.min_debt_free_price is not None
+        or filters.max_debt_free_price is not None
+    ):
+        index = AVAILABLE_INDICES["city-debt_free_price"]
+        conditions = Key(index.partition_key).eq(filters.city)
+
+        if (
+            filters.min_debt_free_price is not None
+            and filters.max_debt_free_price is not None
+        ):
+            conditions &= Key(index.sort_key).between(
+                Decimal(str(filters.min_debt_free_price)),
+                Decimal(str(filters.max_debt_free_price)),
+            )
+        elif filters.min_debt_free_price is not None:
+            conditions &= Key(index.sort_key).gte(
+                Decimal(str(filters.min_debt_free_price))
+            )
+        elif filters.max_debt_free_price is not None:
+            conditions &= Key(index.sort_key).lte(
+                Decimal(str(filters.max_debt_free_price))
+            )
+
+        return index, conditions
+
+    if filters.district or (
+        filters.min_debt_free_price is not None
+        or filters.max_debt_free_price is not None
+    ):
+        index = AVAILABLE_INDICES["district-debt_free_price"]
+        conditions = Key(index.partition_key).eq(filters.district)
+
+        if (
+            filters.min_debt_free_price is not None
+            and filters.max_debt_free_price is not None
+        ):
+            conditions &= Key(index.sort_key).between(
+                Decimal(str(filters.min_debt_free_price)),
+                Decimal(str(filters.max_debt_free_price)),
+            )
+        elif filters.min_debt_free_price is not None:
+            conditions &= Key(index.sort_key).gte(
+                Decimal(str(filters.min_debt_free_price))
+            )
+        elif filters.max_debt_free_price is not None:
+            conditions &= Key(index.sort_key).lte(
+                Decimal(str(filters.max_debt_free_price))
+            )
+
+        return index, conditions
+
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="At least one main filter (city or district) is required",
+    )
+
+
+def build_search_properties_filter_expressions(
+    filters: SearchPropertiesFilters,
+    used_index: DynamoDBIndexConfig,
+) -> Optional[Attr]:
+    """
+    Build filter expressions for criteria not used in key conditions
+    """
+    expressions: list[Attr] = []
+
+    if filters.building_type:
+        expressions.append(Attr("building_type").eq(filters.building_type))
+    if filters.housing_type:
+        expressions.append(Attr("housing_type").eq(filters.housing_type))
+    if filters.plot_ownership:
+        expressions.append(Attr("plot_ownership").eq(filters.plot_ownership))
+    if filters.number_of_rooms:
+        expressions.append(Attr("number_of_rooms").eq(filters.number_of_rooms))
+
+    if used_index.index_name == "CityByDebtFreePriceGSI" and filters.district:
+        expressions.append(Attr("district").eq(filters.district))
+
+    final_expression = None
+    for expr in expressions:
+        if final_expression is None:
+            final_expression = expr
+        else:
+            final_expression = final_expression & expr
+
+    return final_expression

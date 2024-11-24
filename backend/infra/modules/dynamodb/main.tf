@@ -11,26 +11,29 @@ module "properties" {
   attributes = [
     { name = "id", type = "N" },
     { name = "city", type = "S" },
+    { name = "district", type = "S" },
     { name = "debt_free_price", type = "N" },
     { name = "crawled", type = "N" }
   ]
 
   global_secondary_indexes = [
     {
-      name            = "CityByDebtFreePriceGSI"
-      hash_key        = "city"
-      range_key       = "debt_free_price"
-      read_capacity   = 1
-      write_capacity  = 1
-      projection_type = "KEYS_ONLY"
+      name               = "CityByDebtFreePriceGSI"
+      hash_key           = "city"
+      range_key          = "debt_free_price"
+      read_capacity      = 1
+      write_capacity     = 1
+      projection_type    = "INCLUDE"
+      non_key_attributes = ["building_type", "housing_type", "plot_ownership", "number_of_rooms"]
     },
     {
-      name            = "DistrictByDebtFreePriceGSI"
-      hash_key        = "district"
-      range_key       = "debt_free_price"
-      read_capacity   = 1
-      write_capacity  = 1
-      projection_type = "KEYS_ONLY"
+      name               = "DistrictByDebtFreePriceGSI"
+      hash_key           = "district"
+      range_key          = "debt_free_price"
+      read_capacity      = 1
+      write_capacity     = 1
+      projection_type    = "INCLUDE"
+      non_key_attributes = ["building_type", "housing_type", "plot_ownership", "number_of_rooms"]
     },
     {
       name               = "CrawledUrlGSI"

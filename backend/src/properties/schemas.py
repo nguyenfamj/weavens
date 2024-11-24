@@ -1,7 +1,8 @@
 from enum import Enum
 from decimal import Decimal
-
+from typing import Optional, Any
 from pydantic import BaseModel, Field
+from boto3.dynamodb.types import Decimal as DynamoDBDecimal
 
 from ..schemas import BaseResponse, Pagination
 
@@ -20,7 +21,7 @@ class HousingType(str, Enum):
     RIGHT_OF_RESIDENCE = "right_of_residence"
 
 
-class PropertyOwnershipType(str, Enum):
+class PlotOwnershipType(str, Enum):
     OWN = "own"
     OPTIONAL_RENT = "optional_rent"
     RENT = "rent"
@@ -63,14 +64,14 @@ class PropertyQueryParams(BaseModel):
 
 class Property(BaseModel):
     id: int
-    oikotie_id: int
-    url: str
-    image_urls: list[str]
+    oikotie_id: int | None = None
+    url: str | None = None
+    image_urls: list[str] | None = None
 
     # Address information
-    location: str
-    city: str
-    district: str
+    location: str | None = None
+    city: str | None = None
+    district: str | None = None
 
     # Property information
     building_type: BuildingType | None = None
@@ -78,11 +79,12 @@ class Property(BaseModel):
     build_year: int | None = None
     floor: int | None = None
     total_floors: int | None = None
-    living_area: Decimal | None = None
-    plot_area: Decimal | None = None
-    plot_ownership: PropertyOwnershipType | None = None
+    living_area: DynamoDBDecimal | None = None
+    plot_area: DynamoDBDecimal | None = None
+    plot_ownership: PlotOwnershipType | None = None
     apartment_layout: str | None = None
     number_of_rooms: int | None = None
+    number_of_bedrooms: int | None = None
     has_balcony: bool | None = None
     building_has_elevator: bool | None = None
     building_has_sauna: bool | None = None
@@ -96,10 +98,51 @@ class Property(BaseModel):
 
     # Sales information
     debt_free_price: Decimal | None = None
-    sales_price: Decimal | None = None
-    maintenance_charge: Decimal | None = None
-    total_housing_charge: Decimal | None = None
-    water_charge: Decimal | None = None
+    sales_price: DynamoDBDecimal | None = None
+    maintenance_charge: DynamoDBDecimal | None = None
+    total_housing_charge: DynamoDBDecimal | None = None
+    water_charge: DynamoDBDecimal | None = None
+
+
+class DynamoDBIndexConfig(BaseModel):
+    index_name: str
+    partition_key: str
+    sort_key: Optional[str] = None
+
+
+class SearchPropertiesFilters(BaseModel):
+    city: Optional[str] = Field(
+        default=None, description="The city to search for properties in"
+    )
+    district: Optional[str] = Field(
+        default=None, description="The district or neighborhood within the city"
+    )
+    min_debt_free_price: Optional[float] = Field(
+        default=None, description="The minimum debt-free price of the property"
+    )
+    max_debt_free_price: Optional[float] = Field(
+        default=None, description="The maximum debt-free price of the property"
+    )
+    number_of_rooms: Optional[int] = Field(
+        default=None, description="The number of rooms in the property"
+    )
+    plot_ownership: Optional[PlotOwnershipType] = Field(
+        default=None,
+        description="The type of plot ownership (own, optional_rent, rent)",
+    )
+    building_type: Optional[BuildingType] = Field(
+        default=BuildingType.APARTMENT,
+        description="The type of building (apartment, detached, etc.)",
+    )
+    housing_type: Optional[HousingType] = Field(
+        default=None, description="The type of housing (ownership, right_of_residence)"
+    )
+
+
+class SearchPropertiesResponse(BaseModel):
+    properties: list[Property]
+    last_evaluated_key: dict[str, Any] | None = None
+    total_count: int | None = None
 
 
 class PropertyResponse(BaseResponse):
