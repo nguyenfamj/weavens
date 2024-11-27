@@ -7,8 +7,11 @@ from langchain_core.messages import AIMessage
 from src.common.prompts import (
     message_intent_detection_prompt,
     knowledge_rag_answer_prompt,
+    build_search_properties_filters_prompt,
+    generate_properties_search_answer_prompt,
 )
 from src.embedding.service import EmbeddingService
+from src.properties.service import search_properties
 
 
 from ..graph.schemas import (
@@ -16,9 +19,10 @@ from ..graph.schemas import (
     IntentDetectionResponse,
     QuestionIntent,
     GraphNode,
-    GenerateKnowledgeAnswerResponse,
+    SearchPropertiesFiltersResponse,
     RetrievedDocument,
 )
+from ..graph.utils import parse_property_details_to_template
 
 logger = Logger(__name__).logger
 
@@ -103,10 +107,7 @@ def _setup_generate_knowledge_answer():
         max_tokens=2048,
     )
 
-    structured_answer_output_llm = llm.with_structured_output(
-        GenerateKnowledgeAnswerResponse
-    )
-    return knowledge_rag_answer_prompt | structured_answer_output_llm
+    return knowledge_rag_answer_prompt | llm
 
 
 async def generate_knowledge_answer(state: OverallState) -> OverallState:
@@ -123,17 +124,113 @@ async def generate_knowledge_answer(state: OverallState) -> OverallState:
     for index, document in enumerate(state["documents"]):
         source += f"{index+1}. Source URL(optional): {document.metadata['sourceURL']}\n{document.content}\n\n"
 
-    response: GenerateKnowledgeAnswerResponse = (
-        await generate_knowledge_answer_llm.ainvoke(
-            {
-                "source": source,
-                "question": question,
-            }
-        )
+    response = await generate_knowledge_answer_llm.ainvoke(
+        {
+            "source": source,
+            "question": question,
+        }
     )
-    response = AIMessage(content=response.answer)
 
-    return {"messages": response}
+    return {"messages": [response]}
+
+
+def _setup_build_search_properties_filters():
+    llm = ChatOpenAI(
+        api_key=settings.OPENAI_API_KEY,
+        model="gpt-4o-mini",
+        temperature=0.5,
+        streaming=True,
+        max_tokens=2048,
+    )
+
+    structured_output_llm = llm.with_structured_output(SearchPropertiesFiltersResponse)
+
+    return build_search_properties_filters_prompt | structured_output_llm
+
+
+async def build_search_properties_filters(
+    state: OverallState,
+) -> OverallState:
+    """
+    A LangGraph node to build search properties filters based on the user's question.
+    """
+    messages = state["messages"]
+
+    question = messages[-1].content
+
+    build_search_properties_filters_llm = _setup_build_search_properties_filters()
+
+    response: SearchPropertiesFiltersResponse = (
+        await build_search_properties_filters_llm.ainvoke({"question": question})
+    )
+
+    return {
+        "search_properties_filters": response.filters,
+        "has_enough_search_properties_filters": response.has_enough_search_properties_filters,
+    }
+
+
+def request_user_to_provide_more_filters_parameters(
+    state: OverallState,
+) -> OverallState:
+    """
+    A LangGraph node to request the user to provide more information to build search properties filters.
+    """
+    return {
+        "messages": [
+            AIMessage(
+                content="I need more information to find the property you are looking for. Please provide more details like the city, district, minimum and maximum price, number of rooms, etc."
+            )
+        ]
+    }
+
+
+def find_property_listings(state: OverallState) -> OverallState:
+    """
+    A LangGraph node to find property listings based on the search properties filters.
+    """
+    search_properties_filters = state["search_properties_filters"]
+
+    search_properties_response = search_properties(search_properties_filters, 5)
+
+    return {
+        # TODO: When we have new UI, replace this with a ToolMessage
+        "messages": [AIMessage(content="I am finding property listings for you...")],
+        "retrieved_property_listings": search_properties_response.properties,
+    }
+
+
+def _setup_generate_properties_search_answer():
+    llm = ChatOpenAI(
+        api_key=settings.OPENAI_API_KEY,
+        model="gpt-4o-mini",
+        temperature=0.4,
+        streaming=True,
+    )
+
+    return generate_properties_search_answer_prompt | llm
+
+
+async def generate_properties_search_answer(state: OverallState) -> OverallState:
+    """
+    A LangGraph node to generate an answer based on the retrieved property listings.
+    """
+    messages = state["messages"]
+
+    question = messages[-1].content
+
+    generate_properties_search_answer_llm = _setup_generate_properties_search_answer()
+
+    response = await generate_properties_search_answer_llm.ainvoke(
+        {
+            "property_listings": parse_property_details_to_template(
+                state["retrieved_property_listings"]
+            ),
+            "question": question,
+        }
+    )
+
+    return {"messages": [response]}
 
 
 def refuse_unsupported_intent(state: OverallState) -> OverallState:
@@ -162,6 +259,18 @@ def decide_routing(state: OverallState) -> str:
             return GraphNode.KNOWLEDGE_RETRIEVAL
         case QuestionIntent.UNSUPPORTED:
             return GraphNode.REFUSE_UNSUPPORTED_INTENT
-        # TODO: Add more intent handling here
+        case QuestionIntent.FINDING_PROPERTY:
+            return GraphNode.BUILD_SEARCH_PROPERTIES_FILTERS
         case _:
             return GraphNode.REFUSE_UNSUPPORTED_INTENT
+
+
+def should_continue_properties_search(state: OverallState) -> str:
+    """
+    A LangGraph edge to decide if graph should continue to search for property listings.
+    """
+    return (
+        GraphNode.FIND_PROPERTY_LISTINGS
+        if state["has_enough_search_properties_filters"]
+        else GraphNode.REQUEST_USER_TO_PROVIDE_MORE_FILTERS_PARAMETERS
+    )
