@@ -10,7 +10,7 @@ from langchain_core.messages import (
 from langchain_core.runnables import RunnableConfig
 
 from src.core.logging import Logger
-
+from src.properties.schemas import Property
 from .schemas import UserInput, ChatMessage
 
 logger = Logger(__name__).logger
@@ -92,3 +92,30 @@ def remove_tool_calls(content: str | list[str | dict]) -> str | list[str | dict]
         for content_item in content
         if isinstance(content_item, str) or content_item["type"] != "tool_use"
     ]
+
+
+def parse_property_details_to_template(properties: list[Property]) -> str:
+    """Parse property details to a template string."""
+    property_details_template = ""
+    for index, property in enumerate(properties):
+        property_details_template += f"""
+        {index + 1}. {property.location}
+        # URL: {property.url}
+        # Location: {property.location}
+        # District: {property.district}
+        # Building type: {property.building_type}
+        # Housing type: {property.housing_type}
+        # Debt-free price: {property.debt_free_price}
+        # Living area: {property.living_area}
+        # Build year: {property.build_year}
+        # Apartment layout: {property.apartment_layout}
+        # Plot ownership: {property.plot_ownership}
+        # Maintenance charge: {property.maintenance_charge}
+        # Water charge: {property.water_charge}
+        # Total housing charge: {property.total_housing_charge}
+        # Completed renovations: {property.completed_renovations}
+        # Future renovations: {property.future_renovations}
+        # Has sauna: {property.building_has_sauna}
+        # Has elevator: {property.building_has_elevator}
+        """
+    return property_details_template

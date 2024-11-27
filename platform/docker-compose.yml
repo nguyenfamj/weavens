@@ -15,19 +15,6 @@ services:
     working_dir: /home/dynamodblocal
     command: '-jar DynamoDBLocal.jar -sharedDb -dbPath ./data'
     restart: always
-
-  dynamodb-admin:
-    image: aaronshaf/dynamodb-admin:latest
-    ports:
-      - '${DYNAMODB_ADMIN_PORT}:8001'
-    environment:
-      DYNAMO_ENDPOINT: 'http://dynamodb:8000'
-      AWS_REGION: 'eu-west-2'
-      AWS_ACCESS_KEY_ID: local
-      AWS_SECRET_ACCESS_KEY: local
-    depends_on:
-      dynamodb:
-        condition: service_healthy
   redis:
     container_name: redis-stack
     image: redis/redis-stack:edge

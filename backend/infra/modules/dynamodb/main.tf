@@ -24,7 +24,7 @@ module "properties" {
       read_capacity      = 1
       write_capacity     = 1
       projection_type    = "INCLUDE"
-      non_key_attributes = ["building_type", "housing_type", "plot_ownership", "number_of_rooms"]
+      non_key_attributes = ["district", "building_type", "housing_type", "plot_ownership", "number_of_rooms"]
     },
     {
       name               = "DistrictByDebtFreePriceGSI"
@@ -33,7 +33,7 @@ module "properties" {
       read_capacity      = 1
       write_capacity     = 1
       projection_type    = "INCLUDE"
-      non_key_attributes = ["building_type", "housing_type", "plot_ownership", "number_of_rooms"]
+      non_key_attributes = ["city", "building_type", "housing_type", "plot_ownership", "number_of_rooms"]
     },
     {
       name               = "CrawledUrlGSI"

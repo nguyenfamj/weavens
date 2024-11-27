@@ -112,30 +112,61 @@ class DynamoDBIndexConfig(BaseModel):
 
 class SearchPropertiesFilters(BaseModel):
     city: Optional[str] = Field(
-        default=None, description="The city to search for properties in"
+        default=None,
+        description="The city to search for properties in",
+        examples=["Helsinki", "Espoo", "Vantaa"],
     )
     district: Optional[str] = Field(
-        default=None, description="The district or neighborhood within the city"
+        default=None,
+        description="The district or neighborhood within the city",
+        examples=[
+            "Kamppi",
+            "Käpylä",
+        ],
     )
     min_debt_free_price: Optional[float] = Field(
-        default=None, description="The minimum debt-free price of the property"
+        default=None,
+        description="The minimum debt-free price of the property",
+        examples=[100000, 200000, 300000],
     )
     max_debt_free_price: Optional[float] = Field(
-        default=None, description="The maximum debt-free price of the property"
+        default=None,
+        description="The maximum debt-free price of the property",
+        examples=[100000, 200000, 300000],
     )
     number_of_rooms: Optional[int] = Field(
-        default=None, description="The number of rooms in the property"
+        default=None,
+        description="The number of rooms in the property",
+        examples=[1, 2, 3, 4, 5],
     )
     plot_ownership: Optional[PlotOwnershipType] = Field(
         default=None,
         description="The type of plot ownership (own, optional_rent, rent)",
+        examples=[
+            PlotOwnershipType.OWN,
+            PlotOwnershipType.OPTIONAL_RENT,
+            PlotOwnershipType.RENT,
+        ],
     )
     building_type: Optional[BuildingType] = Field(
         default=BuildingType.APARTMENT,
         description="The type of building (apartment, detached, etc.)",
+        examples=[
+            BuildingType.APARTMENT,
+            BuildingType.DETACHED,
+            BuildingType.SEMI_DETACHED,
+            BuildingType.WOODEN,
+            BuildingType.TERRACED,
+            BuildingType.OTHER,
+        ],
     )
     housing_type: Optional[HousingType] = Field(
-        default=None, description="The type of housing (ownership, right_of_residence)"
+        default=None,
+        description="The type of housing (ownership, right_of_residence)",
+        examples=[
+            HousingType.OWNERSHIP,
+            HousingType.RIGHT_OF_RESIDENCE,
+        ],
     )
 
 

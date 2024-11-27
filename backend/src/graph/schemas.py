@@ -1,6 +1,8 @@
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 from enum import Enum
 from langgraph.graph import MessagesState
+
+from src.properties.schemas import SearchPropertiesFilters, Property
 
 from pydantic import BaseModel, Field
 from typing_extensions import NotRequired, TypedDict
@@ -31,8 +33,16 @@ class IntentDetectionResponse(BaseModel):
     )
 
 
-class GenerateKnowledgeAnswerResponse(BaseModel):
-    answer: str = Field(description="The answer to the user's question")
+class SearchPropertiesFiltersResponse(BaseModel):
+    filters: SearchPropertiesFilters
+    has_enough_search_properties_filters: bool = Field(
+        description="Whether the user provided enough information to build search properties filters",
+        default=True,
+    )
+    reasoning: str = Field(
+        description="The reasoning for the search properties filters",
+        examples=["The user is looking for a property in Helsinki"],
+    )
 
 
 class RetrievedDocument(BaseModel):
@@ -43,7 +53,10 @@ class RetrievedDocument(BaseModel):
 
 class OverallState(MessagesState):
     intent: QuestionIntent
-    documents: list[RetrievedDocument]
+    documents: Optional[list[RetrievedDocument]]
+    search_properties_filters: Optional[SearchPropertiesFilters]
+    has_enough_search_properties_filters: Optional[bool]
+    retrieved_property_listings: Optional[list[Property]]
 
 
 class GraphNode(str, Enum):
@@ -51,6 +64,12 @@ class GraphNode(str, Enum):
     KNOWLEDGE_RETRIEVAL = "knowledge_retrieval"
     DETECT_INTENT = "detect_intent"
     GENERATE_RAG_KNOWLEDGE_ANSWER = "generate_rag_knowledge_answer"
+    BUILD_SEARCH_PROPERTIES_FILTERS = "build_search_properties_filters"
+    REQUEST_USER_TO_PROVIDE_MORE_FILTERS_PARAMETERS = (
+        "request_user_to_provide_more_filters_parameters"
+    )
+    FIND_PROPERTY_LISTINGS = "find_property_listings"
+    GENERATE_PROPERTIES_SEARCH_ANSWER = "generate_properties_search_answer"
     REFUSE_UNSUPPORTED_INTENT = "refuse_unsupported_intent"
 
 
