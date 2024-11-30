@@ -57,8 +57,10 @@ class OikotieUrlSpider(Spider):
         room_counts = [1, 2]
         habitation_types = [1]
 
-        # TODO: Change the range to the desired number of pages
-        for i in range(1, 20):
+        start_page = 1 if self.start_page is None else self.start_page
+        end_page = 20 if self.end_page is None else self.end_page
+        
+        for i in range(start_page, end_page):
             url = build_url(i, locations, building_types, room_counts, habitation_types)
 
             yield Request(

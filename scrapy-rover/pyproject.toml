@@ -13,10 +13,12 @@ dependencies = [
     "boto3<2.0.0,>=1.34.146",
     "dateparser<2.0.0,>=1.2.0",
     "beautifulsoup4<5.0.0,>=4.12.3",
+    "scrapyd>=1.5.0",
+    "scrapyd-client>=2.0.0",
 ]
-name = "house-hunt"
+name = "scrapy-rover"
 version = "0.1.0"
-description = ""
+description = "Python Scrapy project for scraping multiple websites data from the web"
 readme = "README.md"
 
 [dependency-groups]

@@ -389,41 +389,6 @@ wheels = [
 ]
 
 [[package]]
-name = "house-hunt"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "beautifulsoup4" },
-    { name = "boto3" },
-    { name = "dateparser" },
-    { name = "playwright" },
-    { name = "python-dotenv" },
-    { name = "scrapy" },
-    { name = "scrapy-playwright" },
-    { name = "scrapy-redis" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "scrapy" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "beautifulsoup4", specifier = ">=4.12.3,<5.0.0" },
-    { name = "boto3", specifier = ">=1.34.146,<2.0.0" },
-    { name = "dateparser", specifier = ">=1.2.0,<2.0.0" },
-    { name = "playwright", specifier = ">=1.45.0,<2.0.0" },
-    { name = "python-dotenv", specifier = ">=1.0.1,<2.0.0" },
-    { name = "scrapy", specifier = ">=2.11.2,<3.0.0" },
-    { name = "scrapy-playwright", specifier = ">=0.0.40,<1.0.0" },
-    { name = "scrapy-redis", specifier = ">=0.9.1,<1.0.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [{ name = "scrapy", specifier = ">=2.11.2,<3.0.0" }]
-
-[[package]]
 name = "hyperlink"
 version = "21.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -620,6 +585,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pip"
+version = "24.3.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f4/b1/b422acd212ad7eedddaf7981eee6e5de085154ff726459cf2da7c5a184c1/pip-24.3.1.tar.gz", hash = "sha256:ebcb60557f2aefabc2e0f918751cd24ea0d56d8ec5445fe1807f1d2109660b99", size = 1931073 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ef/7d/500c9ad20238fcfcb4cb9243eede163594d7020ce87bd9610c9e02771876/pip-24.3.1-py3-none-any.whl", hash = "sha256:3790624780082365f47549d032f3770eeb2b1e8bd1f7b2e02dace1afa361b4ed", size = 1822182 },
+]
+
+[[package]]
 name = "playwright"
 version = "1.49.0"
 source = { registry = "https://pypi.org/simple" }
@@ -743,6 +717,27 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/3a/31/3c70bf7603cc2dca0f19bdc53b4537a797747a58875b552c8c413d963a3f/pytz-2024.2.tar.gz", hash = "sha256:2aa355083c50a0f93fa581709deac0c9ad65cca8a9e9beac660adcbd493c798a", size = 319692 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/11/c3/005fcca25ce078d2cc29fd559379817424e94885510568bc1bc53d7d5846/pytz-2024.2-py2.py3-none-any.whl", hash = "sha256:31c7c1817eb7fae7ca4b8c7ee50c72f93aa2dd863de768e1ef4245d426aa0725", size = 508002 },
+]
+
+[[package]]
+name = "pywin32"
+version = "308"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/72/a6/3e9f2c474895c1bb61b11fa9640be00067b5c5b363c501ee9c3fa53aec01/pywin32-308-cp310-cp310-win32.whl", hash = "sha256:796ff4426437896550d2981b9c2ac0ffd75238ad9ea2d3bfa67a1abd546d262e", size = 5927028 },
+    { url = "https://files.pythonhosted.org/packages/d9/b4/84e2463422f869b4b718f79eb7530a4c1693e96b8a4e5e968de38be4d2ba/pywin32-308-cp310-cp310-win_amd64.whl", hash = "sha256:4fc888c59b3c0bef905ce7eb7e2106a07712015ea1c8234b703a088d46110e8e", size = 6558484 },
+    { url = "https://files.pythonhosted.org/packages/9f/8f/fb84ab789713f7c6feacaa08dad3ec8105b88ade8d1c4f0f0dfcaaa017d6/pywin32-308-cp310-cp310-win_arm64.whl", hash = "sha256:a5ab5381813b40f264fa3495b98af850098f814a25a63589a8e9eb12560f450c", size = 7971454 },
+    { url = "https://files.pythonhosted.org/packages/eb/e2/02652007469263fe1466e98439831d65d4ca80ea1a2df29abecedf7e47b7/pywin32-308-cp311-cp311-win32.whl", hash = "sha256:5d8c8015b24a7d6855b1550d8e660d8daa09983c80e5daf89a273e5c6fb5095a", size = 5928156 },
+    { url = "https://files.pythonhosted.org/packages/48/ef/f4fb45e2196bc7ffe09cad0542d9aff66b0e33f6c0954b43e49c33cad7bd/pywin32-308-cp311-cp311-win_amd64.whl", hash = "sha256:575621b90f0dc2695fec346b2d6302faebd4f0f45c05ea29404cefe35d89442b", size = 6559559 },
+    { url = "https://files.pythonhosted.org/packages/79/ef/68bb6aa865c5c9b11a35771329e95917b5559845bd75b65549407f9fc6b4/pywin32-308-cp311-cp311-win_arm64.whl", hash = "sha256:100a5442b7332070983c4cd03f2e906a5648a5104b8a7f50175f7906efd16bb6", size = 7972495 },
+    { url = "https://files.pythonhosted.org/packages/00/7c/d00d6bdd96de4344e06c4afbf218bc86b54436a94c01c71a8701f613aa56/pywin32-308-cp312-cp312-win32.whl", hash = "sha256:587f3e19696f4bf96fde9d8a57cec74a57021ad5f204c9e627e15c33ff568897", size = 5939729 },
+    { url = "https://files.pythonhosted.org/packages/21/27/0c8811fbc3ca188f93b5354e7c286eb91f80a53afa4e11007ef661afa746/pywin32-308-cp312-cp312-win_amd64.whl", hash = "sha256:00b3e11ef09ede56c6a43c71f2d31857cf7c54b0ab6e78ac659497abd2834f47", size = 6543015 },
+    { url = "https://files.pythonhosted.org/packages/9d/0f/d40f8373608caed2255781a3ad9a51d03a594a1248cd632d6a298daca693/pywin32-308-cp312-cp312-win_arm64.whl", hash = "sha256:9b4de86c8d909aed15b7011182c8cab38c8850de36e6afb1f0db22b8959e3091", size = 7976033 },
+    { url = "https://files.pythonhosted.org/packages/a9/a4/aa562d8935e3df5e49c161b427a3a2efad2ed4e9cf81c3de636f1fdddfd0/pywin32-308-cp313-cp313-win32.whl", hash = "sha256:1c44539a37a5b7b21d02ab34e6a4d314e0788f1690d65b48e9b0b89f31abbbed", size = 5938579 },
+    { url = "https://files.pythonhosted.org/packages/c7/50/b0efb8bb66210da67a53ab95fd7a98826a97ee21f1d22949863e6d588b22/pywin32-308-cp313-cp313-win_amd64.whl", hash = "sha256:fd380990e792eaf6827fcb7e187b2b4b1cede0585e3d0c9e84201ec27b9905e4", size = 6542056 },
+    { url = "https://files.pythonhosted.org/packages/26/df/2b63e3e4f2df0224f8aaf6d131f54fe4e8c96400eb9df563e2aae2e1a1f9/pywin32-308-cp313-cp313-win_arm64.whl", hash = "sha256:ef313c46d4c18dfb82a2431e3051ac8f112ccee1a34f29c263c583c568db63cd", size = 7974986 },
+    { url = "https://files.pythonhosted.org/packages/a8/41/ead05a7657ffdbb1edabb954ab80825c4f87a3de0285d59f8290457f9016/pywin32-308-cp39-cp39-win32.whl", hash = "sha256:7873ca4dc60ab3287919881a7d4f88baee4a6e639aa6962de25a98ba6b193341", size = 5991824 },
+    { url = "https://files.pythonhosted.org/packages/e4/cd/0838c9a6063bff2e9bac2388ae36524c26c50288b5d7b6aebb6cdf8d375d/pywin32-308-cp39-cp39-win_amd64.whl", hash = "sha256:71b3322d949b4cc20776436a9c9ba0eeedcbc9c650daa536df63f0ff111bb920", size = 6640327 },
 ]
 
 [[package]]
@@ -947,6 +942,79 @@ wheels = [
 ]
 
 [[package]]
+name = "scrapy-rover"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "beautifulsoup4" },
+    { name = "boto3" },
+    { name = "dateparser" },
+    { name = "playwright" },
+    { name = "python-dotenv" },
+    { name = "scrapy" },
+    { name = "scrapy-playwright" },
+    { name = "scrapy-redis" },
+    { name = "scrapyd" },
+    { name = "scrapyd-client" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "scrapy" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "beautifulsoup4", specifier = ">=4.12.3,<5.0.0" },
+    { name = "boto3", specifier = ">=1.34.146,<2.0.0" },
+    { name = "dateparser", specifier = ">=1.2.0,<2.0.0" },
+    { name = "playwright", specifier = ">=1.45.0,<2.0.0" },
+    { name = "python-dotenv", specifier = ">=1.0.1,<2.0.0" },
+    { name = "scrapy", specifier = ">=2.11.2,<3.0.0" },
+    { name = "scrapy-playwright", specifier = ">=0.0.40,<1.0.0" },
+    { name = "scrapy-redis", specifier = ">=0.9.1,<1.0.0" },
+    { name = "scrapyd", specifier = ">=1.5.0" },
+    { name = "scrapyd-client", specifier = ">=2.0.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "scrapy", specifier = ">=2.11.2,<3.0.0" }]
+
+[[package]]
+name = "scrapyd"
+version = "1.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "pywin32", marker = "platform_system == 'Windows'" },
+    { name = "scrapy" },
+    { name = "setuptools" },
+    { name = "twisted" },
+    { name = "w3lib" },
+    { name = "zope-interface" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/88/0a/c1e1322af19983afe2ae9ae97bb39362967fd7ccd86249814b8694bc857a/scrapyd-1.5.0.tar.gz", hash = "sha256:10713874e95b6717510b87344bc1a4981fbb4688dc52677de9050c0aba8cfe43", size = 77081 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/04/a5/45defda203171f5742f7a6ef9a004f968993fa74d4fc52a4599d2eec52ab/scrapyd-1.5.0-py2.py3-none-any.whl", hash = "sha256:103740f596cb2af1954f80d2a2e19cc2ef36eae8bbd17413f9e67be0078e1c02", size = 28917 },
+]
+
+[[package]]
+name = "scrapyd-client"
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pip" },
+    { name = "requests" },
+    { name = "scrapy" },
+    { name = "setuptools" },
+    { name = "uberegg" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cf/8e/9319790d25de498b96e224ac7f3b70dae6e2345de64b456df2af89f89b26/scrapyd_client-2.0.0.tar.gz", hash = "sha256:f5e60071ee0e036472dc3f1da3e87b880d5b4b071090b257ee28d6d41bb3ed63", size = 19235 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/41/4c/d6272c0cb603f9fd0ef5b7cc77cd079815a8cd66621814a036bc441152ad/scrapyd_client-2.0.0-py3-none-any.whl", hash = "sha256:89a94ea92cb501561d16e8a1af0fa1f0c35edba413824592c8e6b8d05b6cfd1f", size = 12732 },
+]
+
+[[package]]
 name = "service-identity"
 version = "24.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1088,6 +1156,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/04/d3/c19d65ae67636fe63953b20c2e4a8ced4497ea232c43ff8d01db16de8dc0/tzlocal-5.2.tar.gz", hash = "sha256:8d399205578f1a9342816409cc1e46a93ebd5755e39ea2d85334bea911bf0e6e", size = 30201 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/97/3f/c4c51c55ff8487f2e6d0e618dba917e3c3ee2caae6cf0fbb59c9b1876f2e/tzlocal-5.2-py3-none-any.whl", hash = "sha256:49816ef2fe65ea8ac19d19aa7a1ae0551c834303d5014c6d5a62e4cbda8047b8", size = 17859 },
+]
+
+[[package]]
+name = "uberegg"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/89/5a/b371f3d5867f9e86a67fda40e4cb561ecb34554d715df450b2c6c0d33953/uberegg-0.1.1.tar.gz", hash = "sha256:30052db3346e75afac1724a5953b9d7fa35fc6c37f861f980cb2a2faed26f5e5", size = 2483 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/44/f9/11d1c551c1957fdeef301653ddd8e8197a8088487185b815aa8a45ad3d97/uberegg-0.1.1-py3-none-any.whl", hash = "sha256:d1372b906cdbf897333b8eec9611939b907e18c1eaef2687c69c39fccf9aeef5", size = 3012 },
 ]
 
 [[package]]
