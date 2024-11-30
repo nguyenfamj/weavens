@@ -1,24 +1,23 @@
-[tool.poetry]
+[project]
+authors = [
+    { name = "Thang Phan", email = "phancaothng@gmail.com" },
+    { name = "Nguyen Pham", email = "nguyenfamj1409@gmail.com" },
+]
+requires-python = "<4.0,>=3.9"
+dependencies = [
+    "Scrapy<3.0.0,>=2.11.2",
+    "scrapy-playwright<1.0.0,>=0.0.40",
+    "playwright<2.0.0,>=1.45.0",
+    "scrapy-redis<1.0.0,>=0.9.1",
+    "python-dotenv<2.0.0,>=1.0.1",
+    "boto3<2.0.0,>=1.34.146",
+    "dateparser<2.0.0,>=1.2.0",
+    "beautifulsoup4<5.0.0,>=4.12.3",
+]
 name = "house-hunt"
 version = "0.1.0"
 description = ""
-authors = ["Thang Phan <phancaothng@gmail.com>"]
 readme = "README.md"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-Scrapy = "^2.11.2"
-scrapy-playwright = "^0.0.40"
-playwright = "^1.45.0"
-scrapy-redis = "^0.9.1"
-python-dotenv = "^1.0.1"
-boto3 = "^1.34.146"
-dateparser = "^1.2.0"
-beautifulsoup4 = "^4.12.3"
-
-[tool.poetry.group.dev.dependencies]
-Scrapy = "^2.11.2"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = ["Scrapy<3.0.0,>=2.11.2"]
