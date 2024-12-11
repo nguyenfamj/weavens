@@ -1,6 +1,7 @@
 import json
 from typing import Any
 
+import logging
 from boto3.dynamodb.conditions import Key
 from redis import from_url
 from scrapy.http import Response
@@ -12,24 +13,31 @@ from ..items import OikotieItem, OikotieItemLoader
 from ..settings import PROPERTY_TABLE_NAME, REDIS_URL
 
 
+logger = logging.getLogger(__name__)
+
+
 class OikotieSpider(RedisSpider):
     name = "oikotie"
     allowed_domains = ["asunnot.oikotie.fi"]
 
     # Redis config
-    redis_key = "scraper:start_urls"
-    redis_batch_size = 12
-    max_idle_time = 7  # seconds
+    redis_key = "oikotie:start_urls"
+    redis_batch_size = 30
+    max_idle_time = 30  # seconds
 
     title_to_field = TITLE_TO_FIELD
 
     custom_settings = {
-        "DOWNLOAD_DELAY": 3,
+        "DOWNLOAD_DELAY": 5,
         "CONCURRENT_REQUESTS_PER_DOMAIN": 2,
+        "SCHEDULER_QUEUE_CLASS": "scrapy_redis.queue.FifoQueue",
+        "DUPEFILTER_CLASS": "scrapy_redis.dupefilter.RFPDupeFilter",
+        "SCHEDULER_PERSIST": True,
     }
 
     def __init__(self, name: str | None = name, **kwargs: Any):
         super().__init__(name, **kwargs)
+        self.item_limit = int(kwargs.get("item_limit", 1000))
         self.add_url_to_redis_client()
 
     def parse(self, response: Response):
@@ -59,7 +67,10 @@ class OikotieSpider(RedisSpider):
         items = db.table.query(
             IndexName="CrawledUrlGSI",
             KeyConditionExpression=(Key("crawled").eq(0)),
+            Limit=self.item_limit,
         ).get("Items", [])
+
+        logger.info(f"Adding {len(items)} items to redis for crawling")
 
         if not items:
             raise ValueError("No items need to be crawled")

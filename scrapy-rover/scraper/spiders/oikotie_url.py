@@ -3,8 +3,12 @@ from scrapy.http import Response
 from scrapy_playwright.page import PageMethod
 from urllib.parse import quote
 import json
+import logging
 
 from ..items import OikotieItem, OikotieItemLoader
+
+
+logger = logging.getLogger(__name__)
 
 
 def build_url(
@@ -48,8 +52,14 @@ class OikotieUrlSpider(Spider):
             "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
             "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
         },
-        DOWNLOAD_DELAY=10,
+        DOWNLOAD_DELAY=5,
+        CONCURRENT_REQUESTS_PER_DOMAIN=2,
     )
+
+    def __init__(self, start_page=None, end_page=None, *args, **kwargs):
+        super(OikotieUrlSpider, self).__init__(*args, **kwargs)
+        self.start_page = int(start_page) if start_page is not None else 1
+        self.end_page = int(end_page) if end_page is not None else 20
 
     def start_requests(self):
         locations = [[39, 6, "Espoo"], [64, 6, "Helsinki"], [65, 6, "Vantaa"]]
@@ -57,11 +67,9 @@ class OikotieUrlSpider(Spider):
         room_counts = [1, 2]
         habitation_types = [1]
 
-        start_page = 1 if self.start_page is None else self.start_page
-        end_page = 20 if self.end_page is None else self.end_page
-        
-        for i in range(start_page, end_page):
+        for i in range(self.start_page, self.end_page):
             url = build_url(i, locations, building_types, room_counts, habitation_types)
+            logger.info(f"Scraping page {url}, page {i}/{self.end_page}")
 
             yield Request(
                 url,
