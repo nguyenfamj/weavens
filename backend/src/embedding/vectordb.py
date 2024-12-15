@@ -1,6 +1,6 @@
 from functools import lru_cache
-
-from chromadb import Collection, PersistentClient
+from pathlib import Path
+from chromadb import Collection, PersistentClient, errors as chromadb_errors
 from chromadb.utils import embedding_functions
 from typing import Optional
 
@@ -13,7 +13,7 @@ logger = Logger(__name__).logger
 class ChromaDB:
     def __init__(
         self,
-        persistent_path: str = "./vectorstore",
+        persistent_path: str = str(Path.home() / "titan-vectorstore"),
         embedding_model: str = "text-embedding-3-small",
     ):
         self._client: Optional[PersistentClient] = None
@@ -35,11 +35,24 @@ class ChromaDB:
         )
 
         try:
-            self._collections["document"] = self._client.get_or_create_collection(
-                name="document",
-                embedding_function=embedder,
-            )
-            logger.info("ChromaDB: Document collection initialized")
+            try:
+                self._client.get_collection("document")
+                exists = True
+            except chromadb_errors.InvalidCollectionException:
+                exists = False
+
+            if not exists:
+                self._client.create_collection(
+                    name="document",
+                    embedding_function=embedder,
+                )
+                logger.info(
+                    f"ChromaDB: Document collection initialized at {self._persistent_path}"
+                )
+            else:
+                logger.info(
+                    f"ChromaDB: Document collection already exists at {self._persistent_path}"
+                )
         except Exception as e:
             logger.error(f"ChromaDB: Error initializing document collection: {e}")
             raise
