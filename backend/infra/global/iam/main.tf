@@ -1,30 +1,5 @@
 provider "aws" {
-  region  = "eu-north-1"
-  profile = "global_admin"
-}
-
-module "iam_nova_developer" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-user"
-  version = "5.44.0"
-
-  name        = "nova.developer"
-  create_user = true
-
-  create_iam_access_key         = false
-  create_iam_user_login_profile = true
-
-  policy_arns = [
-    "arn:aws:iam::aws:policy/IAMUserChangePassword",
-    "arn:aws:iam::aws:policy/IAMSelfManageServiceSpecificCredentials",
-    "arn:aws:iam::aws:policy/IAMFullAccess",
-    module.iam_policy_assume_infrastructure_admin_role.arn
-  ]
-
-  tags = {
-    Environment = "production"
-    Terraform   = true
-    User        = "nova.developer"
-  }
+  region = "eu-north-1"
 }
 
 module "iam_infrastructure_admin_role" {
@@ -35,12 +10,11 @@ module "iam_infrastructure_admin_role" {
   create_role = true
 
   trusted_role_arns = [
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
-    # TODO: This role should be here just temporarily until we have a proper CI/CD setup
-    module.iam_nova_developer.iam_user_arn
+    "arn:aws:iam::484907490685:root",
+    "arn:aws:iam::484907490685:user/GlobalAdmin"
   ]
   # TODO: Enforce MFA for this role when we have proper SSO setup
-  role_requires_mfa = false
+  role_requires_mfa = true
 
   custom_role_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
@@ -78,4 +52,39 @@ module "iam_policy_assume_infrastructure_admin_role" {
       }
     ]
   })
+}
+
+module "developer_policy" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.44.0"
+
+  name = "DeveloperAccess"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:Describe*",
+          "ecs:Describe*",
+          "logs:GetLogEvents",
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+module "developers_group" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-group-with-policies"
+  version = "5.44.0"
+  name    = "Developers"
+
+  group_users = [
+    "GlobalAdmin"
+  ]
+
+  custom_group_policy_arns = [
+    module.developer_policy.arn
+  ]
 }
