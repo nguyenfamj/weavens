@@ -80,9 +80,7 @@ module "developers_group" {
   version = "5.44.0"
   name    = "Developers"
 
-  group_users = [
-    "GlobalAdmin"
-  ]
+  group_users = []
 
   custom_group_policy_arns = [
     module.developer_policy.arn
