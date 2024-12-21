@@ -1,30 +1,40 @@
-module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+data "aws_availability_zones" "available" {}
 
-  name = "crux-vpc"
-  cidr = "10.0.0.0/16"
+locals {
+  name = "production-vpc"
 
-  azs             = ["eu-north-1a"]
-  private_subnets = ["10.0.1.0/24"]
-  public_subnets  = ["10.0.101.0/24"]
-
-  default_security_group_ingress = [
-    {
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      cidr_blocks = "0.0.0.0/0"
-    },
-    {
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_blocks = "0.0.0.0/0"
-    }
-  ]
+  vpc_cidr = "10.0.0.0/16"
+  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = {
+    Terraform   = "true"
     Environment = "production"
-    Terraform   = true
   }
+}
+
+output "app_vpc_public_subnets" {
+  value = module.vpc.public_subnets
+}
+
+output "app_vpc_id" {
+  value = module.vpc.vpc_id
+}
+
+output "app_vpc_cidr" {
+  value = local.vpc_cidr
+}
+
+# VPC
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 5.0"
+
+  name = local.name
+  cidr = local.vpc_cidr
+
+  azs             = local.azs
+  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
+  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
+
+  tags = local.tags
 }
