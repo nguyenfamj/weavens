@@ -6,6 +6,10 @@ data "aws_ssm_parameter" "production_firecrawl_api_key" {
   name = "/crux/production/firecrawl_api_key"
 }
 
+data "aws_ssm_parameter" "production_backend_image_tag" {
+  name = "/crux/production/backend_image_tag"
+}
+
 locals {
   region = "eu-north-1"
   name   = "production-crux-backend"
@@ -38,7 +42,7 @@ module "ecs" {
     execute_command_configuration = {
       logging = "OVERRIDE"
       log_configuration = {
-        cloud_watch_log_group_name = "/aws/ecs/crux"
+        cloud_watch_log_group_name = local.name
       }
     }
   }
@@ -70,7 +74,7 @@ module "ecs" {
 
       container_definitions = {
         (local.container_name) = {
-          image = "${var.backend_ecr_repository_url}:latest"
+          image = "${var.backend_ecr_repository_url}:${data.aws_ssm_parameter.production_backend_image_tag.value}"
 
           port_mappings = [
             {
@@ -116,6 +120,15 @@ module "ecs" {
               valueFrom = data.aws_ssm_parameter.production_firecrawl_api_key.arn
             }
           ]
+
+          log_configuration = {
+            logDriver = "awslogs"
+            options = {
+              "awslogs-group"         = aws_cloudwatch_log_group.backend_task_log_group.name
+              "awslogs-region"        = local.region
+              "awslogs-stream-prefix" = "ecs"
+            }
+          }
         }
       }
 
@@ -268,4 +281,12 @@ resource "aws_iam_policy" "parameter_access" {
       }
     ]
   })
+}
+
+# CloudWatch Log Group
+resource "aws_cloudwatch_log_group" "backend_task_log_group" {
+  name              = "/ecs-task/${local.container_name}"
+  retention_in_days = 30
+
+  tags = local.tags
 }
