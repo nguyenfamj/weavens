@@ -3,9 +3,6 @@ terraform {
     aws = {
       source = "hashicorp/aws"
     }
-    docker = {
-      source = "kreuzwerker/docker"
-    }
   }
 }
 
@@ -13,18 +10,28 @@ provider "aws" {
   region = "eu-north-1"
 }
 
-provider "docker" {
-  registry_auth {
-    address  = format("%v.dkr.ecr.%v.amazonaws.com", data.aws_caller_identity.this.account_id, data.aws_region.current.name)
-    username = data.aws_ecr_authorization_token.token.user_name
-    password = data.aws_ecr_authorization_token.token.password
+data "terraform_remote_state" "ecr" {
+  backend = "s3"
+  config = {
+    bucket = "terraform-state-crux"
+    key    = "globalECR/terraform.tfstate"
+    region = "eu-north-1"
   }
+}
+
+module "vpc" {
+  source = "./vpc"
 }
 
 module "dynamodb" {
   source = "../../modules/dynamodb"
 }
 
-module "vpc" {
-  source = "./vpc"
+module "backend" {
+  source = "./backend"
+
+  vpc_public_subnets         = module.vpc.app_vpc_public_subnets
+  vpc_id                     = module.vpc.app_vpc_id
+  vpc_cidr                   = module.vpc.app_vpc_cidr
+  backend_ecr_repository_url = data.terraform_remote_state.ecr.outputs.backend_ecr_repository_url
 }
