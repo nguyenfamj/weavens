@@ -35,23 +35,22 @@ class ChromaDB:
         )
 
         try:
+            collection = None
             try:
-                self._client.get_collection("document")
-                exists = True
+                collection = self._client.get_collection("document")
             except chromadb_errors.InvalidCollectionException:
-                exists = False
-
-            if not exists:
-                self._client.create_collection(
+                collection = self._client.create_collection(
                     name="document",
                     embedding_function=embedder,
                 )
                 logger.info(
                     f"ChromaDB: Document collection initialized at {self._persistent_path}"
                 )
-            else:
+
+            self._collections["document"] = collection
+            if collection:
                 logger.info(
-                    f"ChromaDB: Document collection already exists at {self._persistent_path}"
+                    f"ChromaDB: Document collection successfully loaded at {self._persistent_path}"
                 )
         except Exception as e:
             logger.error(f"ChromaDB: Error initializing document collection: {e}")

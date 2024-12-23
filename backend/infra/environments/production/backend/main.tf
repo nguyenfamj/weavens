@@ -102,12 +102,16 @@ module "ecs" {
             },
             {
               name  = "WORKERS"
-              value = "2"
+              value = "1"
             },
             {
               name  = "ENVIRONMENT"
-              value = "production"
+              value = "PRODUCTION"
             },
+            {
+              name  = "AWS_REGION_NAME"
+              value = local.region
+            }
           ]
 
           secrets = [
