@@ -24,7 +24,6 @@ module "ecs" {
   task_exec_iam_role_policies = {
     AWSSecretsManagerReadWrite = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
     ParameterAccess            = aws_iam_policy.parameter_access.arn
-    DynamodbTablesAccess       = aws_iam_policy.dynamodb_tables_access.arn
   }
 
   cluster_configuration = {
@@ -123,6 +122,12 @@ module "ecs" {
             }
           }
         }
+      }
+
+      task_iam_role_name         = "${local.name}-tasks"
+      tasks_iam_role_description = "Tasks IAM role for ${local.name}"
+      tasks_iam_role_policies = {
+        DynamoDBTablesAccess = aws_iam_policy.dynamodb_tables_access.arn
       }
 
       service_connect_configuration = {
@@ -291,6 +296,7 @@ resource "aws_iam_policy" "dynamodb_tables_access" {
         Resource = [
           data.aws_dynamodb_table.properties.arn,
           data.aws_dynamodb_table.chat_checkpoints.arn,
+          "${data.aws_dynamodb_table.properties.arn}/index/*",
         ]
       }
     ]

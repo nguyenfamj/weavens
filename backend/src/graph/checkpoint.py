@@ -221,7 +221,7 @@ def _load_writes(
         (
             task_id,
             data["channel"],
-            serde.loads_typed(data["type"], data["value"]),
+            serde.loads_typed((data["type"], data["value"])),
         )
         for (task_id, _), data in task_id_to_data.items()
     ]
