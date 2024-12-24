@@ -292,6 +292,7 @@ resource "aws_iam_policy" "dynamodb_tables_access" {
           "dynamodb:GetItem",
           "dynamodb:Query",
           "dynamodb:PutItem",
+          "dynamodb:BatchGetItem"
         ]
         Resource = [
           data.aws_dynamodb_table.properties.arn,
