@@ -1,15 +1,3 @@
-data "aws_ssm_parameter" "production_openai_api_key" {
-  name = "/crux/production/openai_api_key"
-}
-
-data "aws_ssm_parameter" "production_firecrawl_api_key" {
-  name = "/crux/production/firecrawl_api_key"
-}
-
-data "aws_ssm_parameter" "production_backend_image_tag" {
-  name = "/crux/production/backend_image_tag"
-}
-
 locals {
   region = "eu-north-1"
   name   = "production-crux-backend"
@@ -36,6 +24,7 @@ module "ecs" {
   task_exec_iam_role_policies = {
     AWSSecretsManagerReadWrite = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
     ParameterAccess            = aws_iam_policy.parameter_access.arn
+    DynamodbTablesAccess       = aws_iam_policy.dynamodb_tables_access.arn
   }
 
   cluster_configuration = {
@@ -281,6 +270,27 @@ resource "aws_iam_policy" "parameter_access" {
         Resource = [
           data.aws_ssm_parameter.production_openai_api_key.arn,
           data.aws_ssm_parameter.production_firecrawl_api_key.arn,
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "dynamodb_tables_access" {
+  name = "${local.name}-dynamodb-tables-access"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:PutItem",
+        ]
+        Resource = [
+          data.aws_dynamodb_table.properties.arn,
+          data.aws_dynamodb_table.chat_checkpoints.arn,
         ]
       }
     ]
