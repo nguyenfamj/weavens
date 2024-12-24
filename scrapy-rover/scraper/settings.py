@@ -14,6 +14,7 @@ SPIDER_MODULES = ["scraper.spiders"]
 NEWSPIDER_MODULE = "scraper.spiders"
 
 # Environment variables
+AWS_REGION = os.getenv("AWS_REGION", "eu-north-1")
 ENVIRONMENT = os.getenv("ENVIRONMENT", "LOCAL")
 
 # DYNAMODB variables

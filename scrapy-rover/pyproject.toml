@@ -22,4 +22,4 @@ description = "Python Scrapy project for scraping multiple websites data from th
 readme = "README.md"
 
 [dependency-groups]
-dev = ["Scrapy<3.0.0,>=2.11.2"]
+dev = []

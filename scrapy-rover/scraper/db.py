@@ -1,12 +1,12 @@
 import boto3
 from botocore.exceptions import ClientError
-from .settings import ENVIRONMENT
+from .settings import ENVIRONMENT, AWS_REGION
 
 
 class DynamoDB:
     def __init__(self, table_name: str):
         endpoint_url = None
-        region_name = None
+        region_name = AWS_REGION
         aws_access_key_id = None
         aws_secret_access_key = None
 
