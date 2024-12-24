@@ -46,8 +46,8 @@ module "ecs" {
 
   services = {
     (local.name) = {
-      cpu    = 1024
-      memory = 4096
+      cpu    = 512
+      memory = 2048
 
       enable_execute_command = true
       assign_public_ip       = true
@@ -77,8 +77,8 @@ module "ecs" {
           readonly_root_filesystem  = false
           enable_cloudwatch_logging = false
 
-          memory_reservation = 2048
-          memory             = 4096
+          memory_reservation = 1024
+          memory             = 2048
 
           environment = [
             {
