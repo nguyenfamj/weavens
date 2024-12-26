@@ -11,20 +11,17 @@ from langchain_core.runnables import RunnableConfig
 
 from src.core.logging import Logger
 from src.properties.schemas import Property
-from .schemas import UserInput, ChatMessage
+from .schemas import ThreadRunsStreamInput, ChatMessage
 
 logger = Logger(__name__).logger
 
 
-def parse_input(user_input: UserInput) -> dict[str, Any]:
-    thread_id = user_input.thread_id
+def parse_input(thread_id: str, user_input: ThreadRunsStreamInput) -> dict[str, Any]:
     if not thread_id:
         raise ValueError("thread_id is required")
 
-    input_message = HumanMessage(content=user_input.message, thread_id=thread_id)
-
     return dict(
-        input={"messages": [input_message]},
+        input={"messages": user_input.messages},
         config=RunnableConfig(configurable={"thread_id": thread_id}),
     )
 

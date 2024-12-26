@@ -1,8 +1,8 @@
 from typing import Any, Literal, Optional
 from enum import Enum
 from langgraph.graph import MessagesState
-
 from src.properties.schemas import SearchPropertiesFilters, Property
+from langchain_core.messages import HumanMessage
 
 from pydantic import BaseModel, Field
 from typing_extensions import NotRequired, TypedDict
@@ -171,3 +171,11 @@ class ChatMessage(BaseModel):
 
     def pretty_print(self) -> None:
         print(self.pretty_repr())  # noqa: T201
+
+
+class ThreadRunsStreamInput(BaseModel):
+    messages: list[HumanMessage]
+
+
+class ThreadRunsStreamRequestParams(BaseModel):
+    input: ThreadRunsStreamInput

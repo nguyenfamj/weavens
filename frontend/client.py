@@ -35,15 +35,21 @@ class GraphClient:
         self, message: str, thread_id: str, stream_tokens: bool = True
     ) -> AsyncGenerator[str, None]:
         payload = {
-            "message": message,
-            "thread_id": thread_id,
+            "input": {
+                "messages": [
+                    {
+                        "type": "human",
+                        "content": message,
+                    }
+                ],
+            },
             "stream_tokens": stream_tokens,
         }
 
         async with httpx.AsyncClient() as client:
             async with client.stream(
                 "POST",
-                f"{self.base_url}/api/v1/graph/stream",
+                f"{self.base_url}/api/v1/graph/threads/{thread_id}/runs/stream",
                 json=payload,
                 timeout=self.time_out,
             ) as response:

@@ -9,7 +9,7 @@ from langgraph.graph.state import CompiledStateGraph
 
 from src.common.exceptions import InternalServerErrorHTTPException
 from src.core.logging import Logger
-from .schemas import StreamUserInput, UserInput
+from .schemas import UserInput, ThreadRunsStreamRequestParams
 from .utils import (
     parse_input,
     langchain_to_chat_message,
@@ -27,14 +27,18 @@ async def get_app_agents(request: Request) -> dict[str, CompiledStateGraph]:
 
 
 async def message_generator(
-    user_input: StreamUserInput, app_agents: dict[str, CompiledStateGraph]
+    thread_id: str,
+    request_params: ThreadRunsStreamRequestParams,
+    app_agents: dict[str, CompiledStateGraph],
 ) -> AsyncGenerator[str, None]:
     """
     Generate a stream of messages from the agent.
 
     This is the workhorse method for the /stream endpoint.
     """
-    parsed_input = parse_input(user_input)
+    parsed_input = parse_input(thread_id, request_params.input)
+
+    print(f"parsed_input: {parsed_input}")
 
     async for event in app_agents["default"].astream_events(
         **parsed_input, version="v2"
@@ -72,7 +76,7 @@ async def message_generator(
             # LangGraph re-sends the input message, which feels weird, so drop it
             if (
                 chat_message.type == "human"
-                and chat_message.content == user_input.message
+                and chat_message.content == request_params.input.messages[0].content
             ):
                 continue
             yield f"data: {json.dumps({'type': 'message', 'content': chat_message.model_dump()})}\n\n"
@@ -100,7 +104,7 @@ async def invoke(
 
     Use thread_id to persist and continue a multi-turn conversation.
     """
-    parsed_input = parse_input(user_input)
+    parsed_input = parse_input(user_input.thread_id, user_input)
     try:
         response = await app_agents["default"].ainvoke(**parsed_input)
 
@@ -120,16 +124,19 @@ class TokenQueueStreamingHandler(AsyncCallbackHandler):
             await self.queue.put(token)
 
 
-@router.post("/stream")
+@router.post("/threads/{thread_id}/runs/stream")
 async def stream(
-    user_input: StreamUserInput,
+    thread_id: str,
+    request_params: ThreadRunsStreamRequestParams,
     app_agents: dict[str, CompiledStateGraph] = Depends(get_app_agents),
 ) -> StreamingResponse:
+    print(f"request_params: {request_params}")
     """
     Stream the graph's response to a user input, including intermediate messages and tokens.
 
     Use thread_id to persist and continue a multi-turn conversation.
     """
     return StreamingResponse(
-        message_generator(user_input, app_agents), media_type="text/event-stream"
+        message_generator(thread_id, request_params, app_agents),
+        media_type="text/event-stream",
     )
