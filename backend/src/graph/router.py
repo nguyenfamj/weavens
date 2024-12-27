@@ -37,6 +37,8 @@ async def message_generator(
     """
     parsed_input = parse_input(thread_id, request_params.input)
 
+    partial_message_dict = {}
+
     async for event in app_agents["default"].astream_events(
         **parsed_input, version="v2"
     ):
@@ -81,6 +83,11 @@ async def message_generator(
                 and chat_message.content == request_params.input.messages[0].content
             ):
                 continue
+
+            # Delete the partial message from the dictionary when the chain ends.
+            if chat_message.id in partial_message_dict:
+                del partial_message_dict[chat_message.id]
+
             yield {
                 "event": "messages/complete",
                 "data": json.dumps(
@@ -92,8 +99,15 @@ async def message_generator(
 
         # Yield tokens streamed from LLMs.
         if event["event"] == "on_chat_model_stream":
-            print(event)
             message = langchain_to_chat_message(event["data"]["chunk"])
+
+            # Handle tokens appending to the existing partial message.
+            partial_message_dict[message.id] = (
+                partial_message_dict.get(message.id, "") + message.content
+            )
+            # Update the message with the new content.
+            message.content = partial_message_dict[message.id]
+
             if message.content:
                 # Empty content in the context of OpenAI usually means
                 # that the model is asking for a tool to be invoked.
