@@ -145,7 +145,7 @@ class ChatMessage(BaseModel):
         default=None,
         examples=["call_Jja7J89XsjrOLA5r!MEOW!SL"],
     )
-    run_id: str | None = Field(
+    id: str | None = Field(
         description="Run ID of the message.",
         default=None,
         examples=["847c6285-8fc9-4560-a83f-4e6285809254"],

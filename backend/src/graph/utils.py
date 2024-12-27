@@ -52,6 +52,7 @@ def langchain_to_chat_message(message: BaseMessage) -> ChatMessage:
             ai_message = ChatMessage(
                 type="ai",
                 content=convert_message_content_to_string(message.content),
+                id=message.id,
             )
             if message.tool_calls:
                 ai_message.tool_calls = message.tool_calls

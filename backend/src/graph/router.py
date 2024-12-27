@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from langchain_core.callbacks import AsyncCallbackHandler
 from langgraph.graph.state import CompiledStateGraph
+from sse_starlette.sse import EventSourceResponse
 
 from src.common.exceptions import InternalServerErrorHTTPException
 from src.core.logging import Logger
@@ -13,8 +14,6 @@ from .schemas import UserInput, ThreadRunsStreamRequestParams
 from .utils import (
     parse_input,
     langchain_to_chat_message,
-    remove_tool_calls,
-    convert_message_content_to_string,
 )
 
 logger = Logger(__name__).logger
@@ -30,15 +29,13 @@ async def message_generator(
     thread_id: str,
     request_params: ThreadRunsStreamRequestParams,
     app_agents: dict[str, CompiledStateGraph],
-) -> AsyncGenerator[str, None]:
+) -> AsyncGenerator[dict, None]:
     """
     Generate a stream of messages from the agent.
 
     This is the workhorse method for the /stream endpoint.
     """
     parsed_input = parse_input(thread_id, request_params.input)
-
-    print(f"parsed_input: {parsed_input}")
 
     async for event in app_agents["default"].astream_events(
         **parsed_input, version="v2"
@@ -71,7 +68,12 @@ async def message_generator(
                 chat_message = langchain_to_chat_message(message)
             except Exception as e:
                 logger.error(f"Error parsing message: {e}")
-                yield f"data: {json.dumps({'type': 'error', 'content': 'Unexpected error'})}\n\n"
+                yield {
+                    "event": "error",
+                    "data": json.dumps(
+                        {"type": "error", "content": "Unexpected error"}
+                    ),
+                }
                 continue
             # LangGraph re-sends the input message, which feels weird, so drop it
             if (
@@ -79,19 +81,38 @@ async def message_generator(
                 and chat_message.content == request_params.input.messages[0].content
             ):
                 continue
-            yield f"data: {json.dumps({'type': 'message', 'content': chat_message.model_dump()})}\n\n"
+            yield {
+                "event": "messages/complete",
+                "data": json.dumps(
+                    [
+                        chat_message.model_dump(),
+                    ],
+                ),
+            }
 
         # Yield tokens streamed from LLMs.
         if event["event"] == "on_chat_model_stream":
-            content = remove_tool_calls(event["data"]["chunk"].content)
-            if content:
+            print(event)
+            message = langchain_to_chat_message(event["data"]["chunk"])
+            if message.content:
                 # Empty content in the context of OpenAI usually means
                 # that the model is asking for a tool to be invoked.
                 # So we only print non-empty content.
-                yield f"data: {json.dumps({'type': 'token', 'content': convert_message_content_to_string(content)})}\n\n"
+
+                yield {
+                    "event": "messages/partial",
+                    "data": json.dumps(
+                        [
+                            message.model_dump(),
+                        ],
+                    ),
+                }
             continue
 
-    yield "data: [DONE]\n\n"
+    yield {
+        "event": "message",
+        "data": "[DONE]",
+    }
 
 
 @router.post("/invoke")
@@ -130,13 +151,12 @@ async def stream(
     request_params: ThreadRunsStreamRequestParams,
     app_agents: dict[str, CompiledStateGraph] = Depends(get_app_agents),
 ) -> StreamingResponse:
-    print(f"request_params: {request_params}")
     """
     Stream the graph's response to a user input, including intermediate messages and tokens.
 
     Use thread_id to persist and continue a multi-turn conversation.
     """
-    return StreamingResponse(
+    return EventSourceResponse(
         message_generator(thread_id, request_params, app_agents),
         media_type="text/event-stream",
     )
