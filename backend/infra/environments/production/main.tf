@@ -35,3 +35,7 @@ module "backend" {
   vpc_cidr                   = module.vpc.app_vpc_cidr
   backend_ecr_repository_url = data.terraform_remote_state.ecr.outputs.backend_ecr_repository_url
 }
+
+module "frontend" {
+  source = "./frontend"
+}
