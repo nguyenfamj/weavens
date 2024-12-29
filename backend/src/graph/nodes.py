@@ -39,7 +39,7 @@ async def pure_llm_answer(state: OverallState) -> OverallState:
         streaming=True,
     )
     response = await llm.ainvoke(messages)
-    return {"messages": [response]}
+    return OverallState(messages=[response])
 
 
 def _setup_intent_detection():
@@ -71,7 +71,7 @@ async def detect_intent(state: OverallState) -> OverallState:
         }
     )
 
-    return {"intent": response.intent}
+    return OverallState(intent=response.intent)
 
 
 async def knowledge_retrieval(state: OverallState) -> OverallState:
@@ -95,7 +95,7 @@ async def knowledge_retrieval(state: OverallState) -> OverallState:
             )
         )
 
-    return {"documents": documents}
+    return OverallState(documents=documents)
 
 
 def _setup_generate_knowledge_answer():
@@ -131,7 +131,7 @@ async def generate_knowledge_answer(state: OverallState) -> OverallState:
         }
     )
 
-    return {"messages": [response]}
+    return OverallState(messages=[response])
 
 
 def _setup_build_search_properties_filters():
@@ -164,10 +164,10 @@ async def build_search_properties_filters(
         await build_search_properties_filters_llm.ainvoke({"question": question})
     )
 
-    return {
-        "search_properties_filters": response.filters,
-        "has_enough_search_properties_filters": response.has_enough_search_properties_filters,
-    }
+    return OverallState(
+        search_properties_filters=response.filters,
+        has_enough_search_properties_filters=response.has_enough_search_properties_filters,
+    )
 
 
 def request_user_to_provide_more_filters_parameters(
@@ -176,13 +176,13 @@ def request_user_to_provide_more_filters_parameters(
     """
     A LangGraph node to request the user to provide more information to build search properties filters.
     """
-    return {
-        "messages": [
+    return OverallState(
+        messages=[
             AIMessage(
                 content="I need more information to find the property you are looking for. Please provide more details like the city, district, minimum and maximum price, number of rooms, etc."
             )
         ]
-    }
+    )
 
 
 def find_property_listings(state: OverallState) -> OverallState:
@@ -193,11 +193,11 @@ def find_property_listings(state: OverallState) -> OverallState:
 
     search_properties_response = search_properties(search_properties_filters, 5)
 
-    return {
+    return OverallState(
         # TODO: When we have new UI, replace this with a ToolMessage
-        "messages": [AIMessage(content="I am finding property listings for you...")],
-        "retrieved_property_listings": search_properties_response.properties,
-    }
+        messages=[AIMessage(content="Let me find the property listings for you...")],
+        retrieved_property_listings=search_properties_response.properties,
+    )
 
 
 def _setup_generate_properties_search_answer():
@@ -215,6 +215,9 @@ async def generate_properties_search_answer(state: OverallState) -> OverallState
     """
     A LangGraph node to generate an answer based on the retrieved property listings.
     """
+    logger.info(
+        f"Generating properties search answer for intent: {state['intent']} with {len(state['retrieved_property_listings'])} properties"
+    )
     messages = state["messages"]
 
     question = messages[-1].content
@@ -230,20 +233,20 @@ async def generate_properties_search_answer(state: OverallState) -> OverallState
         }
     )
 
-    return {"messages": [response]}
+    return OverallState(messages=[response])
 
 
 def refuse_unsupported_intent(state: OverallState) -> OverallState:
     """
     A LangGraph node to refuse unsupported intent.
     """
-    return {
-        "messages": [
+    return OverallState(
+        messages=[
             AIMessage(
                 content="I apologize, I don't have the answer to that question. Please try asking something else."
             )
         ]
-    }
+    )
 
 
 # Edges

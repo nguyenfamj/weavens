@@ -88,6 +88,10 @@ def search_properties(
             "Limit": limit,
         }
 
+        logger.info(
+            f"Searching properties for filters: {filters.model_dump_json(indent=2)}"
+        )
+
         # Add filter expressions for remaining criteria
         filter_expressions = build_search_properties_filter_expressions(
             filters, index_info
@@ -121,6 +125,8 @@ def search_properties(
             ]
         else:
             properties = []
+
+        logger.info(f"Found {len(properties)} properties")
 
         return SearchPropertiesResponse(
             properties=properties,
