@@ -187,22 +187,23 @@ def build_search_properties_filter_expressions(
     expressions: list[Attr] = []
 
     if filters.building_type:
-        expressions.append(Attr("building_type").eq(filters.building_type))
+        expr = Attr("building_type").eq(filters.building_type.value)
+        expressions.append(expr)
     if filters.housing_type:
-        expressions.append(Attr("housing_type").eq(filters.housing_type))
+        expr = Attr("housing_type").eq(filters.housing_type.value)
+        expressions.append(expr)
     if filters.plot_ownership:
-        expressions.append(Attr("plot_ownership").eq(filters.plot_ownership))
+        expr = Attr("plot_ownership").eq(filters.plot_ownership.value)
+        expressions.append(expr)
     if filters.number_of_rooms:
-        expressions.append(Attr("number_of_rooms").eq(filters.number_of_rooms))
+        expr = Attr("number_of_rooms").eq(filters.number_of_rooms)
+        expressions.append(expr)
 
     if used_index.index_name == "CityByDebtFreePriceGSI" and filters.district:
-        expressions.append(Attr("district").eq(filters.district))
+        expr = Attr("district").eq(filters.district)
+        expressions.append(expr)
 
-    final_expression = None
-    for expr in expressions:
-        if final_expression is None:
-            final_expression = expr
-        else:
-            final_expression = final_expression & expr
+    # Combine all expressions
+    final_expression = reduce(lambda x, y: x & y, expressions) if expressions else None
 
     return final_expression

@@ -85,7 +85,6 @@ def search_properties(
         query_params = {
             "IndexName": index_info.index_name,
             "KeyConditionExpression": key_conditions,
-            "Limit": limit,
         }
 
         logger.info(
@@ -105,8 +104,12 @@ def search_properties(
 
         response = properties_table.query(**query_params)
 
+        # TODO: Find a new solution for this
+        # Apply server side limit due to dynamodb limitation of LIMIT query
+        items = response["Items"][:limit]
+
         properties_ids = [
-            Property.model_validate(item).id for item in response["Items"]
+            Property.model_validate(item).id for item in items
         ]
 
         properties = None
