@@ -21,3 +21,4 @@ class Database:
     CHECKPOINTS_TABLE_NAME = "Checkpoints"
     SCRAPED_URL_TRACKER_TABLE_NAME = "ScrapedUrlTracker"
     SCRAPED_CONTENT_TABLE_NAME = "ScrapedContent"
+    USER_MESSAGE_LOGS_TABLE_NAME = "UserMessageLogs"

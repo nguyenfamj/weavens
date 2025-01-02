@@ -10,6 +10,7 @@ from sse_starlette.sse import EventSourceResponse
 
 from src.common.exceptions import InternalServerErrorHTTPException
 from src.core.logging import Logger
+from src.core.analytics import log_user_message
 from .schemas import UserInput, ThreadRunsStreamRequestParams
 from .utils import (
     parse_input,
@@ -151,6 +152,11 @@ async def stream(
 
     Use thread_id to persist and continue a multi-turn conversation.
     """
+
+    # Log user message
+    for message in request_params.input.messages:
+        log_user_message(message)
+
     return EventSourceResponse(
         message_generator(thread_id, request_params, app_agents),
         media_type="text/event-stream",

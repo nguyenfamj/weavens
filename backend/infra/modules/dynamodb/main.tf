@@ -147,3 +147,23 @@ module "scraped_content_table" {
     Terraform   = true
   } : null
 }
+
+module "user_message_logs" {
+  source = "terraform-aws-modules/dynamodb-table/aws"
+
+  name     = "UserMessageLogs"
+  hash_key = "id"
+
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 1
+  write_capacity = 1
+
+  attributes = [
+    { name = "id", type = "S" },
+  ]
+
+  tags = var.enable_tags ? {
+    Environment = var.tag_environment
+    Terraform   = true
+  } : null
+}
