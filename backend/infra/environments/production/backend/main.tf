@@ -297,6 +297,7 @@ resource "aws_iam_policy" "dynamodb_tables_access" {
         Resource = [
           data.aws_dynamodb_table.properties.arn,
           data.aws_dynamodb_table.chat_checkpoints.arn,
+          data.aws_dynamodb_table.user_message_logs.arn,
           "${data.aws_dynamodb_table.properties.arn}/index/*",
         ]
       }

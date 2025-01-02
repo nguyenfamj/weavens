@@ -17,3 +17,7 @@ data "aws_dynamodb_table" "properties" {
 data "aws_dynamodb_table" "chat_checkpoints" {
   name = "Checkpoints"
 }
+
+data "aws_dynamodb_table" "user_message_logs" {
+  name = "UserMessageLogs"
+}
