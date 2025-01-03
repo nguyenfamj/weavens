@@ -39,3 +39,12 @@ module "backend" {
 module "frontend" {
   source = "./frontend"
 }
+
+module "opensearch" {
+  source = "./opensearch"
+
+  stage              = "production"
+  vpc_id             = module.vpc.app_vpc_id
+  vpc_cidr           = module.vpc.app_vpc_cidr
+  private_subnet_ids = module.vpc.app_vpc_private_subnets
+}

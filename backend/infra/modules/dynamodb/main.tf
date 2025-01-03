@@ -8,6 +8,9 @@ module "properties" {
   read_capacity  = 1
   write_capacity = 1
 
+  stream_enabled = true
+  stream_view_type = "NEW_AND_OLD_IMAGES"
+
   attributes = [
     { name = "id", type = "N" },
     { name = "city", type = "S" },
