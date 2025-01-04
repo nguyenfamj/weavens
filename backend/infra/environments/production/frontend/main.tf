@@ -17,7 +17,8 @@ module "static_website" {
 
   bucket = module.s3_bucket.s3_bucket_id
 
-  content_type = "text/html"
+  content_type  = "text/html"
+  cache_control = "max-age=3600"
 
   key = "index.html"
   acl = "private"
@@ -30,9 +31,9 @@ module "s3_bucket" {
 
   force_destroy = true
 
-  block_public_acls = false
-  block_public_policy = false
-  ignore_public_acls = false
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
   restrict_public_buckets = false
 
   website = {

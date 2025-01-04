@@ -17,3 +17,8 @@ variable "backend_ecr_repository_url" {
   type        = string
   description = "The URL of the ECR repository for the backend"
 }
+
+variable "opensearch_domain_arn" {
+  type        = string
+  description = "The ARN of the OpenSearch domain"
+}

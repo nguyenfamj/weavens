@@ -128,6 +128,7 @@ module "ecs" {
       tasks_iam_role_description = "Tasks IAM role for ${local.name}"
       tasks_iam_role_policies = {
         DynamoDBTablesAccess = aws_iam_policy.dynamodb_tables_access.arn
+        OpenSearchAccess     = aws_iam_policy.opensearch_access.arn
       }
 
       service_connect_configuration = {
@@ -299,6 +300,24 @@ resource "aws_iam_policy" "dynamodb_tables_access" {
           data.aws_dynamodb_table.chat_checkpoints.arn,
           data.aws_dynamodb_table.user_message_logs.arn,
           "${data.aws_dynamodb_table.properties.arn}/index/*",
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "opensearch_access" {
+  name = "${local.name}-opensearch-access"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "es:ESHttp*"
+        ]
+        Resource = [
+          "${var.opensearch_domain_arn}/*"
         ]
       }
     ]

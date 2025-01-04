@@ -5,6 +5,9 @@ locals {
   }
 }
 
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 module "search_instance" {
   source  = "terraform-aws-modules/opensearch/aws"
   version = "1.5.0"
@@ -42,14 +45,18 @@ module "search_instance" {
     {
       effect  = "Allow"
       actions = ["es:*"]
-
       principals = [
         {
-          type        = "*"
+          type        = "AWS"
           identifiers = ["*"]
         }
       ]
-      resources = ["*"]
+      resources = ["arn:aws:es:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:domain/titan-production-search/*"]
+      condition = {
+        IpAddress = {
+          "aws:SourceIp" = ["${var.vpc_cidr}"]
+        }
+      }
     }
   ]
 
@@ -72,4 +79,8 @@ module "search_instance" {
 
 output "search_instance_endpoint" {
   value = module.search_instance.domain_endpoint
+}
+
+output "search_domain_arn" {
+  value = module.search_instance.domain_arn
 }

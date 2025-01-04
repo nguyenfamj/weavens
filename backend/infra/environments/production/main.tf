@@ -34,6 +34,7 @@ module "backend" {
   vpc_id                     = module.vpc.app_vpc_id
   vpc_cidr                   = module.vpc.app_vpc_cidr
   backend_ecr_repository_url = data.terraform_remote_state.ecr.outputs.backend_ecr_repository_url
+  opensearch_domain_arn      = module.opensearch.search_domain_arn
 }
 
 module "frontend" {
@@ -47,4 +48,13 @@ module "opensearch" {
   vpc_id             = module.vpc.app_vpc_id
   vpc_cidr           = module.vpc.app_vpc_cidr
   private_subnet_ids = module.vpc.app_vpc_private_subnets
+}
+
+module "lambda_dynamo_es_property_sync" {
+  source = "./lambdas/dynamo-es-property-sync"
+
+  opensearch_domain     = module.opensearch.search_instance_endpoint
+  opensearch_domain_arn = module.opensearch.search_domain_arn
+  private_subnet_ids    = module.vpc.app_vpc_private_subnets
+  vpc_id                = module.vpc.app_vpc_id
 }
