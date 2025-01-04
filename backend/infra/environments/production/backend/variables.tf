@@ -22,3 +22,8 @@ variable "opensearch_domain_arn" {
   type        = string
   description = "The ARN of the OpenSearch domain"
 }
+
+variable "opensearch_domain" {
+  type        = string
+  description = "The endpoint of the OpenSearch domain"
+}

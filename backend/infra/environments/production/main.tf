@@ -35,6 +35,7 @@ module "backend" {
   vpc_cidr                   = module.vpc.app_vpc_cidr
   backend_ecr_repository_url = data.terraform_remote_state.ecr.outputs.backend_ecr_repository_url
   opensearch_domain_arn      = module.opensearch.search_domain_arn
+  opensearch_domain          = module.opensearch.search_instance_endpoint
 }
 
 module "frontend" {

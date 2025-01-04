@@ -99,6 +99,10 @@ module "ecs" {
             {
               name  = "AWS_REGION_NAME"
               value = local.region
+            },
+            {
+              name  = "OPENSEARCH_DOMAIN",
+              value = var.opensearch_domain
             }
           ]
 

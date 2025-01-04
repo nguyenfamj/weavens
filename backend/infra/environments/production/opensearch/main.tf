@@ -41,6 +41,15 @@ module "search_instance" {
     vpc_id     = var.vpc_id
   }
 
+  security_group_rules = {
+    ingress = {
+      from_port   = 443
+      to_port     = 443
+      ip_protocol = "tcp"
+      cidr_ipv4   = var.vpc_cidr
+    }
+  }
+
   access_policy_statements = [
     {
       effect  = "Allow"
