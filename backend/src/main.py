@@ -6,6 +6,7 @@ from fastapi_lifespan_manager import LifespanManager, State
 
 from src.core.logging import Logger
 from src.core.config import settings
+from src.core.opensearch import initialize_search_properties_index
 from src.common.constants import Database
 
 from .common.exception_handlers import exception_handlers
@@ -30,6 +31,11 @@ async def init_chroma_db() -> AsyncIterator[State]:
     chroma_db.initialize()
 
     yield {"chromadb": chroma_db}
+
+
+@manager.add
+def init_opensearch_db():
+    initialize_search_properties_index()
 
 
 @manager.add

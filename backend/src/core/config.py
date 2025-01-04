@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field(default="INFO")
 
     AWS_REGION_NAME: str
+    OPENSEARCH_DOMAIN: str
     OPENAI_API_KEY: str
     FIRECRAWL_API_KEY: str
 
