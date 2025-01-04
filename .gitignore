@@ -207,3 +207,6 @@ terraform.rc
 
 # Ignore scraper data
 .data/
+
+# Lambda
+node_modules/
