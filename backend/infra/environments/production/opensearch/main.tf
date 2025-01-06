@@ -60,22 +60,11 @@ module "search_instance" {
           identifiers = ["*"]
         }
       ]
-      resources = ["arn:aws:es:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:domain/titan-production-search/*"]
-      condition = {
-        IpAddress = {
-          "aws:SourceIp" = ["${var.vpc_cidr}"]
-        }
-      }
     }
   ]
 
   advanced_security_options = {
-    enabled                        = true
-    internal_user_database_enabled = true
-    master_user_options = {
-      master_user_name     = "admin"
-      master_user_password = "!TitanAdmin123"
-    }
+    enabled = false
   }
 
   auto_tune_options = {

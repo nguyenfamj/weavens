@@ -21,3 +21,7 @@ data "aws_dynamodb_table" "chat_checkpoints" {
 data "aws_dynamodb_table" "user_message_logs" {
   name = "UserMessageLogs"
 }
+
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
+}

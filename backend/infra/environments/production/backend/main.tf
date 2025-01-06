@@ -22,8 +22,7 @@ module "ecs" {
 
   create_task_exec_iam_role = true
   task_exec_iam_role_policies = {
-    AWSSecretsManagerReadWrite = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-    ParameterAccess            = aws_iam_policy.parameter_access.arn
+    ParameterAccess = aws_iam_policy.parameter_access.arn
   }
 
   cluster_configuration = {
@@ -35,9 +34,21 @@ module "ecs" {
     }
   }
 
-  fargate_capacity_providers = {
-    FARGATE_SPOT = {
+  default_capacity_provider_use_fargate = false
+  autoscaling_capacity_providers = {
+    "production-crux-backend" = {
+      auto_scaling_group_arn         = module.autoscaling.autoscaling_group_arn
+      managed_termination_protection = "ENABLED"
+
+      managed_scaling = {
+        maximum_scaling_step_size = 1
+        minimum_scaling_step_size = 1
+        status                    = "ENABLED"
+        target_capacity           = 100
+      }
+
       default_capacity_provider_strategy = {
+        base   = 1
         weight = 100
       }
     }
@@ -45,11 +56,23 @@ module "ecs" {
 
   services = {
     (local.name) = {
-      cpu    = 512
-      memory = 2048
+      cpu    = 256
+      memory = 512
+
+      requires_compatibilities = ["EC2"]
+      capacity_provider_strategy = {
+        "production-crux-backend" = {
+          capacity_provider = "production-crux-backend"
+          weight            = 1
+          base              = 1
+        }
+      }
+
+      volume = {
+        shared-volume = {}
+      }
 
       enable_execute_command = true
-      assign_public_ip       = true
 
       deployment_circuit_breaker = {
         enable   = true
@@ -73,11 +96,14 @@ module "ecs" {
             }
           ]
 
-          readonly_root_filesystem  = false
-          enable_cloudwatch_logging = false
+          mount_points = [
+            {
+              sourceVolume  = "shared-volume",
+              containerPath = "/var/www/shared-volume"
+            }
+          ]
 
-          memory_reservation = 1024
-          memory             = 2048
+          readonly_root_filesystem = false
 
           environment = [
             {
@@ -117,13 +143,13 @@ module "ecs" {
             }
           ]
 
+          enable_cloudwatch_logging              = true
+          create_cloudwatch_log_group            = true
+          cloudwatch_log_group_name              = "/aws/ecs/${local.name}/${local.container_name}"
+          cloudwatch_log_group_retention_in_days = 7
+
           log_configuration = {
             logDriver = "awslogs"
-            options = {
-              "awslogs-group"         = aws_cloudwatch_log_group.backend_task_log_group.name
-              "awslogs-region"        = local.region
-              "awslogs-stream-prefix" = "ecs"
-            }
           }
         }
       }
@@ -135,18 +161,6 @@ module "ecs" {
         OpenSearchAccess     = aws_iam_policy.opensearch_access.arn
       }
 
-      service_connect_configuration = {
-        namespace = aws_service_discovery_http_namespace.this.arn
-        service = {
-          client_alias = {
-            port     = local.container_port
-            dns_name = local.container_name
-          }
-          port_name      = local.container_name
-          discovery_name = local.container_name
-        }
-      }
-
       load_balancer = {
         service = {
           target_group_arn = module.alb.target_groups["ex_ecs"].arn
@@ -155,7 +169,7 @@ module "ecs" {
         }
       }
 
-      subnet_ids = var.vpc_public_subnets
+      subnet_ids = var.vpc_private_subnets
 
       security_group_rules = {
         alb_ingress_3000 = {
@@ -179,13 +193,80 @@ module "ecs" {
 
   depends_on = [aws_iam_policy.parameter_access]
 
-  tags = {
-    Environment = "production"
-  }
+  tags = local.tags
 }
 
 
 # SUPPORTING RESOURCES
+
+# Autoscaling
+module "autoscaling" {
+  source  = "terraform-aws-modules/autoscaling/aws"
+  version = "8.0.1"
+
+  name          = "${local.name}-autoscaling"
+  instance_type = "t3.micro"
+  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+
+  ignore_desired_capacity_changes = true
+
+  # use_mixed_instances_policy = true
+  # mixed_instances_policy = {
+  #   instances_distribution = {
+  #     on_demand_base_capacity                  = 0
+  #     on_demand_percentage_above_base_capacity = 0
+  #     spot_allocation_strategy                 = "price-capacity-optimized"
+  #   }
+
+  #   override = [
+  #     { instance_type = "t3.micro" },
+  #     { instance_type = "t2.micro" },
+  #   ]
+  # }
+
+  # tag_specifications = [
+  #   {
+  #     resource_type = "spot-instances-request"
+  #     tags          = local.tags
+  #   }
+  # ]
+
+  security_groups = [module.autoscaling_sg.security_group_id]
+  user_data = base64encode(<<-EOT
+    #!/bin/bash
+    set -e
+
+    echo "ECS_CLUSTER=${local.name}" >> /etc/ecs/ecs.config
+    echo "ECS_LOGLEVEL=debug" >> /etc/ecs/ecs.config
+    echo 'ECS_CONTAINER_INSTANCE_TAGS=${jsonencode(local.tags)}' >> /etc/ecs/ecs.config
+    echo "ECS_ENABLE_TASK_IAM_ROLE=true" >> /etc/ecs/ecs.config
+  EOT
+  )
+
+
+  create_iam_instance_profile = true
+  iam_role_name               = local.name
+  iam_role_description        = "ECS role for ${local.name}"
+  iam_role_policies = {
+    AmazonEC2ContainerServiceforEC2Role = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+    AmazonSSMManagedInstanceCore        = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    AmazonEC2RoleforSSM                 = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+  }
+
+  vpc_zone_identifier = var.vpc_private_subnets
+  health_check_type   = "EC2"
+  min_size            = 1
+  max_size            = 1
+  desired_capacity    = 1
+
+  autoscaling_group_tags = {
+    AmazonECSManaged = true
+  }
+
+  protect_from_scale_in = true
+
+  tags = local.tags
+}
 
 
 # ALB
@@ -258,13 +339,6 @@ module "alb" {
   tags = local.tags
 }
 
-# Service Discovery
-resource "aws_service_discovery_http_namespace" "this" {
-  name        = local.name
-  description = "CloudMap namespace for ${local.name}"
-  tags        = local.tags
-}
-
 # Create the custom policy first
 resource "aws_iam_policy" "parameter_access" {
   name = "${local.name}-ssm-parameter-access"
@@ -328,10 +402,24 @@ resource "aws_iam_policy" "opensearch_access" {
   })
 }
 
-# CloudWatch Log Group
-resource "aws_cloudwatch_log_group" "backend_task_log_group" {
-  name              = "/ecs-task/${local.container_name}"
-  retention_in_days = 30
+# Autoscaling Security Group
+module "autoscaling_sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.2.0"
+
+  name        = local.name
+  description = "Autoscaling group security group"
+  vpc_id      = var.vpc_id
+
+  computed_ingress_with_source_security_group_id = [
+    {
+      rule                     = "http-80-tcp"
+      source_security_group_id = module.alb.security_group_id
+    }
+  ]
+  number_of_computed_ingress_with_source_security_group_id = 1
+
+  egress_rules = ["all-all"]
 
   tags = local.tags
 }
