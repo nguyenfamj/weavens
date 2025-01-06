@@ -7,6 +7,7 @@ from .config import settings
 
 dynamodb = boto3.resource(
     "dynamodb",
+    region_name=settings.AWS_REGION_NAME,
     endpoint_url="http://localhost:8000" if settings.ENVIRONMENT.is_local else None,
 )
 
@@ -17,11 +18,10 @@ class DynamoDB:
     def __new__(cls):
         if cls.instance is None:
             cls.instance = super().__new__(cls)
-            cls.instance.session = boto3.Session(
-                region_name=settings.AWS_REGION_NAME,
-            )
+            cls.instance.session = boto3.Session(region_name=settings.AWS_REGION_NAME)
             cls.instance.resource = cls.instance.session.resource(
                 Database.RESOURCE_NAME,
+                region_name=settings.AWS_REGION_NAME,
                 endpoint_url="http://localhost:8000"
                 if settings.ENVIRONMENT.is_local
                 else None,

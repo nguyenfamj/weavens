@@ -112,7 +112,7 @@ module "ecs" {
             },
             {
               name  = "PORT"
-              value = "8386"
+              value = local.container_port
             },
             {
               name  = "WORKERS"
@@ -124,6 +124,11 @@ module "ecs" {
             },
             {
               name  = "AWS_REGION_NAME"
+              value = local.region
+            },
+            # TODO: These two are duplicates, remove one later
+            {
+              name  = "AWS_REGION",
               value = local.region
             },
             {
