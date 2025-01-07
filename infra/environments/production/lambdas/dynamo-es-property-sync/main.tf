@@ -42,7 +42,7 @@ module "this" {
   timeout     = 30
   memory_size = 128
 
-  source_path = "${path.module}/../../../../../../lambdas/dynamo-es-property-sync"
+  source_path = "${path.module}/../../../../../lambdas/dynamo-es-property-sync"
 
   environment_variables = {
     OPENSEARCH_DOMAIN = var.opensearch_domain

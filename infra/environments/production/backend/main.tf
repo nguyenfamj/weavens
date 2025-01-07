@@ -296,6 +296,13 @@ module "alb" {
       ip_protocol = "tcp"
       cidr_ipv4   = "0.0.0.0/0"
     }
+
+    all_https = {
+      from_port   = 443
+      to_port     = 443
+      ip_protocol = "tcp"
+      cidr_ipv4   = "0.0.0.0/0"
+    }
   }
   security_group_egress_rules = {
     all = {
@@ -309,6 +316,17 @@ module "alb" {
       port     = 80
       protocol = "HTTP"
 
+      forward = {
+        target_group_key = "ex_ecs"
+      }
+    }
+
+    ex_https = {
+      port     = 443
+      protocol = "HTTPS"
+
+      ssl_policy      = "ELBSecurityPolicy-2016-08"
+      certificate_arn = aws_acm_certificate.self_signed_cert.arn
       forward = {
         target_group_key = "ex_ecs"
       }
@@ -427,4 +445,32 @@ module "autoscaling_sg" {
   egress_rules = ["all-all"]
 
   tags = local.tags
+}
+
+# Self-signed certificate for HTTPS
+resource "tls_private_key" "self_signed_cert" {
+  algorithm = "RSA"
+}
+
+resource "tls_self_signed_cert" "self_signed_cert" {
+  private_key_pem = tls_private_key.self_signed_cert.private_key_pem
+
+  subject {
+    common_name  = "titan.co"
+    organization = "Titan OY"
+  }
+
+  validity_period_hours = 8760
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth"
+  ]
+}
+
+resource "aws_acm_certificate" "self_signed_cert" {
+  private_key      = tls_private_key.self_signed_cert.private_key_pem
+  certificate_body = tls_self_signed_cert.self_signed_cert.cert_pem
+  tags             = local.tags
 }
