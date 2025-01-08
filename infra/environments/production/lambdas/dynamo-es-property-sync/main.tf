@@ -45,7 +45,7 @@ module "this" {
   source_path = "${path.module}/../../../../../lambdas/dynamo-es-property-sync"
 
   environment_variables = {
-    OPENSEARCH_DOMAIN = var.opensearch_domain
+    OPENSEARCH_DOMAIN = "https://${var.opensearch_domain}"
   }
 
   vpc_subnet_ids         = var.private_subnet_ids

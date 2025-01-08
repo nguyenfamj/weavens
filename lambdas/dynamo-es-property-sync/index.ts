@@ -29,6 +29,10 @@ const client = new Client({
 export const handler = async (event: DynamoDBStreamEvent): Promise<void> => {
   try {
     const records = event.Records;
+    if (!records || records.length === 0) {
+      console.log('No records to process, skipping');
+      return;
+    }
 
     const promises = records.map(async (record) => {
       // Skip if not an event from the Properties table
