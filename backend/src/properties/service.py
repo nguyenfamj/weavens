@@ -1,13 +1,13 @@
 from math import ceil
 
 from fastapi import status
-from typing import Optional, Any
+from typing import Any
 
 from src.core.db import DynamoDB, get_db
 from src.common.exceptions import InternalServerErrorHTTPException
 from src.core.logging import Logger
 from src.common.constants import Database
-
+from src.core.opensearch import opensearch_client
 from ..schemas import CommonParams, Pagination
 from .schemas import (
     PropertyQueryParams,
@@ -18,8 +18,6 @@ from .schemas import (
 )
 from .utils import (
     build_query,
-    get_optimal_index_and_conditions,
-    build_search_properties_filter_expressions,
 )
 
 logger = Logger(__name__).logger
@@ -77,42 +75,21 @@ class PropertyService:
 def search_properties(
     filters: SearchPropertiesFilters,
     limit: int = 10,
-    last_evaluated_key: Optional[dict[str, Any]] = None,
 ) -> SearchPropertiesResponse:
     try:
-        index_info, key_conditions = get_optimal_index_and_conditions(filters)
-        # Build query params
-        query_params = {
-            "IndexName": index_info.index_name,
-            "KeyConditionExpression": key_conditions,
-        }
-
         logger.info(
             f"Searching properties for filters: {filters.model_dump_json(indent=2)}"
         )
 
-        # Add filter expressions for remaining criteria
-        filter_expressions = build_search_properties_filter_expressions(
-            filters, index_info
-        )
+        query = build_property_query_from_filters(filters, limit)
 
-        if filter_expressions:
-            query_params["FilterExpression"] = filter_expressions
+        response = opensearch_client.search(index="properties", body=query)
 
-        if last_evaluated_key:
-            query_params["ExclusiveStartKey"] = last_evaluated_key
+        logger.info(f"Response from opensearch: {response}")
 
-        response = properties_table.query(**query_params)
+        properties_ids = [hit["_source"]["id"] for hit in response["hits"]["hits"]]
 
-        # TODO: Find a new solution for this
-        # Apply server side limit due to dynamodb limitation of LIMIT query
-        items = response["Items"][:limit]
-
-        properties_ids = [
-            Property.model_validate(item).id for item in items
-        ]
-
-        properties = None
+        properties = []
         # Batch get properties by ids
         if properties_ids:
             batch_keys = {
@@ -126,16 +103,50 @@ def search_properties(
                 Property.model_validate(item)
                 for item in batch_response["Responses"][Database.PROPERTIES_TABLE_NAME]
             ]
-        else:
-            properties = []
 
         logger.info(f"Found {len(properties)} properties")
 
         return SearchPropertiesResponse(
             properties=properties,
-            last_evaluated_key=response.get("LastEvaluatedKey"),
-            total_count=response["Count"],
+            total_count=response["hits"]["total"]["value"],
         )
     except Exception as e:
         logger.error("Error searching properties: %s", e)
         raise InternalServerErrorHTTPException()
+
+
+def build_property_query_from_filters(
+    filters: SearchPropertiesFilters,
+    limit: int = 10,
+) -> dict[str, Any]:
+    must_conditions = []
+
+    if filters.city:
+        must_conditions.append({"term": {"city": filters.city}})
+    if filters.district:
+        must_conditions.append({"term": {"district": filters.district}})
+    if filters.building_type:
+        must_conditions.append({"term": {"building_type": filters.building_type}})
+    if filters.housing_type:
+        must_conditions.append({"term": {"housing_type": filters.housing_type}})
+    if filters.number_of_rooms:
+        must_conditions.append({"term": {"number_of_rooms": filters.number_of_rooms}})
+    if filters.plot_ownership:
+        must_conditions.append({"term": {"plot_ownership": filters.plot_ownership}})
+
+    # Add range queries for price
+    if filters.min_debt_free_price or filters.max_debt_free_price:
+        range_query = {"range": {"debt_free_price": {}}}
+        if filters.min_debt_free_price:
+            range_query["range"]["debt_free_price"]["gte"] = filters.min_debt_free_price
+        if filters.max_debt_free_price:
+            range_query["range"]["debt_free_price"]["lte"] = filters.max_debt_free_price
+        must_conditions.append(range_query)
+
+    query = {
+        "query": {"bool": {"must": must_conditions}},
+        "size": limit,
+        "_source": ["id"],
+    }
+
+    return query
