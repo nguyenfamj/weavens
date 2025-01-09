@@ -122,17 +122,23 @@ def build_property_query_from_filters(
     must_conditions = []
 
     if filters.city:
-        must_conditions.append({"term": {"city": filters.city}})
+        must_conditions.append({"term": {"city.keyword": filters.city}})
     if filters.district:
-        must_conditions.append({"term": {"district": filters.district}})
+        must_conditions.append({"term": {"district.keyword": filters.district}})
     if filters.building_type:
-        must_conditions.append({"term": {"building_type": filters.building_type}})
+        must_conditions.append(
+            {"term": {"building_type.keyword": filters.building_type.value}}
+        )
     if filters.housing_type:
-        must_conditions.append({"term": {"housing_type": filters.housing_type}})
+        must_conditions.append(
+            {"term": {"housing_type.keyword": filters.housing_type.value}}
+        )
     if filters.number_of_rooms:
         must_conditions.append({"term": {"number_of_rooms": filters.number_of_rooms}})
     if filters.plot_ownership:
-        must_conditions.append({"term": {"plot_ownership": filters.plot_ownership}})
+        must_conditions.append(
+            {"term": {"plot_ownership.keyword": filters.plot_ownership.value}}
+        )
 
     # Add range queries for price
     if filters.min_debt_free_price or filters.max_debt_free_price:
