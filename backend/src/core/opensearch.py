@@ -20,6 +20,9 @@ opensearch_client = OpenSearch(
     verify_certs=True,
     connection_class=RequestsHttpConnection,
     pool_maxsize=20,
+    timeout=15,
+    max_retries=3,
+    retry_on_timeout=True,
 )
 
 

@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 from fastapi.params import Depends
 
 from src.core.db import DynamoDB, get_db
+from src.core.opensearch import opensearch_client
+
 from src.common.exceptions import NotFoundHTTPException
 from ..schemas import CommonParams
-from .schemas import PropertyQueryParams, PropertyResponse
 from .service import PropertyService
 
 router = APIRouter(tags=["properties"])
@@ -38,4 +39,13 @@ def get_property(
             {"details": "Not found property with the ID: %s" % property_id}
         )
 
+    return response
+
+
+# NOTE: This is a temporary endpoint for testing the search functionality
+@router.post("/dev/search")
+def search_properties(
+    query: dict = Body(...),
+):
+    response = opensearch_client.search(index="properties", body=query)
     return response
