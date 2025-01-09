@@ -13,10 +13,12 @@ permissions:
   pull-requests: write
 
 jobs:
-  release:
-    name: Create Release
+  build-and-release:
+    name: Build and Create Release
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.create_tag.outputs.release_tag }}
 
     steps:
       - name: Checkout code
@@ -53,6 +55,31 @@ jobs:
           docker buildx build --no-cache --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+      - name: Tag ref
+        run: |
+          git tag -a ${{ steps.create_tag.outputs.release_tag }} -m "Release ${{ steps.create_tag.outputs.release_tag }}" ${{ github.sha }}
+          git push origin ${{ steps.create_tag.outputs.release_tag }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.create_tag.outputs.release_tag }}
+
+  deploy-to-prod:
+    name: Deploy to Production
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -65,22 +92,14 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve \
-            -var="PRODUCTION_BACKEND_IMAGE_TAG=${{ steps.create_tag.outputs.release_tag }}" \
+            -var="PRODUCTION_BACKEND_IMAGE_TAG=${{ needs.build-and-release.outputs.release_tag }}" \
             -var="PRODUCTION_BACKEND_OPENAI_API_KEY=${{ secrets.PRODUCTION_BACKEND_OPENAI_API_KEY }}" \
             -var="PRODUCTION_BACKEND_FIRECRAWL_API_KEY=${{ secrets.PRODUCTION_BACKEND_FIRECRAWL_API_KEY }}"
 
       - name: Update ECS task definition
         working-directory: infra/environments/production
+        env:
+          TF_LOG: DEBUG
         run: |
           terraform init
           terraform apply -auto-approve -target=module.backend
-
-      - name: Tag ref
-        run: |
-          git tag -a ${{ steps.create_tag.outputs.release_tag }} -m "Release ${{ steps.create_tag.outputs.release_tag }}" ${{ github.sha }}
-          git push origin ${{ steps.create_tag.outputs.release_tag }}
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.create_tag.outputs.release_tag }}
