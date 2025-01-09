@@ -1,6 +1,7 @@
-name: Create Release
+name: Create release and deploy backend to production
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -14,7 +15,7 @@ permissions:
 jobs:
   release:
     name: Create Release
-    if: github.event_name == 'push' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
@@ -43,6 +44,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push backend Docker image
+        working-directory: backend
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: crux-backend
