@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'
 
 permissions:
   contents: write
@@ -28,6 +30,46 @@ jobs:
         id: create_tag
         run: |
           echo "::set-output name=release_tag::v$(date +%Y.%m.%d).$(date +%s)"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push backend Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: crux-backend
+          IMAGE_TAG: ${{ steps.create_tag.outputs.release_tag }}
+        run: |
+          docker buildx build --no-cache --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7.0'
+
+      - name: Update Backend image version in SSM
+        working-directory: infra/global/ssm_parameters
+        run: |
+          terraform init
+          terraform apply -auto-approve \
+            -var="PRODUCTION_BACKEND_IMAGE_TAG=${{ steps.create_tag.outputs.release_tag }}" \
+            -var="PRODUCTION_BACKEND_OPENAI_API_KEY=${{ secrets.PRODUCTION_BACKEND_OPENAI_API_KEY }}" \
+            -var="PRODUCTION_BACKEND_FIRECRAWL_API_KEY=${{ secrets.PRODUCTION_BACKEND_FIRECRAWL_API_KEY }}"
+
+      - name: Update ECS task definition
+        working-directory: infra/environments/production
+        run: |
+          terraform init
+          terraform apply -auto-approve -target=module.backend
 
       - name: Tag ref
         run: |
