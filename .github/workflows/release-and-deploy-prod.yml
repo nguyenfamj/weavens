@@ -60,6 +60,8 @@ jobs:
 
       - name: Update Backend image version in SSM
         working-directory: infra/global/ssm_parameters
+        env:
+          TF_LOG: DEBUG
         run: |
           terraform init
           terraform apply -auto-approve \
