@@ -8,6 +8,7 @@ from src.core.opensearch import opensearch_client
 
 from src.common.exceptions import NotFoundHTTPException
 from ..schemas import CommonParams
+from .schemas import PropertyQueryParams, PropertyResponse
 from .service import PropertyService
 
 router = APIRouter(tags=["properties"])
