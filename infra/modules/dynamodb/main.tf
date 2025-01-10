@@ -8,39 +8,27 @@ module "properties" {
   read_capacity  = 1
   write_capacity = 1
 
-  stream_enabled = true
+  stream_enabled   = true
   stream_view_type = "NEW_AND_OLD_IMAGES"
 
   attributes = [
     { name = "id", type = "N" },
-    { name = "city", type = "S" },
-    { name = "district", type = "S" },
-    { name = "debt_free_price", type = "N" },
-    { name = "crawled", type = "N" }
+    { name = "crawled", type = "N" },
+    { name = "opensearch_version", type = "N" }
   ]
 
   global_secondary_indexes = [
     {
-      name               = "CityByDebtFreePriceGSI"
-      hash_key           = "city"
-      range_key          = "debt_free_price"
-      read_capacity      = 1
-      write_capacity     = 1
-      projection_type    = "INCLUDE"
-      non_key_attributes = ["district", "building_type", "housing_type", "plot_ownership", "number_of_rooms"]
-    },
-    {
-      name               = "DistrictByDebtFreePriceGSI"
-      hash_key           = "district"
-      range_key          = "debt_free_price"
-      read_capacity      = 1
-      write_capacity     = 1
-      projection_type    = "INCLUDE"
-      non_key_attributes = ["city", "building_type", "housing_type", "plot_ownership", "number_of_rooms"]
-    },
-    {
       name               = "CrawledUrlGSI"
       hash_key           = "crawled"
+      projection_type    = "INCLUDE"
+      non_key_attributes = ["url"]
+      read_capacity      = 1
+      write_capacity     = 1
+    },
+    {
+      name               = "IndexedOpensearchGSI"
+      hash_key           = "opensearch_version"
       projection_type    = "INCLUDE"
       non_key_attributes = ["url"]
       read_capacity      = 1
