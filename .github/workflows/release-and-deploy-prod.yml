@@ -87,19 +87,9 @@ jobs:
 
       - name: Update Backend image version in SSM
         working-directory: infra/global/ssm_parameters
-        env:
-          TF_LOG: DEBUG
         run: |
           terraform init
           terraform apply -auto-approve \
             -var="PRODUCTION_BACKEND_IMAGE_TAG=${{ needs.build-and-release.outputs.release_tag }}" \
             -var="PRODUCTION_BACKEND_OPENAI_API_KEY=${{ secrets.PRODUCTION_BACKEND_OPENAI_API_KEY }}" \
             -var="PRODUCTION_BACKEND_FIRECRAWL_API_KEY=${{ secrets.PRODUCTION_BACKEND_FIRECRAWL_API_KEY }}"
-
-      - name: Update ECS task definition
-        working-directory: infra/environments/production
-        env:
-          TF_LOG: DEBUG
-        run: |
-          terraform init
-          terraform apply -auto-approve -target=module.backend
