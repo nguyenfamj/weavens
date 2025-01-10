@@ -83,6 +83,13 @@ module "ecs" {
       deployment_minimum_healthy_percent = 0
       deployment_maximum_percent         = 100
 
+      force_new_deployment = true
+      lifecycle = {
+        ignore_changes = [
+          "task_definition",
+        ]
+      }
+
       container_definitions = {
         (local.container_name) = {
           image = "${var.backend_ecr_repository_url}:${data.aws_ssm_parameter.production_backend_image_tag.value}"
