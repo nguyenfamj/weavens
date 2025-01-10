@@ -24,19 +24,18 @@ logger.debug(
 
 manager = LifespanManager()
 
+# TODO: Currently disabled
+# @manager.add
+# async def init_chroma_db() -> AsyncIterator[State]:
+#     chroma_db = get_chroma_db()
+#     chroma_db.initialize()
 
-@manager.add
-async def init_chroma_db() -> AsyncIterator[State]:
-    chroma_db = get_chroma_db()
-    chroma_db.initialize()
-
-    yield {"chromadb": chroma_db}
+#     yield {"chromadb": chroma_db}
 
 
 @manager.add
 async def init_opensearch_db() -> AsyncIterator[State]:
     initialize_search_properties_index()
-
     yield {"opensearch_client": opensearch_client}
 
 
