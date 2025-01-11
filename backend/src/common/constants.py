@@ -2,8 +2,8 @@ from enum import Enum
 
 
 class Environment(str, Enum):
-    LOCAL = "LOCAL"
-    PRODUCTION = "PRODUCTION"
+    LOCAL = "local"
+    PRODUCTION = "production"
 
     @property
     def is_local(self) -> bool:
@@ -17,7 +17,7 @@ class Environment(str, Enum):
 class Database:
     RESOURCE_NAME = "dynamodb"
 
-    PROPERTIES_TABLE_NAME = "Properties"
+    PROPERTIES_TABLE_NAME = f"Properties"
     CHECKPOINTS_TABLE_NAME = "Checkpoints"
     SCRAPED_URL_TRACKER_TABLE_NAME = "ScrapedUrlTracker"
     SCRAPED_CONTENT_TABLE_NAME = "ScrapedContent"

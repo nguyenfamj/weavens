@@ -75,7 +75,7 @@ Features
 
 ```bash
 AWS_REGION=eu-north-1  # Default AWS region
-ENVIRONMENT=LOCAL      # LOCAL or PRODUCTION
+ENVIRONMENT=local      # local or production
 REDIS_HOST=localhost   # Redis host
 REDIS_PORT=6379       # Redis port
 ```

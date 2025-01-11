@@ -49,7 +49,7 @@ jobs:
         working-directory: backend
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: weavens-backend
+          ECR_REPOSITORY: production-backend-ecr
           IMAGE_TAG: ${{ steps.create_tag.outputs.release_tag }}
         run: |
           docker buildx build --no-cache --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -85,11 +85,14 @@ jobs:
         with:
           terraform_version: '1.7.0'
 
-      - name: Update Backend image version in SSM
-        working-directory: infra/global/ssm_parameters
+      - name: Trigger task replacement in ECS with new image
+        working-directory: infra/environments/production
         run: |
           terraform init
-          terraform apply -auto-approve \
-            -var="PRODUCTION_BACKEND_IMAGE_TAG=${{ needs.build-and-release.outputs.release_tag }}" \
-            -var="PRODUCTION_BACKEND_OPENAI_API_KEY=${{ secrets.PRODUCTION_BACKEND_OPENAI_API_KEY }}" \
-            -var="PRODUCTION_BACKEND_FIRECRAWL_API_KEY=${{ secrets.PRODUCTION_BACKEND_FIRECRAWL_API_KEY }}"
+          terraform apply -target=module.compute.module.ecs.module.backend_ecs -auto-approve \
+            -var="environment=production" \
+            -var="aws_region=eu-north-1" \
+            -var="aws_profile=default" \
+            -var="backend_image_version_tag=${{ needs.build-and-release.outputs.release_tag }}" \
+            -var="production_openai_api_key=${{ secrets.PRODUCTION_BACKEND_OPENAI_API_KEY }}" \
+            -var="production_firecrawl_api_key=${{ secrets.PRODUCTION_BACKEND_FIRECRAWL_API_KEY }}"

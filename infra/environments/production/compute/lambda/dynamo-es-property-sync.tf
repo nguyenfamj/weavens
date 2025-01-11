@@ -1,5 +1,5 @@
 data "aws_dynamodb_table" "properties" {
-  name = "${var.environment}-Properties"
+  name = "Properties"
 }
 
 data "aws_opensearch_domain" "this" {

@@ -10,7 +10,7 @@ class DynamoDB:
         aws_access_key_id = None
         aws_secret_access_key = None
 
-        if ENVIRONMENT == "LOCAL":
+        if ENVIRONMENT == "local":
             endpoint_url = "http://localhost:8000"
             region_name = "local"
             aws_access_key_id = "local"

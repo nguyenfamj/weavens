@@ -1,7 +1,7 @@
 module "properties" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
-  name     = "${var.environment}-Properties"
+  name     = "Properties"
   hash_key = "id"
 
   billing_mode   = try(var.properties_table_config.billing_mode, "PAY_PER_REQUEST")
@@ -51,7 +51,7 @@ module "properties" {
 module "checkpoints" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
-  name      = "${var.environment}-Checkpoints"
+  name      = "Checkpoints"
   hash_key  = "PK"
   range_key = "SK"
 
@@ -78,7 +78,7 @@ module "checkpoints" {
 module "scrape_jobs_table" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
-  name     = "${var.environment}-ScrapeJobs"
+  name     = "ScrapeJobs"
   hash_key = "id"
 
   billing_mode   = try(var.scrape_jobs_table_config.billing_mode, "PAY_PER_REQUEST")
@@ -116,7 +116,7 @@ module "scrape_jobs_table" {
 module "scraped_content_table" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
-  name     = "${var.environment}-ScrapedContent"
+  name     = "ScrapedContent"
   hash_key = "url"
 
   billing_mode   = try(var.scraped_content_table_config.billing_mode, "PAY_PER_REQUEST")
@@ -163,7 +163,7 @@ module "scraped_content_table" {
 module "user_message_logs" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
-  name     = "${var.environment}-UserMessageLogs"
+  name     = "UserMessageLogs"
   hash_key = "id"
 
   billing_mode   = try(var.user_message_logs_table_config.billing_mode, "PAY_PER_REQUEST")

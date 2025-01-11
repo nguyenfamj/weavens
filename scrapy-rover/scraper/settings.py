@@ -15,11 +15,11 @@ NEWSPIDER_MODULE = "scraper.spiders"
 
 # Environment variables
 AWS_REGION = os.getenv("AWS_REGION", "eu-north-1")
-ENVIRONMENT = os.getenv("ENVIRONMENT", "LOCAL")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
 
 # DYNAMODB variables
-PROPERTY_TABLE_NAME = "Properties"
-SCRAPED_CONTENT_TABLE_NAME = "ScrapedContent"
+PROPERTY_TABLE_NAME = "production-Properties"
+SCRAPED_CONTENT_TABLE_NAME = "production-ScrapedContent"
 
 SCRAPED_CONTENT_BATCH_SIZE = 25
 

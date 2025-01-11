@@ -165,7 +165,7 @@ class PutToS3Pipeline:
             json_data = json.dumps(item, ensure_ascii=False, indent=4)
 
             # Check if the environment is production
-            if os.environ.get("ENVIRONMENT") == "PRODUCTION":
+            if os.environ.get("ENVIRONMENT") == "production":
                 # S3 client
                 s3_client = boto3.client("s3")
 
@@ -183,7 +183,7 @@ class PutToS3Pipeline:
                 except Exception as e:
                     print(f"Error uploading item to S3: {e}")
             elif (
-                os.environ.get("ENVIRONMENT") == "LOCAL"
+                os.environ.get("ENVIRONMENT") == "local"
                 and self.bucket_name == "local-storage"
             ):
                 print(f"Saving item to local storage: {object_key}")

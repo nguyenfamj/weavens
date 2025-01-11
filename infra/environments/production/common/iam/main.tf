@@ -1,13 +1,13 @@
 data "aws_dynamodb_table" "properties" {
-  name = "${var.environment}-Properties"
+  name = "Properties"
 }
 
 data "aws_dynamodb_table" "chat_checkpoints" {
-  name = "${var.environment}-Checkpoints"
+  name = "Checkpoints"
 }
 
 data "aws_dynamodb_table" "user_message_logs" {
-  name = "${var.environment}-UserMessageLogs"
+  name = "UserMessageLogs"
 }
 
 resource "aws_iam_policy" "backend_dynamodb_tables_access" {
