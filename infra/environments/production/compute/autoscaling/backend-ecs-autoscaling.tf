@@ -17,6 +17,15 @@ module "autoscaling" {
 
   ignore_desired_capacity_changes = true
 
+  instance_refresh = {
+    strategy = "Rolling"
+    preferences = {
+      min_healthy_percentage = 50
+      instance_warmup        = 300
+    }
+    triggers = ["tag"]
+  }
+
   # use_mixed_instances_policy = true
   # mixed_instances_policy = {
   #   instances_distribution = {
@@ -72,7 +81,9 @@ module "autoscaling" {
 
   protect_from_scale_in = true
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    InstanceRefreshTrigger = "1"
+  })
 }
 
 # Outputs
