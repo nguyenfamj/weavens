@@ -1,62 +1,67 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-    }
-  }
-}
 
 provider "aws" {
-  region = "eu-north-1"
+  region  = var.aws_region
+  profile = var.aws_profile
 }
 
-data "terraform_remote_state" "ecr" {
-  backend = "s3"
-  config = {
-    bucket = "terraform-state-weavens"
-    key    = "globalECR/terraform.tfstate"
-    region = "eu-north-1"
-  }
+module "common_tags" {
+  source      = "../../modules/tags"
+  environment = var.environment
 }
 
-module "vpc" {
-  source = "./vpc"
+module "networking" {
+  source = "./networking"
+
+  environment = var.environment
+  tags        = merge(module.common_tags.tags, { Type = "networking" })
 }
 
-module "dynamodb" {
-  source = "../../modules/dynamodb"
+
+module "storage" {
+  source = "./storage"
+
+  environment = var.environment
+  tags        = merge(module.common_tags.tags, { Type = "storage" })
+
+  vpc_id             = module.networking.app_vpc_id
+  vpc_cidr           = module.networking.app_vpc_cidr
+  private_subnet_ids = module.networking.app_vpc_private_subnets
+
+  depends_on = [module.common_tags, module.networking]
 }
 
-module "backend" {
-  source = "./backend"
+module "compute" {
+  source = "./compute"
 
-  vpc_public_subnets         = module.vpc.app_vpc_public_subnets
-  vpc_private_subnets        = module.vpc.app_vpc_private_subnets
-  vpc_id                     = module.vpc.app_vpc_id
-  vpc_cidr                   = module.vpc.app_vpc_cidr
-  backend_ecr_repository_url = data.terraform_remote_state.ecr.outputs.backend_ecr_repository_url
-  opensearch_domain_arn      = module.opensearch.search_domain_arn
-  opensearch_domain          = module.opensearch.search_instance_endpoint
+  environment = var.environment
+  tags        = merge(module.common_tags.tags, { Type = "compute" })
+
+  vpc_private_subnets = module.networking.app_vpc_private_subnets
+
+  ecr_backend_repository_name               = module.storage.ecr_backend_repository_name
+  backend_image_version_tag                 = var.backend_image_version_tag
+  backend_ecs_alb_target_group_ex_ecs_arn   = module.networking.backend_ecs_alb_target_group_ex_ecs_arn
+  backend_ecs_autoscaling_security_group_id = module.networking.backend_ecs_autoscaling_security_group_id
+  backend_ecs_alb_security_group_id         = module.networking.backend_ecs_alb_security_group_id
+  backend_dynamodb_tables_access_policy_arn = module.iam.backend_dynamodb_tables_access_policy_arn
+  backend_opensearch_access_policy_arn      = module.iam.backend_opensearch_access_policy_arn
+
+  # Lambda
+  dynamo_es_property_lambda_sg_id = module.networking.dynamo_es_property_lambda_sg_id
+
+  # Environment variables
+  production_openai_api_key    = var.production_openai_api_key
+  production_firecrawl_api_key = var.production_firecrawl_api_key
+  opensearch_domain            = module.storage.opensearch_domain_endpoint
+
+  depends_on = [module.common_tags, module.networking, module.storage]
 }
 
-module "frontend" {
-  source = "./frontend"
-}
+module "iam" {
+  source = "./common/iam"
 
-module "opensearch" {
-  source = "./opensearch"
+  environment = var.environment
+  tags        = merge(module.common_tags.tags, { Type = "iam" })
 
-  stage              = "production"
-  vpc_id             = module.vpc.app_vpc_id
-  vpc_cidr           = module.vpc.app_vpc_cidr
-  private_subnet_ids = module.vpc.app_vpc_private_subnets
-}
-
-module "lambda_dynamo_es_property_sync" {
-  source = "./lambdas/dynamo-es-property-sync"
-
-  opensearch_domain     = module.opensearch.search_instance_endpoint
-  opensearch_domain_arn = module.opensearch.search_domain_arn
-  private_subnet_ids    = module.vpc.app_vpc_private_subnets
-  vpc_id                = module.vpc.app_vpc_id
+  opensearch_domain_arn = module.storage.opensearch_domain_arn
 }

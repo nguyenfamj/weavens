@@ -34,3 +34,13 @@ module "bootstrap" {
   log_bucket_tags     = local.tags
   dynamodb_table_tags = local.tags
 }
+
+output "terraform_state_bucket_name" {
+  value       = module.bootstrap.state_bucket
+  description = "The name of the Terraform state bucket"
+}
+
+output "terraform_state_dynamodb_table_name" {
+  value       = module.bootstrap.dynamodb_table
+  description = "The name of the Terraform state DynamoDB table"
+}

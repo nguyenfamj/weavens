@@ -1,0 +1,1 @@
+{"filename": "builds/b69478ad26b72601fd025fb1c7892d7db893c93fafa3da1aede172a532cd9a1f.zip", "runtime": "nodejs20.x", "artifacts_dir": "builds", "build_plan": [[["npm", "nodejs20.x", "compute/lambda/../../../../../lambdas/dynamo-es-property-sync/package.json", null, null], ["zip", "compute/lambda/../../../../../lambdas/dynamo-es-property-sync", null]]]}
