@@ -1,5 +1,5 @@
 data "aws_s3_bucket" "terraform_state" {
-  bucket = "terraform-state-crux"
+  bucket = "terraform-state-weavens"
 }
 
 data "aws_dynamodb_table" "terraform_state_locks" {
@@ -7,5 +7,5 @@ data "aws_dynamodb_table" "terraform_state_locks" {
 }
 
 data "aws_ecr_repository" "backend" {
-  name = "crux-backend"
+  name = "weavens-backend"
 }

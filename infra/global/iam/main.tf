@@ -113,7 +113,7 @@ resource "aws_iam_policy" "github_actions_terraform_policy" {
           data.aws_s3_bucket.terraform_state.arn,
           "${data.aws_s3_bucket.terraform_state.arn}/*",
           data.aws_dynamodb_table.terraform_state_locks.arn,
-          "arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.account_id}:parameter/crux/production/*",
+          "arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.account_id}:parameter/weavens/production/*",
           "arn:aws:ssm:${local.region}::parameter/*",
           "arn:aws:ecs:${local.region}:${data.aws_caller_identity.current.account_id}:*",
           "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/*",

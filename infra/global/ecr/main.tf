@@ -11,12 +11,12 @@ provider "aws" {
 }
 
 output "backend_ecr_repository_url" {
-  value = aws_ecr_repository.crux_backend.repository_url
+  value = aws_ecr_repository.weavens_backend.repository_url
 }
 
 
-resource "aws_ecr_repository" "crux_backend" {
-  name                 = "crux-backend"
+resource "aws_ecr_repository" "weavens_backend" {
+  name                 = "weavens-backend"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -28,8 +28,8 @@ resource "aws_ecr_repository" "crux_backend" {
   }
 }
 
-resource "aws_ecr_lifecycle_policy" "crux_backend" {
-  repository = aws_ecr_repository.crux_backend.name
+resource "aws_ecr_lifecycle_policy" "weavens_backend" {
+  repository = aws_ecr_repository.weavens_backend.name
 
   policy = jsonencode({
     rules = [{

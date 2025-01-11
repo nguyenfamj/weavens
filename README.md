@@ -12,7 +12,7 @@ https://github.com/user-attachments/assets/49847c1e-44de-491c-8d77-49db3912e308
 
 ## Architecture
 
-![crux-architecture](https://github.com/user-attachments/assets/0c7a3bce-e4fe-42e1-a1a1-69c1b88e7874)
+![weavens-architecture](https://github.com/user-attachments/assets/0c7a3bce-e4fe-42e1-a1a1-69c1b88e7874)
 
 ## Features
 

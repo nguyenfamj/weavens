@@ -13,7 +13,7 @@ logger = Logger(__name__).logger
 class ChromaDB:
     def __init__(
         self,
-        persistent_path: str = str(Path.home() / "titan-vectorstore"),
+        persistent_path: str = str(Path.home() / "weavens-vectorstore"),
         embedding_model: str = "text-embedding-3-small",
     ):
         self._client: Optional[PersistentClient] = None

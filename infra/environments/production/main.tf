@@ -13,7 +13,7 @@ provider "aws" {
 data "terraform_remote_state" "ecr" {
   backend = "s3"
   config = {
-    bucket = "terraform-state-crux"
+    bucket = "terraform-state-weavens"
     key    = "globalECR/terraform.tfstate"
     region = "eu-north-1"
   }

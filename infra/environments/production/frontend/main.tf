@@ -27,7 +27,7 @@ module "static_website" {
 module "s3_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "titan-frontend"
+  bucket = "weavens-frontend"
 
   force_destroy = true
 

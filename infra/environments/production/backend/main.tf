@@ -1,8 +1,8 @@
 locals {
   region = "eu-north-1"
-  name   = "production-crux-backend"
+  name   = "production-weavens-backend"
 
-  container_name = "ecs-crux-backend"
+  container_name = "ecs-weavens-backend"
   container_port = 8386
 
   tags = {
@@ -36,7 +36,7 @@ module "ecs" {
 
   default_capacity_provider_use_fargate = false
   autoscaling_capacity_providers = {
-    "production-crux-backend" = {
+    "production-weavens-backend" = {
       auto_scaling_group_arn         = module.autoscaling.autoscaling_group_arn
       managed_termination_protection = "ENABLED"
 
@@ -61,8 +61,8 @@ module "ecs" {
 
       requires_compatibilities = ["EC2"]
       capacity_provider_strategy = {
-        "production-crux-backend" = {
-          capacity_provider = "production-crux-backend"
+        "production-weavens-backend" = {
+          capacity_provider = "production-weavens-backend"
           weight            = 1
           base              = 1
         }
@@ -327,17 +327,6 @@ module "alb" {
         target_group_key = "ex_ecs"
       }
     }
-
-    ex_https = {
-      port     = 443
-      protocol = "HTTPS"
-
-      ssl_policy      = "ELBSecurityPolicy-2016-08"
-      certificate_arn = aws_acm_certificate.self_signed_cert.arn
-      forward = {
-        target_group_key = "ex_ecs"
-      }
-    }
   }
 
   target_groups = {
@@ -452,32 +441,4 @@ module "autoscaling_sg" {
   egress_rules = ["all-all"]
 
   tags = local.tags
-}
-
-# Self-signed certificate for HTTPS
-resource "tls_private_key" "self_signed_cert" {
-  algorithm = "RSA"
-}
-
-resource "tls_self_signed_cert" "self_signed_cert" {
-  private_key_pem = tls_private_key.self_signed_cert.private_key_pem
-
-  subject {
-    common_name  = "titan.co"
-    organization = "Titan OY"
-  }
-
-  validity_period_hours = 8760
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth"
-  ]
-}
-
-resource "aws_acm_certificate" "self_signed_cert" {
-  private_key      = tls_private_key.self_signed_cert.private_key_pem
-  certificate_body = tls_self_signed_cert.self_signed_cert.cert_pem
-  tags             = local.tags
 }

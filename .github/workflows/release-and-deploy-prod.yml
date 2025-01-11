@@ -49,7 +49,7 @@ jobs:
         working-directory: backend
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: crux-backend
+          ECR_REPOSITORY: weavens-backend
           IMAGE_TAG: ${{ steps.create_tag.outputs.release_tag }}
         run: |
           docker buildx build --no-cache --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .

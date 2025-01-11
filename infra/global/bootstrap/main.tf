@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "terraform-state-crux"
+  bucket = "terraform-state-weavens"
 
   lifecycle {
     prevent_destroy = true

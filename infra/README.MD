@@ -13,14 +13,14 @@ aws ecr get-login-password --region eu-north-1 | docker login --username AWS --p
 Build image
 
 ```bash
-docker buildx build --platform linux/amd64 -t crux-backend:${IMAGE_TAG} .
-docker tag crux-backend:${IMAGE_TAG} 484907490685.dkr.ecr.eu-north-1.amazonaws.com/crux-backend:${IMAGE_TAG}
+docker buildx build --platform linux/amd64 -t weavens-backend:${IMAGE_TAG} .
+docker tag weavens-backend:${IMAGE_TAG} 484907490685.dkr.ecr.eu-north-1.amazonaws.com/weavens-backend:${IMAGE_TAG}
 ```
 
 ### 2. Push image to ECR
 
 ```bash
-docker push 484907490685.dkr.ecr.eu-north-1.amazonaws.com/crux-backend:${IMAGE_TAG}
+docker push 484907490685.dkr.ecr.eu-north-1.amazonaws.com/weavens-backend:${IMAGE_TAG}
 ```
 
 ### 3. Update backend image tag in SSM parameter

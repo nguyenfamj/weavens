@@ -1,13 +1,13 @@
 data "aws_ssm_parameter" "production_openai_api_key" {
-  name = "/crux/production/openai_api_key"
+  name = "/weavens/production/openai_api_key"
 }
 
 data "aws_ssm_parameter" "production_firecrawl_api_key" {
-  name = "/crux/production/firecrawl_api_key"
+  name = "/weavens/production/firecrawl_api_key"
 }
 
 data "aws_ssm_parameter" "production_backend_image_tag" {
-  name = "/crux/production/backend_image_tag"
+  name = "/weavens/production/backend_image_tag"
 }
 
 data "aws_dynamodb_table" "properties" {

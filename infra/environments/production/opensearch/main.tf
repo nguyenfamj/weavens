@@ -12,7 +12,7 @@ module "search_instance" {
   source  = "terraform-aws-modules/opensearch/aws"
   version = "1.5.0"
 
-  domain_name = "titan-production-search"
+  domain_name = "weavens-production-search"
 
   cluster_config = {
     instance_count = 1
