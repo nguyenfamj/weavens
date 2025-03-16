@@ -173,7 +173,6 @@ cython_debug/
 # .tfstate files
 *.tfstate
 *.tfstate.*
-!infra/bootstrap/terraform.tfstate
 
 # Crash log files
 crash.log
@@ -212,3 +211,7 @@ terraform.rc
 
 # Lambda
 node_modules/
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
