@@ -1,108 +1,73 @@
-# House Hunt
+<p align="center"> 
+  <h1 align="center">Weavens</h1>
+</p>
 
-## Description
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/nguyenfamj/weavens?label=version">
+  <img src="https://img.shields.io/badge/license-MIT-green">
+</p>
 
-This is an application that allows users to chat with an Artificial Intelligence (AI), powered by OpenAI's GPT-4o-mini model, to help them find properties to rent or buy in Finland. The AI can help users find properties based on their preferences, such as location, price range, built year, and more. Based on the user's input, the AI will generate a list of properties that match the user's criteria and provide additional information about each property. The user can then, for example, provide personal information to the chat and let the AI recommend the best properties for them.
+Weavens is a platform for finding apartments in Finland.
 
-## Demo
+# 🛠️ Local Development
 
-- **Chat with the AI:**
+You can set up a Weavens development environment by following the guide below for your operating system:
 
-https://github.com/user-attachments/assets/49847c1e-44de-491c-8d77-49db3912e308
+Prerequisites:
 
-## Architecture
+- Docker
+- Python 3.10
+- uv
+- terraform
+- Node.js 20
+- pnpm
 
-![weavens-architecture](https://github.com/user-attachments/assets/0c7a3bce-e4fe-42e1-a1a1-69c1b88e7874)
+## 🚀 Quick Setup
 
-## Features
+We provide scripts to help you quickly set up and run the project:
 
-- **Chat application**
-  - [x] User interface for chatting with the AI.
-  - [x] Properties search based on user preference (e.g., location, price range, living area, building type, building year)
-  - [x] Stored chat sessions.
-  - [ ] Caching search results.
-  - [ ] User authentication.
-  - [ ] Load chat sessions.
-  - [ ] Monitored AI performance and usage.
-  - [ ] Optimized data retrieval.
-- **Data**
-  - [x] Crawling of property data from online sources.
-  - [ ] Automatic updating property data.
-  - [ ] Fully translated property data.
+### Automated Setup
 
-## Tech Stack
-
-- Client: Python, Streamlit
-- Server: Python, FastAPI, OpenAI, Langchain
-- Database: DynamoDB
-- Crawling: Python, Scrapy, Redis
-
-## Getting Started
-
-### Requirements:
-
-- Python version management tool: [pyenv](https://github.com/pyenv/pyenv)
-
-- Python CLI application installer: [pipx](https://github.com/pypa/pipx)
-
-- Python dependency management tool: [poetry](https://python-poetry.org/)
-
-- Justfile: [just](https://github.com/casey/just)
-
-### Installation:
-
-1. Install `just`:
-
-   ```bash
-   brew install just
-   ```
-
-2. Install `pyenv` and Python 3.10.14 version:
-
-   ```bash
-   brew install pyenv
-   pyenv install 3.10.14
-   pyenv local 3.10.14
-   ```
-
-3. Install `pipx`:
-
-   ```bash
-   brew install pipx
-   ```
-
-4. Install `poetry`:
-
-   ```bash
-   pipx install poetry
-   ```
-
-5. Copy the `.env.example` files in the following directories and rename them to `.env`:
-
-   - `backend/.env.example`
-   - `platform/dynamodb/.env.example`
-   - `platform/redis/.env.example`
-
-Then add the OpenAI API key to the `OPENAI_API_KEY` variable in the `backend/.env` file.
-
-### Running the crawlers:
-
-Details on how to run the crawlers can be found in this [`README.md`](scraper/README.md) file.
-
-### Running the application:
-
-> **Note:**
->
-> - To run both the backend and the frontend in development, you need to have two terminal windows/tabs and run them each in a separate terminal.
-
-**Run the backend in development:**
+Run the setup script to prepare your environment:
 
 ```bash
-just dev-backend
+# Make scripts executable (if needed)
+chmod +x scripts/setup.sh scripts/run.sh
+
+# Run the setup script
+./scripts/setup.sh
 ```
 
-**Run the frontend in development:**
+This script will:
+
+1. Check prerequisites
+2. Set up environment files
+3. Start Docker containers
+4. Apply Terraform configuration to create DynamoDB tables
+5. Install backend dependencies with uv
+6. Install frontend dependencies with pnpm
+
+### Running the Project
+
+After setup, you can use the run script to start development servers:
 
 ```bash
-just dev-frontend
+# Start backend server only
+./scripts/run.sh backend
+
+# Start frontend server only
+./scripts/run.sh frontend
+
+# Start both backend and frontend (in separate terminals)
+./scripts/run.sh all
 ```
+
+## 📦 Manual Setup
+
+If you prefer to set up components manually, follow these steps:
+
+### Backend
+
+## 📦 Frontend
+
+## 📦 Search
