@@ -34,26 +34,27 @@ jobs:
         run: |
           echo "::set-output name=release_tag::v$(date +%Y.%m.%d).$(date +%s)"
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
+      # NOTE: Optional for deploying to production
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: eu-north-1
 
-      - name: Login to ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      # - name: Login to ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push backend Docker image
-        working-directory: backend
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: production-backend-ecr
-          IMAGE_TAG: ${{ steps.create_tag.outputs.release_tag }}
-        run: |
-          docker buildx build --no-cache --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      # - name: Build and push backend Docker image
+      #   working-directory: backend
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #     ECR_REPOSITORY: production-backend-ecr
+      #     IMAGE_TAG: ${{ steps.create_tag.outputs.release_tag }}
+      #   run: |
+      #     docker buildx build --no-cache --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
       - name: Tag ref
         run: |
@@ -65,34 +66,35 @@ jobs:
         with:
           tag_name: ${{ steps.create_tag.outputs.release_tag }}
 
-  deploy-to-prod:
-    name: Deploy to Production
-    needs: build-and-release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # NOTE: Optional for deploying to production
+  # deploy-to-prod:
+  #   name: Deploy to Production
+  #   needs: build-and-release
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: eu-north-1
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: '1.7.0'
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v3
+  #       with:
+  #         terraform_version: '1.7.0'
 
-      - name: Trigger task replacement in ECS with new image
-        working-directory: infra/environments/production
-        run: |
-          terraform init
-          terraform apply -target=module.compute.module.ecs.module.backend_ecs -auto-approve \
-            -var="environment=production" \
-            -var="aws_region=eu-north-1" \
-            -var="aws_profile=default" \
-            -var="backend_image_version_tag=${{ needs.build-and-release.outputs.release_tag }}" \
-            -var="production_openai_api_key=${{ secrets.PRODUCTION_BACKEND_OPENAI_API_KEY }}" \
-            -var="production_firecrawl_api_key=${{ secrets.PRODUCTION_BACKEND_FIRECRAWL_API_KEY }}"
+  #     - name: Trigger task replacement in ECS with new image
+  #       working-directory: infra/environments/production
+  #       run: |
+  #         terraform init
+  #         terraform apply -target=module.compute.module.ecs.module.backend_ecs -auto-approve \
+  #           -var="environment=production" \
+  #           -var="aws_region=eu-north-1" \
+  #           -var="aws_profile=default" \
+  #           -var="backend_image_version_tag=${{ needs.build-and-release.outputs.release_tag }}" \
+  #           -var="production_openai_api_key=${{ secrets.PRODUCTION_BACKEND_OPENAI_API_KEY }}" \
+  #           -var="production_firecrawl_api_key=${{ secrets.PRODUCTION_BACKEND_FIRECRAWL_API_KEY }}"
