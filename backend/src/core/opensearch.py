@@ -14,9 +14,9 @@ auth = AWSV4SignerAuth(
 )
 
 opensearch_client = OpenSearch(
-    hosts=[{"host": settings.OPENSEARCH_DOMAIN, "port": 443}],
+    hosts=[{"host": settings.OPENSEARCH_DOMAIN, "port": 443 if settings.ENVIRONMENT == "production" else 9200}],
     http_auth=auth,
-    use_ssl=True,
+    use_ssl=True if settings.ENVIRONMENT == "production" else False,
     verify_certs=True,
     connection_class=RequestsHttpConnection,
     pool_maxsize=20,

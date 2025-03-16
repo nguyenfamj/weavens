@@ -1,3 +1,4 @@
+name: weavens-stack
 services:
   dynamodb:
     image: amazon/dynamodb-local:latest
@@ -24,7 +25,18 @@ services:
       - '${REDIS_PORT}:6379'
     volumes:
       - redis-data:/data
-
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    ports:
+      - '9200:9200'
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=@OpenSearch123!!
+      - plugins.security.disabled=true
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
 volumes:
   redis-data:
   dynamodb-data:
+  opensearch-data:
